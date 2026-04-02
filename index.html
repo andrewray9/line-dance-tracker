@@ -6,912 +6,963 @@
   <title>Line Dance Tracker</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #ffffff;
-      --bg2: #f5f4f0;
-      --bg3: #eeede9;
-      --t1: #1a1a18;
-      --t2: #6b6a66;
-      --t3: #a8a7a3;
-      --b1: rgba(0,0,0,0.4);
-      --b2: rgba(0,0,0,0.3);
-      --b3: rgba(0,0,0,0.15);
-      --radius-md: 8px;
-      --radius-lg: 12px;
-      --green-bg: #EAF3DE;
-      --green-border: #C0DD97;
-      --green-text: #27500A;
-      --green-dark: #3B6D11;
-      --red-bg: #FCEBEB;
-      --red-border: #F7C1C1;
-      --red-text: #A32D2D;
-      --blue-bg: #E6F1FB;
-      --blue-border: #B5D4F4;
-      --blue-text: #0C447C;
-      --amber-bg: #FAEEDA;
-      --amber-border: #FAC775;
-      --amber-text: #633806;
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --bg:#ffffff;--bg2:#f5f4f0;--bg3:#eeede9;
+      --t1:#1a1a18;--t2:#6b6a66;--t3:#a8a7a3;
+      --b1:rgba(0,0,0,0.4);--b2:rgba(0,0,0,0.3);--b3:rgba(0,0,0,0.15);
+      --radius-md:8px;--radius-lg:12px;
+      --green-bg:#EAF3DE;--green-border:#C0DD97;--green-text:#27500A;--green-dark:#3B6D11;
+      --red-bg:#FCEBEB;--red-border:#F7C1C1;--red-text:#A32D2D;
+      --blue-bg:#E6F1FB;--blue-border:#B5D4F4;--blue-text:#0C447C;
+      --amber-bg:#FAEEDA;--amber-border:#FAC775;--amber-text:#633806;
+      --purple-bg:#EEEDFE;--purple-border:#AFA9EC;--purple-text:#3C3489;
+      --pink-bg:#FBEAF0;--pink-border:#ED93B1;--pink-text:#72243E;
     }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #1c1c1a;
-        --bg2: #252523;
-        --bg3: #2e2e2b;
-        --t1: #f0efe9;
-        --t2: #9e9d98;
-        --t3: #5a5955;
-        --b1: rgba(255,255,255,0.4);
-        --b2: rgba(255,255,255,0.3);
-        --b3: rgba(255,255,255,0.12);
+    @media(prefers-color-scheme:dark){
+      :root{
+        --bg:#1c1c1a;--bg2:#252523;--bg3:#2e2e2b;
+        --t1:#f0efe9;--t2:#9e9d98;--t3:#5a5955;
+        --b1:rgba(255,255,255,0.4);--b2:rgba(255,255,255,0.3);--b3:rgba(255,255,255,0.12);
       }
     }
+    html,body{min-height:100vh;background:var(--bg3);color:var(--t1);font-family:'DM Sans',sans-serif;}
 
-    html, body { min-height: 100vh; background: var(--bg3); color: var(--t1); font-family: 'DM Sans', sans-serif; }
+    /* AUTH */
+    .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+    .auth-card{background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:2.5rem 2rem;width:100%;max-width:380px;}
+    .auth-card h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-bottom:4px;}
+    .auth-card .sub{font-size:13px;color:var(--t2);margin-bottom:2rem;}
+    .field{margin-bottom:14px;}
+    .field label{display:block;font-size:12px;font-weight:500;color:var(--t2);margin-bottom:5px;}
+    .field input{width:100%;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;}
+    .field input:focus{outline:none;border-color:var(--b1);background:var(--bg);}
+    .auth-btn{width:100%;padding:10px;background:var(--t1);color:var(--bg);border:none;border-radius:var(--radius-md);font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;margin-top:6px;transition:opacity 0.12s;}
+    .auth-btn:hover{opacity:0.82;}.auth-btn:disabled{opacity:0.45;cursor:not-allowed;}
+    .auth-toggle{text-align:center;margin-top:1.25rem;font-size:13px;color:var(--t2);}
+    .auth-toggle span{color:var(--t1);cursor:pointer;font-weight:500;text-decoration:underline;}
+    .auth-error{font-size:13px;color:var(--red-text);background:var(--red-bg);border:0.5px solid var(--red-border);border-radius:var(--radius-md);padding:8px 12px;margin-bottom:14px;display:none;}
 
-    /* ---- Auth ---- */
-    .auth-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+    /* APP SHELL */
+    .app{max-width:880px;margin:0 auto;padding:2rem 1.25rem 4rem;display:none;}
+    .app-header{display:flex;align-items:center;gap:12px;margin-bottom:4px;flex-wrap:wrap;}
+    h1{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;letter-spacing:-0.5px;flex:1;}
+    .user-pill{font-size:12px;color:var(--t2);background:var(--bg2);border:0.5px solid var(--b3);border-radius:20px;padding:4px 12px;display:flex;align-items:center;gap:8px;}
+    .user-pill .logout{cursor:pointer;color:var(--t3);font-size:15px;line-height:1;background:none;border:none;font-family:inherit;padding:0;}
+    .user-pill .logout:hover{color:var(--red-text);}
+    .admin-badge{font-size:11px;font-weight:500;background:var(--amber-bg);color:var(--amber-text);border:0.5px solid var(--amber-border);border-radius:20px;padding:3px 9px;}
+    .subtitle{font-size:13px;color:var(--t2);margin-bottom:1.25rem;}
+    .sync-bar{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t2);margin-bottom:1.25rem;}
+    .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--t3);flex-shrink:0;}
+    .sync-dot.synced{background:var(--green-dark);}.sync-dot.syncing{background:#BA7517;animation:pulse 1s infinite;}.sync-dot.error{background:var(--red-text);}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 
-    .auth-card {
-      background: var(--bg);
-      border: 0.5px solid var(--b3);
-      border-radius: var(--radius-lg);
-      padding: 2.5rem 2rem;
-      width: 100%;
-      max-width: 380px;
-    }
+    /* TABS */
+    .tab-row{display:flex;gap:2px;border-bottom:0.5px solid var(--b3);margin-bottom:1.5rem;overflow-x:auto;}
+    .tab{font-size:13px;font-weight:500;padding:8px 13px;cursor:pointer;border:none;background:none;color:var(--t2);border-bottom:2px solid transparent;margin-bottom:-0.5px;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:color 0.15s;}
+    .tab.active{color:var(--t1);border-bottom-color:var(--t1);}
+    .tab:hover:not(.active){color:var(--t1);}
+    .tab.admin-tab{color:var(--amber-text);}.tab.admin-tab.active{border-bottom-color:#BA7517;color:var(--amber-text);}
+    .tab.picks-tab{color:var(--blue-text);}.tab.picks-tab.active{border-bottom-color:var(--blue-text);color:var(--blue-text);}
+    .section{display:none;}.section.visible{display:block;}
 
-    .auth-card h1 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; margin-bottom: 4px; }
-    .auth-card .sub { font-size: 13px; color: var(--t2); margin-bottom: 2rem; }
+    /* BUTTONS */
+    button.btn{padding:9px 18px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.12s,opacity 0.12s;white-space:nowrap;}
+    button.btn:hover{background:var(--bg2);}
+    button.btn.primary{background:var(--t1);color:var(--bg);border-color:var(--t1);}button.btn.primary:hover{opacity:0.82;}
+    button.btn.sm{padding:5px 11px;font-size:12px;}button.btn.xs{padding:3px 8px;font-size:11px;}
+    button.btn.danger{color:var(--red-text);border-color:var(--red-border);}button.btn.danger:hover{background:var(--red-bg);}
+    button.btn.success{color:var(--green-text);border-color:var(--green-border);}button.btn.success:hover{background:var(--green-bg);}
+    button.btn.info{color:var(--blue-text);border-color:var(--blue-border);}button.btn.info:hover{background:var(--blue-bg);}
+    button.btn.amber{background:#BA7517;color:#fff;border-color:#BA7517;}button.btn.amber:hover{opacity:0.85;}
+    button.btn.pink{background:var(--pink-text);color:#fff;border-color:var(--pink-text);}button.btn.pink:hover{opacity:0.85;}
 
-    .field { margin-bottom: 14px; }
-    .field label { display: block; font-size: 12px; font-weight: 500; color: var(--t2); margin-bottom: 5px; }
-    .field input {
-      width: 100%; padding: 9px 13px;
-      border: 0.5px solid var(--b2); border-radius: var(--radius-md);
-      background: var(--bg2); color: var(--t1);
-      font-size: 14px; font-family: 'DM Sans', sans-serif;
-    }
-    .field input:focus { outline: none; border-color: var(--b1); background: var(--bg); }
+    /* INPUTS */
+    .add-row{display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;}
+    .add-row input,.add-row select{flex:1;min-width:120px;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;}
+    .add-row input:focus,.add-row select:focus{outline:none;border-color:var(--b1);}
+    .add-row input::placeholder{color:var(--t3);}
+    .search-sort-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+    .search-sort-row input{flex:1;min-width:160px;padding:8px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;}
+    .search-sort-row input:focus{outline:none;border-color:var(--b1);}
+    .search-sort-row input::placeholder{color:var(--t3);}
+    .sort-btn{padding:7px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t2);font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:background 0.1s;}
+    .sort-btn.active{background:var(--t1);color:var(--bg);border-color:var(--t1);}
+    .sort-btn:hover:not(.active){background:var(--bg2);}
+    .empty{text-align:center;padding:3rem 1rem;color:var(--t3);font-size:14px;}
+    .section-note{font-size:13px;color:var(--t2);margin-bottom:1rem;}
+    .section-title{font-size:12px;font-weight:500;color:var(--t2);letter-spacing:.05em;text-transform:uppercase;margin:1.5rem 0 .75rem;}
 
-    .auth-btn {
-      width: 100%; padding: 10px;
-      background: var(--t1); color: var(--bg);
-      border: none; border-radius: var(--radius-md);
-      font-size: 14px; font-weight: 500; font-family: 'DM Sans', sans-serif;
-      cursor: pointer; margin-top: 6px; transition: opacity 0.12s;
-    }
-    .auth-btn:hover { opacity: 0.82; }
-    .auth-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    /* MY LISTS */
+    .dance-list{display:flex;flex-direction:column;gap:6px;}
+    .dance-item{display:flex;align-items:center;gap:10px;padding:11px 15px;border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);}
+    .dance-item .name{flex:1;font-size:14px;font-weight:500;}
+    .fav-btn{background:none;border:none;cursor:pointer;font-size:18px;line-height:1;padding:0 2px;color:var(--t3);transition:color 0.15s;}
+    .fav-btn.active{color:#D4537E;}
+    .fav-btn:hover{color:#D4537E;}
 
-    .auth-toggle { text-align: center; margin-top: 1.25rem; font-size: 13px; color: var(--t2); }
-    .auth-toggle span { color: var(--t1); cursor: pointer; font-weight: 500; text-decoration: underline; }
+    /* DANCE BANK */
+    .bank-controls{margin-bottom:1.25rem;}
+    .bank-search-row{display:flex;gap:8px;margin-bottom:8px;}
+    .bank-search-row input{flex:1;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;}
+    .bank-search-row input:focus{outline:none;border-color:var(--b1);}
+    .bank-search-row input::placeholder{color:var(--t3);}
+    .bank-filter-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+    .filter-pill{font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;border:0.5px solid var(--b3);background:var(--bg2);color:var(--t2);cursor:pointer;transition:background 0.1s;}
+    .filter-pill.active{background:var(--t1);color:var(--bg);border-color:var(--t1);}
+    .bank-item{border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);margin-bottom:8px;overflow:hidden;}
+    .bank-item-head{display:flex;align-items:center;gap:8px;padding:12px 15px;flex-wrap:wrap;}
+    .bank-item-name{font-size:14px;font-weight:500;}
+    .bank-item-meta{flex:1;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+    .diff-badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap;}
+    .diff-Beginner{background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border);}
+    .diff-Improver{background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border);}
+    .diff-Intermediate{background:var(--amber-bg);color:var(--amber-text);border:0.5px solid var(--amber-border);}
+    .diff-Advanced{background:var(--red-bg);color:var(--red-text);border:0.5px solid var(--red-border);}
+    .bank-actions{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;}
+    .link-btn{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:4px 9px;border-radius:20px;text-decoration:none;cursor:pointer;border:0.5px solid var(--b3);color:var(--t2);background:var(--bg2);transition:background 0.1s;}
+    .link-btn.demo{background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue-border);}
+    .link-btn.tutorial{background:var(--green-bg);color:var(--green-text);border-color:var(--green-border);}
+    .in-bank-badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border);white-space:nowrap;}
 
-    .auth-error {
-      font-size: 13px; color: var(--red-text);
-      background: var(--red-bg); border: 0.5px solid var(--red-border);
-      border-radius: var(--radius-md); padding: 8px 12px; margin-bottom: 14px; display: none;
-    }
+    /* ADMIN FORM */
+    .admin-form{background:var(--amber-bg);border:0.5px solid var(--amber-border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.5rem;}
+    .admin-form-title{font-size:13px;font-weight:500;color:var(--amber-text);margin-bottom:1rem;}
+    .admin-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+    @media(max-width:540px){.admin-form-grid{grid-template-columns:1fr;}}
+    .admin-form-grid input,.admin-form-grid select{padding:8px 12px;border:0.5px solid var(--amber-border);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;width:100%;}
+    .admin-form-grid input:focus,.admin-form-grid select:focus{outline:none;border-color:#BA7517;}
+    .admin-form-grid input::placeholder{color:var(--t3);}
+    .admin-form-grid .full{grid-column:1/-1;}
+    .admin-form-row{display:flex;justify-content:flex-end;gap:8px;}
+    .edit-form{background:var(--bg2);border-top:0.5px solid var(--b3);padding:12px 15px;display:none;}
+    .edit-form.open{display:block;}
+    .edit-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+    @media(max-width:540px){.edit-form-grid{grid-template-columns:1fr;}}
+    .edit-form-grid input,.edit-form-grid select{padding:7px 10px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;width:100%;}
+    .edit-form-grid input:focus,.edit-form-grid select:focus{outline:none;border-color:var(--b1);}
+    .edit-form-grid input::placeholder{color:var(--t3);}
+    .edit-form-grid .full{grid-column:1/-1;}
+    .edit-form-row{display:flex;justify-content:flex-end;gap:6px;}
 
-    /* ---- App shell ---- */
-    .app { max-width: 820px; margin: 0 auto; padding: 2rem 1.25rem 4rem; display: none; }
-    .app-header { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; flex-wrap: wrap; }
-    h1 { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; letter-spacing: -0.5px; flex: 1; }
+    /* NIGHT TAB */
+    .night-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:1rem;}
+    .night-top label{font-size:13px;color:var(--t2);}
+    .night-top input[type=date],.night-top input[type=text]{padding:8px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;}
+    .night-top input[type=date]:focus,.night-top input[type=text]:focus{outline:none;}
+    .night-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    @media(max-width:540px){.night-grid{grid-template-columns:1fr;}}
+    .night-panel{border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);overflow:hidden;}
+    .night-panel-head{padding:10px 15px;border-bottom:0.5px solid var(--b3);font-size:13px;font-weight:500;color:var(--t2);background:var(--bg2);}
+    .night-panel-search{padding:8px 10px;border-bottom:0.5px solid var(--b3);}
+    .night-panel-search input{width:100%;padding:6px 10px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:12px;font-family:'DM Sans',sans-serif;}
+    .night-panel-search input:focus{outline:none;border-color:var(--b1);}
+    .night-panel-search input::placeholder{color:var(--t3);}
+    .night-panel-body{padding:10px;display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto;}
+    .pick-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border:0.5px solid var(--b3);border-radius:var(--radius-md);cursor:pointer;transition:background 0.1s;background:var(--bg);user-select:none;}
+    .pick-item:hover{background:var(--bg2);}.pick-item.selected{border-color:var(--green-dark);background:var(--green-bg);}
+    .pick-item .check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--b2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;}
+    .pick-item.selected .check{background:var(--green-dark);border-color:var(--green-dark);color:#fff;}
+    .pick-item .pname{font-size:13px;font-weight:500;flex:1;}
+    .did-item{padding:9px 13px;border:0.5px solid var(--green-border);border-radius:var(--radius-md);background:var(--green-bg);font-size:13px;font-weight:500;color:var(--green-text);display:flex;align-items:center;gap:8px;}
+    .did-item .remove{margin-left:auto;cursor:pointer;color:var(--green-dark);font-size:18px;line-height:1;background:none;border:none;font-family:inherit;}
+    .save-row{display:flex;justify-content:flex-end;margin-top:1.25rem;gap:10px;align-items:center;}
+    .save-msg{font-size:13px;color:var(--green-dark);font-weight:500;}
 
-    .user-pill {
-      font-size: 12px; color: var(--t2);
-      background: var(--bg2); border: 0.5px solid var(--b3);
-      border-radius: 20px; padding: 4px 12px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .user-pill .logout { cursor: pointer; color: var(--t3); font-size: 15px; line-height: 1; background: none; border: none; font-family: inherit; padding: 0; }
-    .user-pill .logout:hover { color: var(--red-text); }
+    /* HISTORY */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:1.5rem;}
+    .stat-card{background:var(--bg2);border-radius:var(--radius-md);padding:1rem;}
+    .stat-card .stat-label{font-size:12px;color:var(--t2);margin-bottom:4px;}
+    .stat-card .stat-value{font-size:24px;font-weight:500;color:var(--t1);}
+    .stat-card .stat-sub{font-size:11px;color:var(--t3);margin-top:2px;}
+    .top5-list{display:flex;flex-direction:column;gap:6px;margin-bottom:1.5rem;}
+    .top5-item{display:flex;align-items:center;gap:12px;padding:10px 15px;border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);}
+    .top5-rank{font-size:18px;font-weight:700;color:var(--t3);min-width:28px;font-family:'Playfair Display',serif;}
+    .top5-rank.gold{color:#BA7517;}.top5-rank.silver{color:#6b6a66;}.top5-rank.bronze{color:#854F0B;}
+    .top5-name{flex:1;font-size:14px;font-weight:500;}
+    .top5-count{font-size:12px;color:var(--t2);}
+    .day-log{border:0.5px solid var(--b3);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:8px;}
+    .day-log-head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg2);cursor:pointer;user-select:none;}
+    .day-log-head .date{font-size:14px;font-weight:500;flex:1;}
+    .day-log-head .dj-name{font-size:12px;color:var(--t2);}
+    .day-log-head .count{font-size:12px;color:var(--t2);}
+    .caret{font-size:11px;color:var(--t2);transition:transform 0.2s;}
+    .day-log.open .caret{transform:rotate(180deg);}
+    .day-log-body{padding:12px 16px;display:none;flex-wrap:wrap;gap:6px;border-top:0.5px solid var(--b3);background:var(--bg);}
+    .day-log.open .day-log-body{display:flex;}
+    .log-pill{font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border);}
 
-    .admin-badge {
-      font-size: 11px; font-weight: 500;
-      background: var(--amber-bg); color: var(--amber-text);
-      border: 0.5px solid var(--amber-border);
-      border-radius: 20px; padding: 3px 9px;
-    }
+    /* DJ TAB */
+    .dj-timer-card{background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;text-align:center;}
+    .timer-display{font-family:'Playfair Display',serif;font-size:56px;font-weight:700;letter-spacing:2px;color:var(--t1);margin:1rem 0;}
+    .timer-controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;}
+    .dj-select-row{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;}
+    .dj-select-row label{font-size:13px;color:var(--t2);}
+    .dj-select-row input{padding:7px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;min-width:160px;}
+    .dj-select-row input:focus{outline:none;border-color:var(--b1);}
+    .dj-record-item{display:flex;align-items:center;gap:10px;padding:11px 15px;border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);margin-bottom:6px;flex-wrap:wrap;}
+    .dj-record-name{flex:1;font-size:14px;font-weight:500;min-width:100px;}
+    .dj-stat{font-size:12px;color:var(--t2);}
+    .dj-stat strong{color:var(--t1);font-weight:500;}
 
-    .subtitle { font-size: 13px; color: var(--t2); margin-bottom: 1.25rem; }
-    .sync-bar { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--t2); margin-bottom: 1.25rem; }
-    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--t3); flex-shrink: 0; }
-    .sync-dot.synced { background: var(--green-dark); }
-    .sync-dot.syncing { background: #BA7517; animation: pulse 1s infinite; }
-    .sync-dot.error { background: var(--red-text); }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    /* ADMIN USERS */
+    .user-row{display:flex;align-items:center;gap:10px;padding:10px 15px;border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);margin-bottom:6px;}
+    .user-row .uname{flex:1;font-size:14px;font-weight:500;}
+    .user-row .udate{font-size:12px;color:var(--t2);}
 
-    /* ---- Tabs ---- */
-    .tab-row { display: flex; gap: 4px; border-bottom: 0.5px solid var(--b3); margin-bottom: 1.5rem; overflow-x: auto; }
-    .tab {
-      font-size: 13px; font-weight: 500; padding: 8px 16px;
-      cursor: pointer; border: none; background: none; color: var(--t2);
-      border-bottom: 2px solid transparent; margin-bottom: -0.5px;
-      white-space: nowrap; font-family: 'DM Sans', sans-serif; transition: color 0.15s;
-    }
-    .tab.active { color: var(--t1); border-bottom-color: var(--t1); }
-    .tab:hover:not(.active) { color: var(--t1); }
-    .tab.admin-tab { color: var(--amber-text); }
-    .tab.admin-tab.active { border-bottom-color: #BA7517; color: var(--amber-text); }
-
-    .section { display: none; }
-    .section.visible { display: block; }
-
-    /* ---- Inputs & Buttons ---- */
-    .add-row { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
-    .add-row input, .add-row select {
-      flex: 1; min-width: 140px; padding: 9px 13px;
-      border: 0.5px solid var(--b2); border-radius: var(--radius-md);
-      background: var(--bg); color: var(--t1);
-      font-size: 14px; font-family: 'DM Sans', sans-serif;
-    }
-    .add-row input:focus, .add-row select:focus { outline: none; border-color: var(--b1); }
-    .add-row input::placeholder { color: var(--t3); }
-
-    button.btn {
-      padding: 9px 18px; border: 0.5px solid var(--b2);
-      border-radius: var(--radius-md); background: var(--bg);
-      color: var(--t1); font-size: 13px; font-weight: 500;
-      cursor: pointer; font-family: 'DM Sans', sans-serif;
-      transition: background 0.12s, opacity 0.12s; white-space: nowrap;
-    }
-    button.btn:hover { background: var(--bg2); }
-    button.btn.primary { background: var(--t1); color: var(--bg); border-color: var(--t1); }
-    button.btn.primary:hover { opacity: 0.82; }
-    button.btn.sm { padding: 5px 11px; font-size: 12px; }
-    button.btn.xs { padding: 3px 8px; font-size: 11px; }
-    button.btn.danger { color: var(--red-text); border-color: var(--red-border); }
-    button.btn.danger:hover { background: var(--red-bg); }
-    button.btn.success { color: var(--green-text); border-color: var(--green-border); }
-    button.btn.success:hover { background: var(--green-bg); }
-    button.btn.info { color: var(--blue-text); border-color: var(--blue-border); }
-    button.btn.info:hover { background: var(--blue-bg); }
-
-    /* ---- My lists ---- */
-    .dance-list { display: flex; flex-direction: column; gap: 6px; }
-    .dance-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 11px 15px; border: 0.5px solid var(--b3);
-      border-radius: var(--radius-lg); background: var(--bg);
-    }
-    .dance-item .name { flex: 1; font-size: 14px; font-weight: 500; }
-    .empty { text-align: center; padding: 3rem 1rem; color: var(--t3); font-size: 14px; }
-
-    /* ---- Dance Bank ---- */
-    .bank-search-row { display: flex; gap: 8px; margin-bottom: 1.25rem; }
-    .bank-search-row input {
-      flex: 1; padding: 9px 13px;
-      border: 0.5px solid var(--b2); border-radius: var(--radius-md);
-      background: var(--bg); color: var(--t1);
-      font-size: 14px; font-family: 'DM Sans', sans-serif;
-    }
-    .bank-search-row input:focus { outline: none; border-color: var(--b1); }
-    .bank-search-row input::placeholder { color: var(--t3); }
-
-    .bank-item {
-      border: 0.5px solid var(--b3);
-      border-radius: var(--radius-lg);
-      background: var(--bg);
-      margin-bottom: 8px;
-      overflow: hidden;
-    }
-
-    .bank-item-head {
-      display: flex; align-items: center; gap: 10px;
-      padding: 12px 15px;
-    }
-
-    .bank-item-name { flex: 1; font-size: 14px; font-weight: 500; }
-
-    .bank-item-links { display: flex; gap: 6px; align-items: center; }
-
-    .link-btn {
-      display: inline-flex; align-items: center; gap: 4px;
-      font-size: 11px; font-weight: 500; padding: 4px 9px;
-      border-radius: 20px; text-decoration: none; cursor: pointer;
-      border: 0.5px solid var(--b3); color: var(--t2); background: var(--bg2);
-      transition: background 0.1s;
-    }
-    .link-btn:hover { background: var(--bg3); }
-    .link-btn.demo { background: var(--blue-bg); color: var(--blue-text); border-color: var(--blue-border); }
-    .link-btn.demo:hover { opacity: 0.8; }
-    .link-btn.tutorial { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
-    .link-btn.tutorial:hover { opacity: 0.8; }
-
-    .bank-actions { display: flex; gap: 6px; flex-shrink: 0; }
-
-    /* ---- Admin add form ---- */
-    .admin-form {
-      background: var(--amber-bg);
-      border: 0.5px solid var(--amber-border);
-      border-radius: var(--radius-lg);
-      padding: 1.25rem 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .admin-form-title {
-      font-size: 13px; font-weight: 500; color: var(--amber-text);
-      margin-bottom: 1rem;
-    }
-
-    .admin-form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    @media (max-width: 540px) { .admin-form-grid { grid-template-columns: 1fr; } }
-
-    .admin-form-grid input {
-      padding: 8px 12px;
-      border: 0.5px solid var(--amber-border); border-radius: var(--radius-md);
-      background: var(--bg); color: var(--t1);
-      font-size: 13px; font-family: 'DM Sans', sans-serif; width: 100%;
-    }
-    .admin-form-grid input:focus { outline: none; border-color: #BA7517; }
-    .admin-form-grid input::placeholder { color: var(--t3); }
-    .admin-form-grid input.full { grid-column: 1 / -1; }
-
-    .admin-form-row { display: flex; justify-content: flex-end; gap: 8px; }
-
-    .btn.amber { background: #BA7517; color: #fff; border-color: #BA7517; }
-    .btn.amber:hover { opacity: 0.85; }
-
-    /* ---- Night tab ---- */
-    .day-header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 1.25rem; }
-    .day-header label { font-size: 13px; color: var(--t2); }
-    .day-header input[type=date] {
-      padding: 8px 12px; border: 0.5px solid var(--b2);
-      border-radius: var(--radius-md); background: var(--bg);
-      color: var(--t1); font-size: 13px; font-family: 'DM Sans', sans-serif;
-    }
-    .day-header input[type=date]:focus { outline: none; }
-
-    .night-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    @media (max-width: 540px) { .night-grid { grid-template-columns: 1fr; } }
-
-    .night-panel { border: 0.5px solid var(--b3); border-radius: var(--radius-lg); background: var(--bg); overflow: hidden; }
-    .night-panel-head { padding: 10px 15px; border-bottom: 0.5px solid var(--b3); font-size: 13px; font-weight: 500; color: var(--t2); background: var(--bg2); }
-    .night-panel-body { padding: 10px; display: flex; flex-direction: column; gap: 6px; max-height: 360px; overflow-y: auto; }
-
-    .pick-item {
-      display: flex; align-items: center; gap: 10px; padding: 9px 12px;
-      border: 0.5px solid var(--b3); border-radius: var(--radius-md);
-      cursor: pointer; transition: background 0.1s; background: var(--bg); user-select: none;
-    }
-    .pick-item:hover { background: var(--bg2); }
-    .pick-item.selected { border-color: var(--green-dark); background: var(--green-bg); }
-    .pick-item .check {
-      width: 16px; height: 16px; border-radius: 4px;
-      border: 1.5px solid var(--b2); flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center; font-size: 10px;
-    }
-    .pick-item.selected .check { background: var(--green-dark); border-color: var(--green-dark); color: #fff; }
-    .pick-item .pname { font-size: 13px; font-weight: 500; flex: 1; }
-
-    .did-item {
-      padding: 9px 13px; border: 0.5px solid var(--green-border);
-      border-radius: var(--radius-md); background: var(--green-bg);
-      font-size: 13px; font-weight: 500; color: var(--green-text);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .did-item .remove { margin-left: auto; cursor: pointer; color: var(--green-dark); font-size: 18px; line-height: 1; background: none; border: none; font-family: inherit; }
-
-    .save-row { display: flex; justify-content: flex-end; margin-top: 1.25rem; gap: 10px; align-items: center; }
-    .save-msg { font-size: 13px; color: var(--green-dark); font-weight: 500; }
-
-    /* ---- History ---- */
-    .day-log { border: 0.5px solid var(--b3); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 8px; }
-    .day-log-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg2); cursor: pointer; user-select: none; }
-    .day-log-head .date { font-size: 14px; font-weight: 500; flex: 1; }
-    .day-log-head .count { font-size: 12px; color: var(--t2); }
-    .caret { font-size: 11px; color: var(--t2); transition: transform 0.2s; }
-    .day-log.open .caret { transform: rotate(180deg); }
-    .day-log-body { padding: 12px 16px; display: none; flex-wrap: wrap; gap: 6px; border-top: 0.5px solid var(--b3); background: var(--bg); }
-    .day-log.open .day-log-body { display: flex; }
-    .log-pill { font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 20px; background: var(--green-bg); color: var(--green-text); border: 0.5px solid var(--green-border); }
-
-    .section-note { font-size: 13px; color: var(--t2); margin-bottom: 1rem; }
-
-    .in-bank-badge {
-      font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px;
-      background: var(--blue-bg); color: var(--blue-text); border: 0.5px solid var(--blue-border);
-      white-space: nowrap;
-    }
+    /* DREW'S PICKS */
+    .picks-hero{background:var(--blue-bg);border:0.5px solid var(--blue-border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem;text-align:center;}
+    .picks-hero h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--blue-text);margin-bottom:4px;}
+    .picks-hero p{font-size:13px;color:var(--blue-text);opacity:0.8;}
+    .picks-list{display:flex;flex-direction:column;gap:8px;}
+    .picks-item{display:flex;align-items:center;gap:12px;padding:13px 16px;border:0.5px solid var(--blue-border);border-radius:var(--radius-lg);background:var(--bg);}
+    .picks-num{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--blue-border);min-width:28px;}
+    .picks-name{flex:1;font-size:14px;font-weight:500;}
+    .picks-note{font-size:12px;color:var(--t2);font-style:italic;}
+    .picks-admin-form{background:var(--blue-bg);border:0.5px solid var(--blue-border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.5rem;}
+    .picks-admin-form .title{font-size:13px;font-weight:500;color:var(--blue-text);margin-bottom:1rem;}
+    .picks-admin-form input,.picks-admin-form textarea{width:100%;padding:8px 12px;border:0.5px solid var(--blue-border);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;margin-bottom:8px;}
+    .picks-admin-form input:focus,.picks-admin-form textarea:focus{outline:none;border-color:var(--blue-text);}
+    .picks-admin-form input::placeholder,.picks-admin-form textarea::placeholder{color:var(--t3);}
+    .picks-admin-form textarea{resize:vertical;min-height:60px;}
+    .picks-admin-form .row{display:flex;justify-content:flex-end;gap:8px;}
+    .picks-item-actions{display:flex;gap:6px;}
   </style>
 </head>
 <body>
 
-  <!-- AUTH -->
-  <div class="auth-wrap" id="auth-wrap">
-    <div class="auth-card">
-      <h1>Line Dance Tracker</h1>
-      <p class="sub" id="auth-sub">Sign in to sync your dances across devices</p>
-      <div class="auth-error" id="auth-error"></div>
-      <div class="field">
-        <label>Username</label>
-        <input type="text" id="auth-username" placeholder="e.g. mama_jones" autocomplete="username">
-      </div>
-      <div class="field">
-        <label>Password</label>
-        <input type="password" id="auth-password" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')authSubmit()">
-      </div>
-      <button class="auth-btn" id="auth-btn" onclick="authSubmit()">Sign in</button>
-      <div class="auth-toggle" id="auth-toggle">
-        No account? <span onclick="toggleAuthMode()">Create one</span>
-      </div>
+<!-- AUTH -->
+<div class="auth-wrap" id="auth-wrap">
+  <div class="auth-card">
+    <h1>Line Dance Tracker</h1>
+    <p class="sub" id="auth-sub">Sign in to sync your dances across devices</p>
+    <div class="auth-error" id="auth-error"></div>
+    <div class="field"><label>Username</label><input type="text" id="auth-username" placeholder="e.g. mama_jones" autocomplete="username"></div>
+    <div class="field"><label>Password</label><input type="password" id="auth-password" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')authSubmit()"></div>
+    <button class="auth-btn" id="auth-btn" onclick="authSubmit()">Sign in</button>
+    <div class="auth-toggle" id="auth-toggle">No account? <span onclick="toggleAuthMode()">Create one</span></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <div class="app-header">
+    <h1>Line Dance Tracker</h1>
+    <div class="user-pill">
+      <span id="user-label"></span>
+      <span class="admin-badge" id="admin-badge" style="display:none">Admin</span>
+      <button class="logout" onclick="logout()" title="Sign out">&#215;</button>
     </div>
   </div>
+  <p class="subtitle">Track your dances, your progress, and your nights out</p>
+  <div class="sync-bar"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">Not synced</span></div>
 
-  <!-- APP -->
-  <div class="app" id="app">
-    <div class="app-header">
-      <h1>Line Dance Tracker</h1>
-      <div class="user-pill">
-        <span id="user-label"></span>
-        <span class="admin-badge" id="admin-badge" style="display:none">Admin</span>
-        <button class="logout" onclick="logout()" title="Sign out">&#215;</button>
-      </div>
-    </div>
-    <p class="subtitle">Track your dances, your progress, and your nights out</p>
-    <div class="sync-bar">
-      <div class="sync-dot" id="sync-dot"></div>
-      <span id="sync-label">Not synced</span>
-    </div>
+  <div class="tab-row">
+    <button class="tab active" onclick="switchTab('bank')">Dance Bank</button>
+    <button class="tab" onclick="switchTab('know')">Dances I Know</button>
+    <button class="tab" onclick="switchTab('learn')">Want to Learn</button>
+    <button class="tab" onclick="switchTab('night')">My Night</button>
+    <button class="tab" onclick="switchTab('log')">History</button>
+    <button class="tab" onclick="switchTab('dj')">DJ Timer</button>
+    <button class="tab picks-tab" onclick="switchTab('picks')">&#9733; Drew's Favs</button>
+    <button class="tab admin-tab" id="admin-tab" style="display:none" onclick="switchTab('admin')">&#9733; Admin</button>
+  </div>
 
-    <div class="tab-row" id="tab-row">
-      <button class="tab active" onclick="switchTab('bank')">Dance Bank</button>
-      <button class="tab" onclick="switchTab('know')">Dances I Know</button>
-      <button class="tab" onclick="switchTab('learn')">Want to Learn</button>
-      <button class="tab" onclick="switchTab('night')">My Night</button>
-      <button class="tab" onclick="switchTab('log')">History</button>
-      <button class="tab admin-tab" id="admin-tab" style="display:none" onclick="switchTab('admin')">&#9733; Manage Bank</button>
-    </div>
-
-    <!-- DANCE BANK -->
-    <div id="tab-bank" class="section visible">
-      <p class="section-note">Browse all dances — add any to your personal lists</p>
+  <!-- DANCE BANK -->
+  <div id="tab-bank" class="section visible">
+    <p class="section-note">Browse all dances — add any to your lists</p>
+    <div class="bank-controls">
       <div class="bank-search-row">
         <input type="text" id="bank-search" placeholder="Search dances..." oninput="renderBank()">
       </div>
-      <div id="bank-list"></div>
-    </div>
-
-    <!-- KNOW -->
-    <div id="tab-know" class="section">
-      <div class="add-row">
-        <input type="text" id="know-input" placeholder="Add a dance you know..." onkeydown="if(event.key==='Enter')addDance('know')">
-        <button class="btn primary" onclick="addDance('know')">Add</button>
+      <div class="bank-filter-row">
+        <span class="filter-pill active" onclick="setBankFilter('all',this)">All</span>
+        <span class="filter-pill" onclick="setBankFilter('Beginner',this)">Beginner</span>
+        <span class="filter-pill" onclick="setBankFilter('Improver',this)">Improver</span>
+        <span class="filter-pill" onclick="setBankFilter('Intermediate',this)">Intermediate</span>
+        <span class="filter-pill" onclick="setBankFilter('Advanced',this)">Advanced</span>
+        <button class="sort-btn" id="bank-sort-btn" onclick="toggleSort('bank')">A–Z</button>
       </div>
-      <div id="know-list" class="dance-list"></div>
     </div>
+    <div id="bank-list"></div>
+  </div>
 
-    <!-- LEARN -->
-    <div id="tab-learn" class="section">
-      <div class="add-row">
-        <input type="text" id="learn-input" placeholder="Add a dance to learn..." onkeydown="if(event.key==='Enter')addDance('learn')">
-        <button class="btn primary" onclick="addDance('learn')">Add</button>
-      </div>
-      <div id="learn-list" class="dance-list"></div>
+  <!-- KNOW -->
+  <div id="tab-know" class="section">
+    <div class="add-row">
+      <input type="text" id="know-input" placeholder="Add a dance you know..." onkeydown="if(event.key==='Enter')addDance('know')">
+      <button class="btn primary" onclick="addDance('know')">Add</button>
     </div>
+    <div class="search-sort-row">
+      <input type="text" id="know-search" placeholder="Search..." oninput="renderList('know')">
+      <button class="sort-btn" id="know-sort-btn" onclick="toggleSort('know')">A–Z</button>
+      <button class="sort-btn" id="know-fav-btn" onclick="toggleFavFilter()">&#9829; Favorites</button>
+    </div>
+    <div id="know-list" class="dance-list"></div>
+  </div>
 
-    <!-- NIGHT -->
-    <div id="tab-night" class="section">
-      <div class="day-header">
-        <label>Date:</label>
-        <input type="date" id="night-date">
-      </div>
-      <div class="night-grid">
-        <div class="night-panel">
-          <div class="night-panel-head">Dances I know — pick what you did</div>
-          <div class="night-panel-body" id="pick-list"></div>
+  <!-- LEARN -->
+  <div id="tab-learn" class="section">
+    <div class="add-row">
+      <input type="text" id="learn-input" placeholder="Add a dance to learn..." onkeydown="if(event.key==='Enter')addDance('learn')">
+      <button class="btn primary" onclick="addDance('learn')">Add</button>
+    </div>
+    <div class="search-sort-row">
+      <input type="text" id="learn-search" placeholder="Search..." oninput="renderList('learn')">
+      <button class="sort-btn" id="learn-sort-btn" onclick="toggleSort('learn')">A–Z</button>
+    </div>
+    <div id="learn-list" class="dance-list"></div>
+  </div>
+
+  <!-- MY NIGHT -->
+  <div id="tab-night" class="section">
+    <div class="night-top">
+      <label>Date:</label>
+      <input type="date" id="night-date">
+      <label>DJ:</label>
+      <input type="text" id="night-dj" placeholder="DJ name (optional)" style="min-width:160px;">
+    </div>
+    <div class="night-grid">
+      <div class="night-panel">
+        <div class="night-panel-head">Dances Performed</div>
+        <div class="night-panel-search">
+          <input type="text" id="pick-search" placeholder="Search..." oninput="renderPickList()">
         </div>
-        <div class="night-panel">
-          <div class="night-panel-head">Tonight's dances</div>
-          <div class="night-panel-body" id="did-list"></div>
+        <div style="display:flex;gap:6px;padding:6px 10px;border-bottom:0.5px solid var(--b3);">
+          <button class="sort-btn" id="pick-sort-btn" onclick="toggleSort('pick')" style="font-size:11px;padding:4px 10px;">A–Z</button>
         </div>
+        <div class="night-panel-body" id="pick-list"></div>
       </div>
-      <div class="save-row">
-        <span class="save-msg" id="save-msg"></span>
-        <button class="btn primary" onclick="saveNight()">Save Night</button>
+      <div class="night-panel">
+        <div class="night-panel-head">Tonight's dances</div>
+        <div class="night-panel-body" id="did-list"></div>
       </div>
     </div>
-
-    <!-- LOG -->
-    <div id="tab-log" class="section">
-      <p class="section-note">Your dance nights, most recent first</p>
-      <div id="log-list"></div>
-    </div>
-
-    <!-- ADMIN: MANAGE BANK -->
-    <div id="tab-admin" class="section">
-      <div class="admin-form">
-        <div class="admin-form-title">&#9733; Add a new dance to the bank</div>
-        <div class="admin-form-grid">
-          <input type="text" id="bank-name" placeholder="Dance name" class="full">
-          <input type="url" id="bank-demo" placeholder="Demo link (e.g. YouTube URL)">
-          <input type="url" id="bank-tutorial" placeholder="Tutorial link (e.g. YouTube URL)">
-        </div>
-        <div class="admin-form-row">
-          <button class="btn amber" onclick="adminAddDance()">Add to bank</button>
-        </div>
-      </div>
-      <p class="section-note">All dances in the bank — click Remove to delete</p>
-      <div id="admin-bank-list"></div>
+    <div class="save-row">
+      <span class="save-msg" id="save-msg"></span>
+      <button class="btn primary" onclick="saveNight()">Save Night</button>
     </div>
   </div>
 
-  <script>
-    const SUPABASE_URL = 'https://stzfjzylemnnvtafojfh.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_mkiBIeGKW-g7bphzIYkAOg_qzKxy5ZW';
-    const ADMIN_USER = 'drew';
+  <!-- HISTORY -->
+  <div id="tab-log" class="section">
+    <div class="stats-grid" id="history-stats"></div>
+    <div class="section-title">Top 5 most danced</div>
+    <div class="top5-list" id="top5-list"></div>
+    <div class="section-title">All nights</div>
+    <div id="log-list"></div>
+  </div>
 
-    let currentUser = null;
-    let isAdmin = false;
-    let state = { know: [], learn: [], nights: {} };
-    let bank = []; // shared dance bank, loaded separately
-    let selectedDate = '';
-    let nightSelections = {};
-    let isSignUp = false;
-    let saveTimeout = null;
+  <!-- DJ TIMER -->
+  <div id="tab-dj" class="section">
+    <div class="dj-timer-card">
+      <div class="dj-select-row">
+        <label>DJ name:</label>
+        <input type="text" id="dj-timer-name" placeholder="Enter DJ name">
+      </div>
+      <div class="timer-display" id="timer-display">00:00</div>
+      <div class="timer-controls">
+        <button class="btn primary" id="timer-start-btn" onclick="timerStart()">Start</button>
+        <button class="btn" id="timer-pause-btn" onclick="timerPause()" disabled>Pause</button>
+        <button class="btn danger" onclick="timerReset()">Reset</button>
+        <button class="btn success" onclick="timerSave()">Save this freestyle</button>
+      </div>
+      <p style="font-size:12px;color:var(--t2)">Start the timer when the freestyle section begins, pause or save when it ends.</p>
+    </div>
+    <div class="section-title">Freestyle records by DJ</div>
+    <div id="dj-records-list"></div>
+  </div>
 
-    // ---- Supabase ----
+  <!-- DREW'S PICKS -->
+  <div id="tab-picks" class="section">
+    <div class="picks-hero">
+      <h2>Drew's Current Favorites</h2>
+      <p>my favorite dances right now! :)</p>
+    </div>
+    <div id="picks-admin-panel" style="display:none">
+      <div class="picks-admin-form">
+        <div class="title">&#9733; Add a pick</div>
+        <input type="text" id="pick-dance-name" placeholder="Dance name">
+        <textarea id="pick-dance-note" placeholder="Why you love it"></textarea>
+        <div class="row"><button class="btn blue" onclick="adminAddPick()">Add to picks</button></div>
+      </div>
+    </div>
+    <div class="picks-list" id="picks-list"></div>
+  </div>
 
-    async function sbFetch(path, options = {}) {
-      const headers = {
-        'apikey': SUPABASE_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_KEY,
-        'Content-Type': 'application/json',
-      };
-      if (options.prefer) headers['Prefer'] = options.prefer;
-      const res = await fetch(SUPABASE_URL + path, {
-        method: options.method || 'GET',
-        headers,
-        body: options.body || undefined
-      });
-      const text = await res.text();
-      const data = text ? JSON.parse(text) : null;
-      return { ok: res.ok, status: res.status, data };
-    }
+  <!-- ADMIN -->
+  <div id="tab-admin" class="section">
+    <div class="admin-form">
+      <div class="admin-form-title">&#9733; Add a new dance to the bank</div>
+      <div class="admin-form-grid">
+        <input type="text" id="bank-name" placeholder="Dance name" class="full">
+        <input type="url" id="bank-demo" placeholder="Demo link (YouTube URL)">
+        <input type="url" id="bank-tutorial" placeholder="Tutorial link (YouTube URL)">
+        <select id="bank-diff" class="full">
+          <option value="">Difficulty (optional)</option>
+          <option value="Beginner">Beginner</option>
+          <option value="Improver">Improver</option>
+          <option value="Intermediate">Intermediate</option>
+          <option value="Advanced">Advanced</option>
+        </select>
+      </div>
+      <div class="admin-form-row"><button class="btn amber" onclick="adminAddDance()">Add to bank</button></div>
+    </div>
+    <div class="section-title">All dances in the bank</div>
+    <div id="admin-bank-list"></div>
+    <div class="section-title">Registered users</div>
+    <div id="admin-users-list"><p class="section-note">Loading...</p></div>
+  </div>
+</div>
 
-    function setSyncStatus(type, label) {
-      document.getElementById('sync-dot').className = 'sync-dot ' + type;
-      document.getElementById('sync-label').textContent = label;
-    }
+<script>
+const SUPABASE_URL='https://stzfjzylemnnvtafojfh.supabase.co';
+const SUPABASE_KEY='sb_publishable_mkiBIeGKW-g7bphzIYkAOg_qzKxy5ZW';
+const ADMIN_USER='drew';
 
-    async function saveToCloud() {
-      setSyncStatus('syncing', 'Syncing...');
-      const r = await sbFetch(
-        `/rest/v1/dances?username=eq.${encodeURIComponent(currentUser)}`,
-        { method: 'PATCH', prefer: 'return=minimal', body: JSON.stringify({ data: state, updated_at: new Date().toISOString() }) }
-      );
-      setSyncStatus(r.ok ? 'synced' : 'error', r.ok ? 'Synced' : 'Sync failed');
-    }
+let currentUser=null,isAdmin=false;
+let state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
+let bank=[];
+let drewPicks=[]; // stored in __picks__ bank row
+let selectedDate='',nightSelections={};
+let isSignUp=false,saveTimeout=null;
+let bankFilter='all';
+let sortState={bank:false,know:false,learn:false,pick:false};
+let favFilterActive=false;
+let timerInterval=null,timerSeconds=0,timerRunning=false;
 
-    function scheduleSave() {
-      clearTimeout(saveTimeout);
-      saveTimeout = setTimeout(saveToCloud, 800);
-    }
+// ---- Supabase ----
+async function sbFetch(path,options={}){
+  const headers={'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
+  if(options.prefer) headers['Prefer']=options.prefer;
+  const res=await fetch(SUPABASE_URL+path,{method:options.method||'GET',headers,body:options.body||undefined});
+  const text=await res.text();
+  return{ok:res.ok,status:res.status,data:text?JSON.parse(text):null};
+}
+function setSyncStatus(t,l){document.getElementById('sync-dot').className='sync-dot '+t;document.getElementById('sync-label').textContent=l;}
+async function saveToCloud(){
+  setSyncStatus('syncing','Syncing...');
+  const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(currentUser)}`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:state,updated_at:new Date().toISOString()})});
+  setSyncStatus(r.ok?'synced':'error',r.ok?'Synced':'Sync failed');
+}
+function scheduleSave(){clearTimeout(saveTimeout);saveTimeout=setTimeout(saveToCloud,800);}
 
-    // Bank is stored as a separate row with username = '__bank__'
-    async function loadBank() {
-      const r = await sbFetch(`/rest/v1/dances?username=eq.__bank__&select=data`);
-      if (r.ok && r.data && r.data.length > 0) {
-        bank = r.data[0].data.items || [];
-      } else {
-        bank = [];
-      }
-    }
+async function loadBank(){
+  const r=await sbFetch(`/rest/v1/dances?username=eq.__bank__&select=data`);
+  bank=(r.ok&&r.data&&r.data.length>0)?(r.data[0].data.items||[]):[];
+}
+async function saveBankToCloud(){
+  setSyncStatus('syncing','Syncing...');
+  const check=await sbFetch(`/rest/v1/dances?username=eq.__bank__&select=username`);
+  if(check.ok&&check.data&&check.data.length>0){
+    await sbFetch(`/rest/v1/dances?username=eq.__bank__`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:{items:bank},updated_at:new Date().toISOString()})});
+  } else {
+    await sbFetch('/rest/v1/dances',{method:'POST',prefer:'return=minimal',body:JSON.stringify({username:'__bank__',password:'__bank__',data:{items:bank}})});
+  }
+  setSyncStatus('synced','Synced');
+}
 
-    async function saveBankToCloud() {
-      setSyncStatus('syncing', 'Syncing...');
-      // Check if bank row exists
-      const check = await sbFetch(`/rest/v1/dances?username=eq.__bank__&select=username`);
-      if (check.ok && check.data && check.data.length > 0) {
-        await sbFetch(`/rest/v1/dances?username=eq.__bank__`, {
-          method: 'PATCH', prefer: 'return=minimal',
-          body: JSON.stringify({ data: { items: bank }, updated_at: new Date().toISOString() })
-        });
-      } else {
-        await sbFetch('/rest/v1/dances', {
-          method: 'POST', prefer: 'return=minimal',
-          body: JSON.stringify({ username: '__bank__', password: '__bank__', data: { items: bank } })
-        });
-      }
-      setSyncStatus('synced', 'Synced');
-    }
+async function loadPicks(){
+  const r=await sbFetch(`/rest/v1/dances?username=eq.__picks__&select=data`);
+  drewPicks=(r.ok&&r.data&&r.data.length>0)?(r.data[0].data.picks||[]):[];
+}
+async function savePicksToCloud(){
+  setSyncStatus('syncing','Syncing...');
+  const check=await sbFetch(`/rest/v1/dances?username=eq.__picks__&select=username`);
+  if(check.ok&&check.data&&check.data.length>0){
+    await sbFetch(`/rest/v1/dances?username=eq.__picks__`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:{picks:drewPicks},updated_at:new Date().toISOString()})});
+  } else {
+    await sbFetch('/rest/v1/dances',{method:'POST',prefer:'return=minimal',body:JSON.stringify({username:'__picks__',password:'__picks__',data:{picks:drewPicks}})});
+  }
+  setSyncStatus('synced','Synced');
+}
 
-    // ---- Auth ----
+// ---- Auth ----
+function toggleAuthMode(){
+  isSignUp=!isSignUp;
+  document.getElementById('auth-sub').textContent=isSignUp?'Create an account to get started':'Sign in to sync your dances across devices';
+  document.getElementById('auth-btn').textContent=isSignUp?'Create account':'Sign in';
+  document.getElementById('auth-toggle').innerHTML=isSignUp?'Already have an account? <span onclick="toggleAuthMode()">Sign in</span>':'No account? <span onclick="toggleAuthMode()">Create one</span>';
+  document.getElementById('auth-error').style.display='none';
+}
+function showAuthError(msg){const el=document.getElementById('auth-error');el.textContent=msg;el.style.display='block';}
 
-    function toggleAuthMode() {
-      isSignUp = !isSignUp;
-      document.getElementById('auth-sub').textContent = isSignUp ? 'Create an account to get started' : 'Sign in to sync your dances across devices';
-      document.getElementById('auth-btn').textContent = isSignUp ? 'Create account' : 'Sign in';
-      document.getElementById('auth-toggle').innerHTML = isSignUp
-        ? 'Already have an account? <span onclick="toggleAuthMode()">Sign in</span>'
-        : 'No account? <span onclick="toggleAuthMode()">Create one</span>';
-      document.getElementById('auth-error').style.display = 'none';
-    }
+async function authSubmit(){
+  const username=document.getElementById('auth-username').value.trim().toLowerCase();
+  const password=document.getElementById('auth-password').value;
+  if(!username||!password){showAuthError('Please enter a username and password.');return;}
+  const btn=document.getElementById('auth-btn');
+  btn.disabled=true;btn.textContent=isSignUp?'Creating...':'Signing in...';
+  document.getElementById('auth-error').style.display='none';
+  if(isSignUp){
+    const check=await sbFetch(`/rest/v1/dances?username=eq.${enc(username)}&select=username`);
+    if(check.ok&&check.data&&check.data.length>0){showAuthError('That username is already taken.');btn.disabled=false;btn.textContent='Create account';return;}
+    const create=await sbFetch('/rest/v1/dances',{method:'POST',prefer:'return=minimal',body:JSON.stringify({username,password,data:{know:[],learn:[],nights:{},djFreestyles:{},favorites:[]}})});
+    if(!create.ok){showAuthError('Could not create account. Please try again.');btn.disabled=false;btn.textContent='Create account';return;}
+    state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
+    await loadBank();await loadPicks();enterApp(username);
+  } else {
+    const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(username)}&select=password,data`);
+    if(!r.ok||!r.data||r.data.length===0){showAuthError('Username not found.');btn.disabled=false;btn.textContent='Sign in';return;}
+    if(r.data[0].password!==password){showAuthError('Incorrect password.');btn.disabled=false;btn.textContent='Sign in';return;}
+    state=r.data[0].data||{know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
+    if(!state.djFreestyles) state.djFreestyles={};
+    if(!state.favorites) state.favorites=[];
+    await loadBank();await loadPicks();enterApp(username);
+  }
+}
 
-    function showAuthError(msg) {
-      const el = document.getElementById('auth-error');
-      el.textContent = msg;
-      el.style.display = 'block';
-    }
+function enterApp(username){
+  currentUser=username;isAdmin=username===ADMIN_USER;
+  localStorage.setItem('ld_user',username);
+  document.getElementById('auth-wrap').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('user-label').textContent=username;
+  document.getElementById('admin-badge').style.display=isAdmin?'inline':'none';
+  document.getElementById('admin-tab').style.display=isAdmin?'inline-block':'none';
+  if(isAdmin) document.getElementById('picks-admin-panel').style.display='block';
+  setSyncStatus('synced','Synced');
+  renderBank();renderList('know');renderList('learn');initNightDate();renderDJRecords();renderPicks();
+}
 
-    async function authSubmit() {
-      const username = document.getElementById('auth-username').value.trim().toLowerCase();
-      const password = document.getElementById('auth-password').value;
-      if (!username || !password) { showAuthError('Please enter a username and password.'); return; }
+function logout(){
+  currentUser=null;isAdmin=false;
+  localStorage.removeItem('ld_user');
+  state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};bank=[];drewPicks=[];
+  timerStop();timerSeconds=0;updateTimerDisplay();
+  document.getElementById('app').style.display='none';
+  document.getElementById('auth-wrap').style.display='flex';
+  document.getElementById('auth-username').value='';document.getElementById('auth-password').value='';
+  document.getElementById('auth-btn').disabled=false;document.getElementById('auth-btn').textContent='Sign in';
+}
 
-      const btn = document.getElementById('auth-btn');
-      btn.disabled = true;
-      btn.textContent = isSignUp ? 'Creating...' : 'Signing in...';
-      document.getElementById('auth-error').style.display = 'none';
+async function tryAutoLogin(){
+  const saved=localStorage.getItem('ld_user');if(!saved)return;
+  const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(saved)}&select=data`);
+  if(r.ok&&r.data&&r.data.length>0){
+    state=r.data[0].data||{know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
+    if(!state.djFreestyles) state.djFreestyles={};
+    if(!state.favorites) state.favorites=[];
+    await loadBank();await loadPicks();enterApp(saved);
+  }
+}
 
-      if (isSignUp) {
-        const check = await sbFetch(`/rest/v1/dances?username=eq.${encodeURIComponent(username)}&select=username`);
-        if (check.ok && check.data && check.data.length > 0) {
-          showAuthError('That username is already taken. Try another.');
-          btn.disabled = false; btn.textContent = 'Create account'; return;
-        }
-        const create = await sbFetch('/rest/v1/dances', {
-          method: 'POST', prefer: 'return=minimal',
-          body: JSON.stringify({ username, password, data: { know: [], learn: [], nights: {} } })
-        });
-        if (!create.ok) {
-          showAuthError('Could not create account. Please try again.');
-          btn.disabled = false; btn.textContent = 'Create account'; return;
-        }
-        state = { know: [], learn: [], nights: {} };
-        await loadBank();
-        enterApp(username);
-      } else {
-        const r = await sbFetch(`/rest/v1/dances?username=eq.${encodeURIComponent(username)}&select=password,data`);
-        if (!r.ok || !r.data || r.data.length === 0) {
-          showAuthError('Username not found.');
-          btn.disabled = false; btn.textContent = 'Sign in'; return;
-        }
-        if (r.data[0].password !== password) {
-          showAuthError('Incorrect password.');
-          btn.disabled = false; btn.textContent = 'Sign in'; return;
-        }
-        state = r.data[0].data || { know: [], learn: [], nights: {} };
-        await loadBank();
-        enterApp(username);
-      }
-    }
+// ---- Tabs ----
+function switchTab(tab){
+  const tabs=['bank','know','learn','night','log','dj','picks','admin'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===tab));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('visible'));
+  document.getElementById('tab-'+tab).classList.add('visible');
+  if(tab==='night') renderNight();
+  if(tab==='log'){renderHistoryStats();renderTop5();renderLog();}
+  if(tab==='admin'){renderAdminBank();loadAdminUsers();}
+  if(tab==='bank') renderBank();
+  if(tab==='dj') renderDJRecords();
+  if(tab==='picks') renderPicks();
+}
 
-    function enterApp(username) {
-      currentUser = username;
-      isAdmin = username === ADMIN_USER;
-      localStorage.setItem('ld_user', username);
-      document.getElementById('auth-wrap').style.display = 'none';
-      document.getElementById('app').style.display = 'block';
-      document.getElementById('user-label').textContent = username;
-      document.getElementById('admin-badge').style.display = isAdmin ? 'inline' : 'none';
-      document.getElementById('admin-tab').style.display = isAdmin ? 'inline-block' : 'none';
-      setSyncStatus('synced', 'Synced');
-      renderBank();
-      renderList('know');
-      renderList('learn');
-      initNightDate();
-    }
+// ---- Sort helpers ----
+function toggleSort(key){
+  sortState[key]=!sortState[key];
+  const btn=document.getElementById(key+'-sort-btn');
+  if(btn){btn.classList.toggle('active',sortState[key]);}
+  if(key==='bank') renderBank();
+  else if(key==='know') renderList('know');
+  else if(key==='learn') renderList('learn');
+  else if(key==='pick') renderPickList();
+}
+function applySortAndSearch(items,searchVal,sorted){
+  let result=[...items];
+  if(searchVal) result=result.filter(d=>d.name.toLowerCase().includes(searchVal.toLowerCase()));
+  if(sorted) result.sort((a,b)=>a.name.localeCompare(b.name));
+  return result;
+}
+function toggleFavFilter(){
+  favFilterActive=!favFilterActive;
+  const btn=document.getElementById('know-fav-btn');
+  if(btn) btn.classList.toggle('active',favFilterActive);
+  renderList('know');
+}
 
-    function logout() {
-      currentUser = null; isAdmin = false;
-      localStorage.removeItem('ld_user');
-      state = { know: [], learn: [], nights: {} };
-      bank = [];
-      document.getElementById('app').style.display = 'none';
-      document.getElementById('auth-wrap').style.display = 'flex';
-      document.getElementById('auth-username').value = '';
-      document.getElementById('auth-password').value = '';
-      const btn = document.getElementById('auth-btn');
-      btn.disabled = false; btn.textContent = 'Sign in';
-    }
+// ---- Dance Bank ----
+function setBankFilter(diff,el){
+  bankFilter=diff;
+  document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  renderBank();
+}
+function isInList(name,type){return state[type].some(d=>d.name.toLowerCase()===name.toLowerCase());}
 
-    async function tryAutoLogin() {
-      const saved = localStorage.getItem('ld_user');
-      if (!saved) return;
-      const r = await sbFetch(`/rest/v1/dances?username=eq.${encodeURIComponent(saved)}&select=data`);
-      if (r.ok && r.data && r.data.length > 0) {
-        state = r.data[0].data || { know: [], learn: [], nights: {} };
-        await loadBank();
-        enterApp(saved);
-      }
-    }
+function renderBank(){
+  const el=document.getElementById('bank-list');
+  const q=(document.getElementById('bank-search')?.value||'');
+  let items=bank.filter(d=>!q||d.name.toLowerCase().includes(q.toLowerCase()));
+  if(bankFilter!=='all') items=items.filter(d=>d.difficulty===bankFilter);
+  if(sortState.bank) items.sort((a,b)=>a.name.localeCompare(b.name));
+  if(!items.length){el.innerHTML=`<div class="empty">${bank.length===0?'No dances in the bank yet.':'No dances match your search.'}</div>`;return;}
+  el.innerHTML=items.map(d=>{
+    const inKnow=isInList(d.name,'know'),inLearn=isInList(d.name,'learn');
+    const diffBadge=d.difficulty?`<span class="diff-badge diff-${d.difficulty}">${d.difficulty}</span>`:'';
+    const statusBadge=inKnow?`<span class="in-bank-badge">In: I Know</span>`:inLearn?`<span class="in-bank-badge">In: Want to Learn</span>`:'';
+    const addBtns=(!inKnow&&!inLearn)?`<button class="btn xs success" onclick="addFromBank('know','${escA(d.name)}')">+ I Know It</button><button class="btn xs info" onclick="addFromBank('learn','${escA(d.name)}')">+ Want to Learn</button>`:inLearn?`<button class="btn xs success" onclick="addFromBank('know','${escA(d.name)}')">+ I Know It</button>`:'';
+    const demoBtn=d.demo?`<a class="link-btn demo" href="${escA(d.demo)}" target="_blank" rel="noopener">&#9654; Demo</a>`:'';
+    const tutBtn=d.tutorial?`<a class="link-btn tutorial" href="${escA(d.tutorial)}" target="_blank" rel="noopener">&#127891; Tutorial</a>`:'';
+    return `<div class="bank-item"><div class="bank-item-head"><span class="bank-item-name">${esc(d.name)}</span><div class="bank-item-meta">${diffBadge}${demoBtn}${tutBtn}${statusBadge}</div><div class="bank-actions">${addBtns}</div></div></div>`;
+  }).join('');
+}
 
-    // ---- Tabs ----
+function addFromBank(type,name){
+  const other=type==='know'?'learn':'know';
+  state[other]=state[other].filter(d=>d.name.toLowerCase()!==name.toLowerCase());
+  if(!isInList(name,type)) state[type].push({id:Date.now()+'',name,added:new Date().toISOString()});
+  renderBank();renderList('know');renderList('learn');scheduleSave();
+}
 
-    function switchTab(tab) {
-      const tabs = ['bank', 'know', 'learn', 'night', 'log', 'admin'];
-      document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', tabs[i] === tab));
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
-      document.getElementById('tab-' + tab).classList.add('visible');
-      if (tab === 'night') renderNight();
-      if (tab === 'log') renderLog();
-      if (tab === 'admin') renderAdminBank();
-      if (tab === 'bank') renderBank();
-    }
-
-    // ---- Dance Bank (shared, read by all) ----
-
-    function isInList(name, listType) {
-      return state[listType].some(d => d.name.toLowerCase() === name.toLowerCase());
-    }
-
-    function renderBank() {
-      const el = document.getElementById('bank-list');
-      const q = (document.getElementById('bank-search')?.value || '').toLowerCase();
-      const filtered = bank.filter(d => !q || d.name.toLowerCase().includes(q));
-
-      if (!filtered.length) {
-        el.innerHTML = `<div class="empty">${bank.length === 0 ? 'No dances in the bank yet. Ask your admin to add some!' : 'No dances match your search.'}</div>`;
-        return;
-      }
-
-      el.innerHTML = filtered.map(d => {
-        const inKnow = isInList(d.name, 'know');
-        const inLearn = isInList(d.name, 'learn');
-        const statusBadge = inKnow
-          ? `<span class="in-bank-badge">In: I Know</span>`
-          : inLearn ? `<span class="in-bank-badge">In: Want to Learn</span>` : '';
-
-        const addButtons = (!inKnow && !inLearn) ? `
-          <button class="btn xs success" onclick="addFromBank('know','${escAttr(d.name)}')">+ I Know It</button>
-          <button class="btn xs info" onclick="addFromBank('learn','${escAttr(d.name)}')">+ Want to Learn</button>
-        ` : inLearn ? `
-          <button class="btn xs success" onclick="addFromBank('know','${escAttr(d.name)}')">+ I Know It</button>
-        ` : '';
-
-        const demoBtn = d.demo ? `<a class="link-btn demo" href="${escAttr(d.demo)}" target="_blank" rel="noopener">&#9654; Demo</a>` : '';
-        const tutBtn = d.tutorial ? `<a class="link-btn tutorial" href="${escAttr(d.tutorial)}" target="_blank" rel="noopener">&#127891; Tutorial</a>` : '';
-
-        return `
-          <div class="bank-item">
-            <div class="bank-item-head">
-              <span class="bank-item-name">${esc(d.name)}</span>
-              <div class="bank-item-links">${demoBtn}${tutBtn}${statusBadge}</div>
-              <div class="bank-actions">${addButtons}</div>
-            </div>
-          </div>`;
-      }).join('');
-    }
-
-    function addFromBank(type, name) {
-      // Remove from the other list if present
-      const other = type === 'know' ? 'learn' : 'know';
-      state[other] = state[other].filter(d => d.name.toLowerCase() !== name.toLowerCase());
-      // Add to target if not already there
-      if (!isInList(name, type)) {
-        state[type].push({ id: Date.now() + '', name, added: new Date().toISOString() });
-      }
-      renderBank();
-      renderList('know');
-      renderList('learn');
-      scheduleSave();
-    }
-
-    // ---- Admin: manage bank ----
-
-    function adminAddDance() {
-      if (!isAdmin) return;
-      const name = document.getElementById('bank-name').value.trim();
-      const demo = document.getElementById('bank-demo').value.trim();
-      const tutorial = document.getElementById('bank-tutorial').value.trim();
-      if (!name) { alert('Please enter a dance name.'); return; }
-      if (bank.some(d => d.name.toLowerCase() === name.toLowerCase())) {
-        alert('That dance is already in the bank.');
-        return;
-      }
-      bank.push({ id: Date.now() + '', name, demo, tutorial, added: new Date().toISOString() });
-      document.getElementById('bank-name').value = '';
-      document.getElementById('bank-demo').value = '';
-      document.getElementById('bank-tutorial').value = '';
-      saveBankToCloud();
-      renderAdminBank();
-      renderBank();
-    }
-
-    function adminRemoveDance(id) {
-      if (!isAdmin) return;
-      bank = bank.filter(d => d.id !== id);
-      saveBankToCloud();
-      renderAdminBank();
-      renderBank();
-    }
-
-    function renderAdminBank() {
-      const el = document.getElementById('admin-bank-list');
-      if (!bank.length) {
-        el.innerHTML = `<div class="empty">No dances in the bank yet. Add one above!</div>`;
-        return;
-      }
-      el.innerHTML = bank.map(d => `
-        <div class="bank-item">
-          <div class="bank-item-head">
-            <span class="bank-item-name">${esc(d.name)}</span>
-            <div class="bank-item-links">
-              ${d.demo ? `<a class="link-btn demo" href="${escAttr(d.demo)}" target="_blank" rel="noopener">&#9654; Demo</a>` : '<span style="font-size:12px;color:var(--t3)">No demo</span>'}
-              ${d.tutorial ? `<a class="link-btn tutorial" href="${escAttr(d.tutorial)}" target="_blank" rel="noopener">&#127891; Tutorial</a>` : '<span style="font-size:12px;color:var(--t3)">No tutorial</span>'}
-            </div>
-            <div class="bank-actions">
-              <button class="btn xs danger" onclick="adminRemoveDance('${d.id}')">Remove</button>
-            </div>
+// ---- Admin bank ----
+function adminAddDance(){
+  if(!isAdmin)return;
+  const name=document.getElementById('bank-name').value.trim();
+  const demo=document.getElementById('bank-demo').value.trim();
+  const tutorial=document.getElementById('bank-tutorial').value.trim();
+  const difficulty=document.getElementById('bank-diff').value;
+  if(!name){alert('Please enter a dance name.');return;}
+  if(bank.some(d=>d.name.toLowerCase()===name.toLowerCase())){alert('That dance is already in the bank.');return;}
+  bank.push({id:Date.now()+'',name,demo,tutorial,difficulty,added:new Date().toISOString()});
+  document.getElementById('bank-name').value='';document.getElementById('bank-demo').value='';document.getElementById('bank-tutorial').value='';document.getElementById('bank-diff').value='';
+  saveBankToCloud();renderAdminBank();renderBank();
+}
+function adminRemoveDance(id){
+  if(!isAdmin)return;if(!confirm('Remove this dance from the bank?'))return;
+  bank=bank.filter(d=>d.id!==id);saveBankToCloud();renderAdminBank();renderBank();
+}
+function toggleEditForm(id){const f=document.getElementById('edit-'+id);if(f)f.classList.toggle('open');}
+function adminSaveEdit(id){
+  const d=bank.find(x=>x.id===id);if(!d)return;
+  d.name=document.getElementById('edit-name-'+id).value.trim()||d.name;
+  d.demo=document.getElementById('edit-demo-'+id).value.trim();
+  d.tutorial=document.getElementById('edit-tut-'+id).value.trim();
+  d.difficulty=document.getElementById('edit-diff-'+id).value;
+  saveBankToCloud();renderAdminBank();renderBank();
+}
+function renderAdminBank(){
+  const el=document.getElementById('admin-bank-list');
+  if(!bank.length){el.innerHTML=`<div class="empty">No dances in the bank yet.</div>`;return;}
+  const sorted=[...bank].sort((a,b)=>a.name.localeCompare(b.name));
+  el.innerHTML=sorted.map(d=>{
+    const diffBadge=d.difficulty?`<span class="diff-badge diff-${d.difficulty}">${d.difficulty}</span>`:'';
+    const demoLink=d.demo?`<a class="link-btn demo" href="${escA(d.demo)}" target="_blank" rel="noopener">&#9654; Demo</a>`:`<span style="font-size:12px;color:var(--t3)">No demo</span>`;
+    const tutLink=d.tutorial?`<a class="link-btn tutorial" href="${escA(d.tutorial)}" target="_blank" rel="noopener">&#127891; Tutorial</a>`:`<span style="font-size:12px;color:var(--t3)">No tutorial</span>`;
+    return `
+      <div class="bank-item">
+        <div class="bank-item-head">
+          <span class="bank-item-name">${esc(d.name)}</span>
+          <div class="bank-item-meta">${diffBadge}${demoLink}${tutLink}</div>
+          <div class="bank-actions">
+            <button class="btn xs info" onclick="toggleEditForm('${d.id}')">Edit</button>
+            <button class="btn xs danger" onclick="adminRemoveDance('${d.id}')">Remove</button>
           </div>
         </div>
-      `).join('');
-    }
-
-    // ---- My lists ----
-
-    function addDance(type) {
-      const inp = document.getElementById(type + '-input');
-      const name = inp.value.trim();
-      if (!name) return;
-      state[type].push({ id: Date.now() + '', name, added: new Date().toISOString() });
-      inp.value = '';
-      renderList(type);
-      scheduleSave();
-    }
-
-    function removeDance(type, id) {
-      state[type] = state[type].filter(d => d.id !== id);
-      renderList(type);
-      renderBank();
-      scheduleSave();
-    }
-
-    function moveToKnow(id) {
-      const d = state.learn.find(x => x.id === id);
-      if (!d) return;
-      state.learn = state.learn.filter(x => x.id !== id);
-      state.know.push({ ...d });
-      renderList('learn');
-      renderList('know');
-      renderBank();
-      scheduleSave();
-    }
-
-    function renderList(type) {
-      const el = document.getElementById(type + '-list');
-      if (!state[type].length) {
-        el.innerHTML = `<div class="empty">${type === 'know' ? 'No dances yet — browse the Dance Bank or add one above!' : 'No dances on your wish list yet.'}</div>`;
-        return;
-      }
-      el.innerHTML = state[type].map(d => `
-        <div class="dance-item">
-          <span class="name">${esc(d.name)}</span>
-          ${type === 'learn' ? `<button class="btn sm success" onclick="moveToKnow('${d.id}')">I know it now!</button>` : ''}
-          <button class="btn sm danger" onclick="removeDance('${type}','${d.id}')">Remove</button>
+        <div class="edit-form" id="edit-${d.id}">
+          <div class="edit-form-grid">
+            <input type="text" id="edit-name-${d.id}" value="${escA(d.name)}" placeholder="Dance name" class="full">
+            <input type="url" id="edit-demo-${d.id}" value="${escA(d.demo||'')}" placeholder="Demo link">
+            <input type="url" id="edit-tut-${d.id}" value="${escA(d.tutorial||'')}" placeholder="Tutorial link">
+            <select id="edit-diff-${d.id}" class="full">
+              <option value="">No difficulty</option>
+              <option value="Beginner" ${d.difficulty==='Beginner'?'selected':''}>Beginner</option>
+              <option value="Improver" ${d.difficulty==='Improver'?'selected':''}>Improver</option>
+              <option value="Intermediate" ${d.difficulty==='Intermediate'?'selected':''}>Intermediate</option>
+              <option value="Advanced" ${d.difficulty==='Advanced'?'selected':''}>Advanced</option>
+            </select>
+          </div>
+          <div class="edit-form-row">
+            <button class="btn xs" onclick="toggleEditForm('${d.id}')">Cancel</button>
+            <button class="btn xs amber" onclick="adminSaveEdit('${d.id}')">Save changes</button>
+          </div>
         </div>
-      `).join('');
-    }
+      </div>`;
+  }).join('');
+}
+async function loadAdminUsers(){
+  const el=document.getElementById('admin-users-list');el.innerHTML='<p class="section-note">Loading...</p>';
+  const r=await sbFetch(`/rest/v1/dances?username=neq.__bank__&username=neq.__picks__&select=username,updated_at&order=username.asc`);
+  if(!r.ok||!r.data){el.innerHTML='<p class="section-note">Could not load users.</p>';return;}
+  const users=r.data.filter(u=>u.username!=='__bank__'&&u.username!=='__picks__');
+  if(!users.length){el.innerHTML='<div class="empty">No users yet.</div>';return;}
+  el.innerHTML=users.map(u=>`
+    <div class="user-row">
+      <span class="uname">${esc(u.username)}</span>
+      ${u.username===ADMIN_USER?'<span class="admin-badge">Admin</span>':''}
+      <span class="udate">Last active: ${u.updated_at?formatDate(u.updated_at.slice(0,10)):'—'}</span>
+    </div>`).join('');
+}
 
-    // ---- Night ----
+// ---- My lists ----
+function isFav(id){return(state.favorites||[]).includes(id);}
+function toggleFav(id){
+  if(!state.favorites) state.favorites=[];
+  if(isFav(id)) state.favorites=state.favorites.filter(f=>f!==id);
+  else state.favorites.push(id);
+  renderList('know');scheduleSave();
+}
+function addDance(type){
+  const inp=document.getElementById(type+'-input');
+  const name=inp.value.trim();if(!name)return;
+  state[type].push({id:Date.now()+'',name,added:new Date().toISOString()});
+  inp.value='';renderList(type);scheduleSave();
+}
+function removeDance(type,id){
+  state[type]=state[type].filter(d=>d.id!==id);
+  if(type==='know') state.favorites=(state.favorites||[]).filter(f=>f!==id);
+  renderList(type);renderBank();scheduleSave();
+}
+function moveToKnow(id){
+  const d=state.learn.find(x=>x.id===id);if(!d)return;
+  state.learn=state.learn.filter(x=>x.id!==id);state.know.push({...d});
+  renderList('learn');renderList('know');renderBank();scheduleSave();
+}
+function renderList(type){
+  const el=document.getElementById(type+'-list');
+  const searchEl=document.getElementById(type+'-search');
+  const q=searchEl?searchEl.value:'';
+  let items=applySortAndSearch(state[type],q,sortState[type]);
+  if(type==='know'&&favFilterActive) items=items.filter(d=>isFav(d.id));
+  if(!items.length){
+    el.innerHTML=`<div class="empty">${
+      favFilterActive&&type==='know'?'No favorites yet — click the heart on any dance!'
+      :type==='know'?'No dances yet — browse the Dance Bank or add one above!'
+      :'No dances on your wish list yet.'
+    }</div>`;return;
+  }
+  el.innerHTML=items.map(d=>`
+    <div class="dance-item">
+      ${type==='know'?`<button class="fav-btn ${isFav(d.id)?'active':''}" onclick="toggleFav('${d.id}')" title="${isFav(d.id)?'Unfavorite':'Favorite'}">&#9829;</button>`:''}
+      <span class="name">${esc(d.name)}</span>
+      ${type==='learn'?`<button class="btn sm success" onclick="moveToKnow('${d.id}')">I know it now!</button>`:''}
+      <button class="btn sm danger" onclick="removeDance('${type}','${d.id}')">Remove</button>
+    </div>`).join('');
+}
 
-    function initNightDate() {
-      const inp = document.getElementById('night-date');
-      const today = new Date().toISOString().slice(0, 10);
-      inp.value = today;
-      selectedDate = today;
-      loadNightSelections();
-      renderPickList();
-      renderDidList();
-      inp.onchange = () => {
-        selectedDate = inp.value;
-        loadNightSelections();
-        renderPickList();
-        renderDidList();
-      };
-    }
+// ---- Night ----
+function getNightData(date){
+  const n=state.nights[date];
+  if(!n) return{dances:[],dj:''};
+  if(Array.isArray(n)) return{dances:n,dj:''};
+  return n;
+}
+function initNightDate(){
+  const inp=document.getElementById('night-date');
+  const today=new Date().toISOString().slice(0,10);
+  inp.value=today;selectedDate=today;
+  loadNightSelections();renderPickList();renderDidList();loadNightDJ();
+  inp.onchange=()=>{selectedDate=inp.value;loadNightSelections();renderPickList();renderDidList();loadNightDJ();};
+}
+function loadNightSelections(){
+  nightSelections={};const nd=getNightData(selectedDate);nd.dances.forEach(id=>nightSelections[id]=true);
+}
+function loadNightDJ(){document.getElementById('night-dj').value=getNightData(selectedDate).dj||'';}
+function renderNight(){
+  if(!selectedDate)initNightDate();
+  selectedDate=document.getElementById('night-date').value||new Date().toISOString().slice(0,10);
+  loadNightSelections();renderPickList();renderDidList();loadNightDJ();
+}
+function renderPickList(){
+  const el=document.getElementById('pick-list');
+  if(!state.know.length){el.innerHTML=`<div class="empty" style="padding:1.5rem .5rem">Add dances to "Dances I Know" first</div>`;return;}
+  const q=(document.getElementById('pick-search')?.value||'');
+  let items=applySortAndSearch(state.know,q,sortState.pick);
+  el.innerHTML=items.map(d=>`
+    <div class="pick-item ${nightSelections[d.id]?'selected':''}" onclick="togglePick('${d.id}')">
+      <div class="check">${nightSelections[d.id]?'&#10003;':''}</div>
+      <span class="pname">${esc(d.name)}</span>
+    </div>`).join('');
+}
+function renderDidList(){
+  const el=document.getElementById('did-list');
+  const dances=state.know.filter(d=>nightSelections[d.id]);
+  if(!dances.length){el.innerHTML=`<div class="empty" style="padding:1.5rem .5rem">Nothing selected yet</div>`;return;}
+  el.innerHTML=dances.map(d=>`<div class="did-item">${esc(d.name)}<button class="remove" onclick="togglePick('${d.id}')" title="Remove">&#215;</button></div>`).join('');
+}
+function togglePick(id){
+  if(nightSelections[id])delete nightSelections[id];else nightSelections[id]=true;
+  renderPickList();renderDidList();
+}
+async function saveNight(){
+  if(!selectedDate)return;
+  const dj=document.getElementById('night-dj').value.trim();
+  state.nights[selectedDate]={dances:Object.keys(nightSelections),dj};
+  const msg=document.getElementById('save-msg');msg.textContent='Saving...';
+  await saveToCloud();msg.textContent='Saved!';setTimeout(()=>msg.textContent='',2500);
+}
 
-    function loadNightSelections() {
-      nightSelections = {};
-      const night = state.nights[selectedDate];
-      if (night) night.forEach(id => nightSelections[id] = true);
-    }
-
-    function renderNight() {
-      if (!selectedDate) initNightDate();
-      selectedDate = document.getElementById('night-date').value || new Date().toISOString().slice(0, 10);
-      loadNightSelections();
-      renderPickList();
-      renderDidList();
-    }
-
-    function renderPickList() {
-      const el = document.getElementById('pick-list');
-      if (!state.know.length) {
-        el.innerHTML = `<div class="empty" style="padding:1.5rem .5rem">Add dances to "Dances I Know" first</div>`;
-        return;
-      }
-      el.innerHTML = state.know.map(d => `
-        <div class="pick-item ${nightSelections[d.id] ? 'selected' : ''}" onclick="togglePick('${d.id}')">
-          <div class="check">${nightSelections[d.id] ? '&#10003;' : ''}</div>
-          <span class="pname">${esc(d.name)}</span>
+// ---- History ----
+function getAllDanceCounts(){
+  const counts={};
+  Object.values(state.nights).forEach(val=>{
+    const nd=Array.isArray(val)?{dances:val,dj:''}:val;
+    nd.dances.forEach(id=>{counts[id]=(counts[id]||0)+1;});
+  });
+  return counts;
+}
+function renderHistoryStats(){
+  const el=document.getElementById('history-stats');
+  const now=new Date();
+  const thisMonth=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const thisYear=`${now.getFullYear()}`;
+  let monthCount=0,yearCount=0,totalNights=0;
+  const djNights={};
+  Object.entries(state.nights).forEach(([date,val])=>{
+    const nd=Array.isArray(val)?{dances:val,dj:''}:val;
+    const dc=nd.dances.length;
+    if(date.startsWith(thisMonth)) monthCount+=dc;
+    if(date.startsWith(thisYear)) yearCount+=dc;
+    if(dc>0) totalNights++;
+    if(nd.dj) djNights[nd.dj]=(djNights[nd.dj]||0)+1;
+  });
+  const topDJ=Object.entries(djNights).sort((a,b)=>b[1]-a[1])[0];
+  el.innerHTML=`
+    <div class="stat-card"><div class="stat-label">Dances this month</div><div class="stat-value">${monthCount}</div></div>
+    <div class="stat-card"><div class="stat-label">Dances this year</div><div class="stat-value">${yearCount}</div></div>
+    <div class="stat-card"><div class="stat-label">Nights logged</div><div class="stat-value">${totalNights}</div></div>
+    <div class="stat-card"><div class="stat-label">Top DJ</div><div class="stat-value" style="font-size:18px">${topDJ?esc(topDJ[0]):'—'}</div><div class="stat-sub">${topDJ?topDJ[1]+' night'+(topDJ[1]!==1?'s':''):''}</div></div>`;
+}
+function renderTop5(){
+  const el=document.getElementById('top5-list');
+  const counts=getAllDanceCounts();
+  const ranked=Object.entries(counts)
+    .map(([id,count])=>({id,count,dance:state.know.find(d=>d.id===id)}))
+    .filter(x=>x.dance)
+    .sort((a,b)=>b.count-a.count)
+    .slice(0,5);
+  if(!ranked.length){el.innerHTML=`<div class="empty">Dance some nights to see your top dances!</div>`;return;}
+  const rankClass=['gold','silver','bronze','',''];
+  el.innerHTML=ranked.map((x,i)=>`
+    <div class="top5-item">
+      <span class="top5-rank ${rankClass[i]}">${i+1}</span>
+      <span class="top5-name">${esc(x.dance.name)}</span>
+      <span class="top5-count">${x.count} time${x.count!==1?'s':''}</span>
+    </div>`).join('');
+}
+function renderLog(){
+  const el=document.getElementById('log-list');
+  const nights=Object.entries(state.nights).sort((a,b)=>b[0].localeCompare(a[0]));
+  if(!nights.length){el.innerHTML=`<div class="empty">No nights logged yet. Go dance!</div>`;return;}
+  el.innerHTML=nights.map(([date,val])=>{
+    const nd=Array.isArray(val)?{dances:val,dj:''}:val;
+    const dances=nd.dances.map(id=>state.know.find(d=>d.id===id)).filter(Boolean);
+    const pills=dances.map(d=>`<span class="log-pill">${esc(d.name)}</span>`).join('');
+    const djLabel=nd.dj?`<span class="dj-name">DJ: ${esc(nd.dj)}</span>`:'';
+    return `
+      <div class="day-log" onclick="this.classList.toggle('open')">
+        <div class="day-log-head">
+          <span class="date">${formatDate(date)}</span>
+          ${djLabel}
+          <span class="count">${dances.length} dance${dances.length!==1?'s':''}</span>
+          <span class="caret">&#9660;</span>
         </div>
-      `).join('');
-    }
+        <div class="day-log-body">${pills||'<span style="font-size:13px;color:var(--t3)">No dances recorded</span>'}</div>
+      </div>`;
+  }).join('');
+}
 
-    function renderDidList() {
-      const el = document.getElementById('did-list');
-      const dances = state.know.filter(d => nightSelections[d.id]);
-      if (!dances.length) {
-        el.innerHTML = `<div class="empty" style="padding:1.5rem .5rem">Nothing selected yet</div>`;
-        return;
-      }
-      el.innerHTML = dances.map(d => `
-        <div class="did-item">
-          ${esc(d.name)}
-          <button class="remove" onclick="togglePick('${d.id}')" title="Remove">&#215;</button>
-        </div>
-      `).join('');
-    }
+// ---- DJ Timer ----
+function updateTimerDisplay(){
+  const m=Math.floor(timerSeconds/60),s=timerSeconds%60;
+  document.getElementById('timer-display').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function timerStart(){
+  if(timerRunning)return;timerRunning=true;
+  timerInterval=setInterval(()=>{timerSeconds++;updateTimerDisplay();},1000);
+  document.getElementById('timer-start-btn').disabled=true;
+  document.getElementById('timer-pause-btn').disabled=false;
+}
+function timerPause(){
+  if(!timerRunning)return;timerStop();
+  document.getElementById('timer-start-btn').disabled=false;
+  document.getElementById('timer-start-btn').textContent='Resume';
+}
+function timerStop(){clearInterval(timerInterval);timerInterval=null;timerRunning=false;}
+function timerReset(){
+  timerStop();timerSeconds=0;updateTimerDisplay();
+  document.getElementById('timer-start-btn').disabled=false;
+  document.getElementById('timer-start-btn').textContent='Start';
+  document.getElementById('timer-pause-btn').disabled=true;
+}
+function timerSave(){
+  if(timerSeconds===0){alert('Start the timer first!');return;}
+  const djName=document.getElementById('dj-timer-name').value.trim();
+  if(!djName){alert('Please enter a DJ name.');return;}
+  timerStop();
+  if(!state.djFreestyles) state.djFreestyles={};
+  if(!state.djFreestyles[djName]) state.djFreestyles[djName]=[];
+  state.djFreestyles[djName].push(timerSeconds);
+  scheduleSave();timerReset();renderDJRecords();
+  alert(`Saved! ${fmtSecs(timerSeconds)} freestyle for ${djName}.`);
+}
+function fmtSecs(s){const m=Math.floor(s/60),sec=s%60;return`${m}m ${sec}s`;}
+function renderDJRecords(){
+  const el=document.getElementById('dj-records-list');
+  const djs=Object.entries(state.djFreestyles||{}).filter(([,arr])=>arr&&arr.length>0);
+  if(!djs.length){el.innerHTML=`<div class="empty">No freestyle sessions saved yet.</div>`;return;}
+  const djNights={};
+  Object.values(state.nights).forEach(val=>{
+    const nd=Array.isArray(val)?{dances:val,dj:''}:val;
+    if(nd.dj) djNights[nd.dj]=(djNights[nd.dj]||0)+1;
+  });
+  el.innerHTML=djs.map(([name,times])=>{
+    const avg=Math.round(times.reduce((a,b)=>a+b,0)/times.length);
+    const nights=djNights[name]||0;
+    return `
+      <div class="dj-record-item">
+        <span class="dj-record-name">${esc(name)}</span>
+        <span class="dj-stat">Sessions: <strong>${times.length}</strong></span>
+        <span class="dj-stat">Avg freestyle: <strong>${fmtSecs(avg)}</strong></span>
+        <span class="dj-stat">Nights DJ'd: <strong>${nights}</strong></span>
+      </div>`;
+  }).join('');
+}
 
-    function togglePick(id) {
-      if (nightSelections[id]) delete nightSelections[id];
-      else nightSelections[id] = true;
-      renderPickList();
-      renderDidList();
-    }
+// ---- Drew's Favs ----
+function adminAddPick(){
+  if(!isAdmin)return;
+  const name=document.getElementById('pick-dance-name').value.trim();
+  const note=document.getElementById('pick-dance-note').value.trim();
+  if(!name){alert('Please enter a dance name.');return;}
+  drewPicks.push({id:Date.now()+'',name,note,added:new Date().toISOString()});
+  document.getElementById('pick-dance-name').value='';
+  document.getElementById('pick-dance-note').value='';
+  savePicksToCloud();renderPicks();
+}
+function adminRemovePick(id){
+  if(!isAdmin)return;
+  drewPicks=drewPicks.filter(p=>p.id!==id);
+  savePicksToCloud();renderPicks();
+}
+function renderPicks(){
+  const el=document.getElementById('picks-list');
+  if(!drewPicks.length){
+    el.innerHTML=`<div class="empty">${isAdmin?'Add your first pick above!':'No picks yet — check back soon!'}</div>`;return;
+  }
+  el.innerHTML=drewPicks.map((p,i)=>`
+    <div class="picks-item">
+      <span class="picks-num">${i+1}</span>
+      <span class="picks-name">${esc(p.name)}</span>
+      ${p.note?`<span class="picks-note">"${esc(p.note)}"</span>`:''}
+      ${isAdmin?`<div class="picks-item-actions"><button class="btn xs danger" onclick="adminRemovePick('${p.id}')">Remove</button></div>`:''}
+    </div>`).join('');
+}
 
-    async function saveNight() {
-      if (!selectedDate) return;
-      state.nights[selectedDate] = Object.keys(nightSelections);
-      const msg = document.getElementById('save-msg');
-      msg.textContent = 'Saving...';
-      await saveToCloud();
-      msg.textContent = 'Saved!';
-      setTimeout(() => msg.textContent = '', 2500);
-    }
+// ---- Helpers ----
+function formatDate(d){
+  const[y,m,day]=d.split('-');
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return`${months[+m-1]} ${+day}, ${y}`;
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function escA(s){return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function enc(s){return encodeURIComponent(s);}
 
-    // ---- History ----
-
-    function renderLog() {
-      const el = document.getElementById('log-list');
-      const nights = Object.entries(state.nights).sort((a, b) => b[0].localeCompare(a[0]));
-      if (!nights.length) {
-        el.innerHTML = `<div class="empty">No nights logged yet. Go dance!</div>`;
-        return;
-      }
-      el.innerHTML = nights.map(([date, ids]) => {
-        const dances = ids.map(id => state.know.find(d => d.id === id)).filter(Boolean);
-        const pills = dances.map(d => `<span class="log-pill">${esc(d.name)}</span>`).join('');
-        return `
-          <div class="day-log" onclick="this.classList.toggle('open')">
-            <div class="day-log-head">
-              <span class="date">${formatDate(date)}</span>
-              <span class="count">${dances.length} dance${dances.length !== 1 ? 's' : ''}</span>
-              <span class="caret">&#9660;</span>
-            </div>
-            <div class="day-log-body">${pills || '<span style="font-size:13px;color:var(--t3)">No dances recorded</span>'}</div>
-          </div>`;
-      }).join('');
-    }
-
-    // ---- Helpers ----
-
-    function formatDate(d) {
-      const [y, m, day] = d.split('-');
-      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      return `${months[+m - 1]} ${+day}, ${y}`;
-    }
-
-    function esc(s) {
-      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-
-    function escAttr(s) {
-      return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-    }
-
-    tryAutoLogin();
-  </script>
+tryAutoLogin();
+</script>
 </body>
 </html>
