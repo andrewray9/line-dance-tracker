@@ -27,6 +27,12 @@
       --red-bg: #FCEBEB;
       --red-border: #F7C1C1;
       --red-text: #A32D2D;
+      --blue-bg: #E6F1FB;
+      --blue-border: #B5D4F4;
+      --blue-text: #0C447C;
+      --amber-bg: #FAEEDA;
+      --amber-border: #FAC775;
+      --amber-text: #633806;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -45,13 +51,8 @@
 
     html, body { min-height: 100vh; background: var(--bg3); color: var(--t1); font-family: 'DM Sans', sans-serif; }
 
-    .auth-wrap {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1rem;
-    }
+    /* ---- Auth ---- */
+    .auth-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
 
     .auth-card {
       background: var(--bg);
@@ -62,46 +63,26 @@
       max-width: 380px;
     }
 
-    .auth-card h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 26px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
+    .auth-card h1 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; margin-bottom: 4px; }
     .auth-card .sub { font-size: 13px; color: var(--t2); margin-bottom: 2rem; }
 
     .field { margin-bottom: 14px; }
     .field label { display: block; font-size: 12px; font-weight: 500; color: var(--t2); margin-bottom: 5px; }
-
     .field input {
-      width: 100%;
-      padding: 9px 13px;
-      border: 0.5px solid var(--b2);
-      border-radius: var(--radius-md);
-      background: var(--bg2);
-      color: var(--t1);
-      font-size: 14px;
-      font-family: 'DM Sans', sans-serif;
+      width: 100%; padding: 9px 13px;
+      border: 0.5px solid var(--b2); border-radius: var(--radius-md);
+      background: var(--bg2); color: var(--t1);
+      font-size: 14px; font-family: 'DM Sans', sans-serif;
     }
-
     .field input:focus { outline: none; border-color: var(--b1); background: var(--bg); }
 
     .auth-btn {
-      width: 100%;
-      padding: 10px;
-      background: var(--t1);
-      color: var(--bg);
-      border: none;
-      border-radius: var(--radius-md);
-      font-size: 14px;
-      font-weight: 500;
-      font-family: 'DM Sans', sans-serif;
-      cursor: pointer;
-      margin-top: 6px;
-      transition: opacity 0.12s;
+      width: 100%; padding: 10px;
+      background: var(--t1); color: var(--bg);
+      border: none; border-radius: var(--radius-md);
+      font-size: 14px; font-weight: 500; font-family: 'DM Sans', sans-serif;
+      cursor: pointer; margin-top: 6px; transition: opacity 0.12s;
     }
-
     .auth-btn:hover { opacity: 0.82; }
     .auth-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
@@ -109,205 +90,243 @@
     .auth-toggle span { color: var(--t1); cursor: pointer; font-weight: 500; text-decoration: underline; }
 
     .auth-error {
-      font-size: 13px;
-      color: var(--red-text);
-      background: var(--red-bg);
-      border: 0.5px solid var(--red-border);
-      border-radius: var(--radius-md);
-      padding: 8px 12px;
-      margin-bottom: 14px;
-      display: none;
+      font-size: 13px; color: var(--red-text);
+      background: var(--red-bg); border: 0.5px solid var(--red-border);
+      border-radius: var(--radius-md); padding: 8px 12px; margin-bottom: 14px; display: none;
     }
 
-    .app { max-width: 780px; margin: 0 auto; padding: 2rem 1.25rem 4rem; display: none; }
-
+    /* ---- App shell ---- */
+    .app { max-width: 820px; margin: 0 auto; padding: 2rem 1.25rem 4rem; display: none; }
     .app-header { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; flex-wrap: wrap; }
-
     h1 { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; letter-spacing: -0.5px; flex: 1; }
 
     .user-pill {
-      font-size: 12px;
-      color: var(--t2);
-      background: var(--bg2);
-      border: 0.5px solid var(--b3);
-      border-radius: 20px;
-      padding: 4px 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-size: 12px; color: var(--t2);
+      background: var(--bg2); border: 0.5px solid var(--b3);
+      border-radius: 20px; padding: 4px 12px;
+      display: flex; align-items: center; gap: 8px;
     }
-
     .user-pill .logout { cursor: pointer; color: var(--t3); font-size: 15px; line-height: 1; background: none; border: none; font-family: inherit; padding: 0; }
     .user-pill .logout:hover { color: var(--red-text); }
 
-    .subtitle { font-size: 13px; color: var(--t2); margin-bottom: 1.5rem; }
+    .admin-badge {
+      font-size: 11px; font-weight: 500;
+      background: var(--amber-bg); color: var(--amber-text);
+      border: 0.5px solid var(--amber-border);
+      border-radius: 20px; padding: 3px 9px;
+    }
 
+    .subtitle { font-size: 13px; color: var(--t2); margin-bottom: 1.25rem; }
     .sync-bar { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--t2); margin-bottom: 1.25rem; }
-
     .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--t3); flex-shrink: 0; }
     .sync-dot.synced { background: var(--green-dark); }
     .sync-dot.syncing { background: #BA7517; animation: pulse 1s infinite; }
     .sync-dot.error { background: var(--red-text); }
-
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
+    /* ---- Tabs ---- */
     .tab-row { display: flex; gap: 4px; border-bottom: 0.5px solid var(--b3); margin-bottom: 1.5rem; overflow-x: auto; }
-
     .tab {
-      font-size: 13px;
-      font-weight: 500;
-      padding: 8px 16px;
-      cursor: pointer;
-      border: none;
-      background: none;
-      color: var(--t2);
-      border-bottom: 2px solid transparent;
-      margin-bottom: -0.5px;
-      white-space: nowrap;
-      font-family: 'DM Sans', sans-serif;
-      transition: color 0.15s;
+      font-size: 13px; font-weight: 500; padding: 8px 16px;
+      cursor: pointer; border: none; background: none; color: var(--t2);
+      border-bottom: 2px solid transparent; margin-bottom: -0.5px;
+      white-space: nowrap; font-family: 'DM Sans', sans-serif; transition: color 0.15s;
     }
-
     .tab.active { color: var(--t1); border-bottom-color: var(--t1); }
     .tab:hover:not(.active) { color: var(--t1); }
+    .tab.admin-tab { color: var(--amber-text); }
+    .tab.admin-tab.active { border-bottom-color: #BA7517; color: var(--amber-text); }
 
     .section { display: none; }
     .section.visible { display: block; }
 
-    .add-row { display: flex; gap: 8px; margin-bottom: 1.25rem; }
-
-    .add-row input {
-      flex: 1;
-      padding: 9px 13px;
-      border: 0.5px solid var(--b2);
-      border-radius: var(--radius-md);
-      background: var(--bg);
-      color: var(--t1);
-      font-size: 14px;
-      font-family: 'DM Sans', sans-serif;
+    /* ---- Inputs & Buttons ---- */
+    .add-row { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .add-row input, .add-row select {
+      flex: 1; min-width: 140px; padding: 9px 13px;
+      border: 0.5px solid var(--b2); border-radius: var(--radius-md);
+      background: var(--bg); color: var(--t1);
+      font-size: 14px; font-family: 'DM Sans', sans-serif;
     }
-
-    .add-row input:focus { outline: none; border-color: var(--b1); }
+    .add-row input:focus, .add-row select:focus { outline: none; border-color: var(--b1); }
     .add-row input::placeholder { color: var(--t3); }
 
     button.btn {
-      padding: 9px 18px;
-      border: 0.5px solid var(--b2);
-      border-radius: var(--radius-md);
-      background: var(--bg);
-      color: var(--t1);
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      transition: background 0.12s, opacity 0.12s;
+      padding: 9px 18px; border: 0.5px solid var(--b2);
+      border-radius: var(--radius-md); background: var(--bg);
+      color: var(--t1); font-size: 13px; font-weight: 500;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      transition: background 0.12s, opacity 0.12s; white-space: nowrap;
     }
-
     button.btn:hover { background: var(--bg2); }
     button.btn.primary { background: var(--t1); color: var(--bg); border-color: var(--t1); }
     button.btn.primary:hover { opacity: 0.82; }
     button.btn.sm { padding: 5px 11px; font-size: 12px; }
+    button.btn.xs { padding: 3px 8px; font-size: 11px; }
     button.btn.danger { color: var(--red-text); border-color: var(--red-border); }
     button.btn.danger:hover { background: var(--red-bg); }
     button.btn.success { color: var(--green-text); border-color: var(--green-border); }
     button.btn.success:hover { background: var(--green-bg); }
+    button.btn.info { color: var(--blue-text); border-color: var(--blue-border); }
+    button.btn.info:hover { background: var(--blue-bg); }
 
+    /* ---- My lists ---- */
     .dance-list { display: flex; flex-direction: column; gap: 6px; }
-
     .dance-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 11px 15px;
-      border: 0.5px solid var(--b3);
-      border-radius: var(--radius-lg);
-      background: var(--bg);
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 15px; border: 0.5px solid var(--b3);
+      border-radius: var(--radius-lg); background: var(--bg);
     }
-
     .dance-item .name { flex: 1; font-size: 14px; font-weight: 500; }
     .empty { text-align: center; padding: 3rem 1rem; color: var(--t3); font-size: 14px; }
 
-    .day-header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 1.25rem; }
-    .day-header label { font-size: 13px; color: var(--t2); }
+    /* ---- Dance Bank ---- */
+    .bank-search-row { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+    .bank-search-row input {
+      flex: 1; padding: 9px 13px;
+      border: 0.5px solid var(--b2); border-radius: var(--radius-md);
+      background: var(--bg); color: var(--t1);
+      font-size: 14px; font-family: 'DM Sans', sans-serif;
+    }
+    .bank-search-row input:focus { outline: none; border-color: var(--b1); }
+    .bank-search-row input::placeholder { color: var(--t3); }
 
-    .day-header input[type=date] {
-      padding: 8px 12px;
-      border: 0.5px solid var(--b2);
-      border-radius: var(--radius-md);
+    .bank-item {
+      border: 0.5px solid var(--b3);
+      border-radius: var(--radius-lg);
       background: var(--bg);
-      color: var(--t1);
-      font-size: 13px;
-      font-family: 'DM Sans', sans-serif;
+      margin-bottom: 8px;
+      overflow: hidden;
     }
 
+    .bank-item-head {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 15px;
+    }
+
+    .bank-item-name { flex: 1; font-size: 14px; font-weight: 500; }
+
+    .bank-item-links { display: flex; gap: 6px; align-items: center; }
+
+    .link-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 500; padding: 4px 9px;
+      border-radius: 20px; text-decoration: none; cursor: pointer;
+      border: 0.5px solid var(--b3); color: var(--t2); background: var(--bg2);
+      transition: background 0.1s;
+    }
+    .link-btn:hover { background: var(--bg3); }
+    .link-btn.demo { background: var(--blue-bg); color: var(--blue-text); border-color: var(--blue-border); }
+    .link-btn.demo:hover { opacity: 0.8; }
+    .link-btn.tutorial { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
+    .link-btn.tutorial:hover { opacity: 0.8; }
+
+    .bank-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+    /* ---- Admin add form ---- */
+    .admin-form {
+      background: var(--amber-bg);
+      border: 0.5px solid var(--amber-border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .admin-form-title {
+      font-size: 13px; font-weight: 500; color: var(--amber-text);
+      margin-bottom: 1rem;
+    }
+
+    .admin-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 540px) { .admin-form-grid { grid-template-columns: 1fr; } }
+
+    .admin-form-grid input {
+      padding: 8px 12px;
+      border: 0.5px solid var(--amber-border); border-radius: var(--radius-md);
+      background: var(--bg); color: var(--t1);
+      font-size: 13px; font-family: 'DM Sans', sans-serif; width: 100%;
+    }
+    .admin-form-grid input:focus { outline: none; border-color: #BA7517; }
+    .admin-form-grid input::placeholder { color: var(--t3); }
+    .admin-form-grid input.full { grid-column: 1 / -1; }
+
+    .admin-form-row { display: flex; justify-content: flex-end; gap: 8px; }
+
+    .btn.amber { background: #BA7517; color: #fff; border-color: #BA7517; }
+    .btn.amber:hover { opacity: 0.85; }
+
+    /* ---- Night tab ---- */
+    .day-header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    .day-header label { font-size: 13px; color: var(--t2); }
+    .day-header input[type=date] {
+      padding: 8px 12px; border: 0.5px solid var(--b2);
+      border-radius: var(--radius-md); background: var(--bg);
+      color: var(--t1); font-size: 13px; font-family: 'DM Sans', sans-serif;
+    }
     .day-header input[type=date]:focus { outline: none; }
 
     .night-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     @media (max-width: 540px) { .night-grid { grid-template-columns: 1fr; } }
 
     .night-panel { border: 0.5px solid var(--b3); border-radius: var(--radius-lg); background: var(--bg); overflow: hidden; }
-
     .night-panel-head { padding: 10px 15px; border-bottom: 0.5px solid var(--b3); font-size: 13px; font-weight: 500; color: var(--t2); background: var(--bg2); }
-
     .night-panel-body { padding: 10px; display: flex; flex-direction: column; gap: 6px; max-height: 360px; overflow-y: auto; }
 
     .pick-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 12px;
-      border: 0.5px solid var(--b3);
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      transition: background 0.1s;
-      background: var(--bg);
-      user-select: none;
+      display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+      border: 0.5px solid var(--b3); border-radius: var(--radius-md);
+      cursor: pointer; transition: background 0.1s; background: var(--bg); user-select: none;
     }
-
     .pick-item:hover { background: var(--bg2); }
     .pick-item.selected { border-color: var(--green-dark); background: var(--green-bg); }
-
     .pick-item .check {
       width: 16px; height: 16px; border-radius: 4px;
       border: 1.5px solid var(--b2); flex-shrink: 0;
       display: flex; align-items: center; justify-content: center; font-size: 10px;
     }
-
     .pick-item.selected .check { background: var(--green-dark); border-color: var(--green-dark); color: #fff; }
     .pick-item .pname { font-size: 13px; font-weight: 500; flex: 1; }
 
     .did-item {
-      padding: 9px 13px;
-      border: 0.5px solid var(--green-border);
-      border-radius: var(--radius-md);
-      background: var(--green-bg);
+      padding: 9px 13px; border: 0.5px solid var(--green-border);
+      border-radius: var(--radius-md); background: var(--green-bg);
       font-size: 13px; font-weight: 500; color: var(--green-text);
       display: flex; align-items: center; gap: 8px;
     }
-
     .did-item .remove { margin-left: auto; cursor: pointer; color: var(--green-dark); font-size: 18px; line-height: 1; background: none; border: none; font-family: inherit; }
 
     .save-row { display: flex; justify-content: flex-end; margin-top: 1.25rem; gap: 10px; align-items: center; }
     .save-msg { font-size: 13px; color: var(--green-dark); font-weight: 500; }
 
+    /* ---- History ---- */
     .day-log { border: 0.5px solid var(--b3); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 8px; }
-
     .day-log-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg2); cursor: pointer; user-select: none; }
     .day-log-head .date { font-size: 14px; font-weight: 500; flex: 1; }
     .day-log-head .count { font-size: 12px; color: var(--t2); }
     .caret { font-size: 11px; color: var(--t2); transition: transform 0.2s; }
     .day-log.open .caret { transform: rotate(180deg); }
-
     .day-log-body { padding: 12px 16px; display: none; flex-wrap: wrap; gap: 6px; border-top: 0.5px solid var(--b3); background: var(--bg); }
     .day-log.open .day-log-body { display: flex; }
-
     .log-pill { font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 20px; background: var(--green-bg); color: var(--green-text); border: 0.5px solid var(--green-border); }
 
     .section-note { font-size: 13px; color: var(--t2); margin-bottom: 1rem; }
+
+    .in-bank-badge {
+      font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px;
+      background: var(--blue-bg); color: var(--blue-text); border: 0.5px solid var(--blue-border);
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body>
 
+  <!-- AUTH -->
   <div class="auth-wrap" id="auth-wrap">
     <div class="auth-card">
       <h1>Line Dance Tracker</h1>
@@ -328,11 +347,13 @@
     </div>
   </div>
 
+  <!-- APP -->
   <div class="app" id="app">
     <div class="app-header">
       <h1>Line Dance Tracker</h1>
       <div class="user-pill">
         <span id="user-label"></span>
+        <span class="admin-badge" id="admin-badge" style="display:none">Admin</span>
         <button class="logout" onclick="logout()" title="Sign out">&#215;</button>
       </div>
     </div>
@@ -342,14 +363,26 @@
       <span id="sync-label">Not synced</span>
     </div>
 
-    <div class="tab-row">
-      <button class="tab active" onclick="switchTab('know')">Dances I Know</button>
+    <div class="tab-row" id="tab-row">
+      <button class="tab active" onclick="switchTab('bank')">Dance Bank</button>
+      <button class="tab" onclick="switchTab('know')">Dances I Know</button>
       <button class="tab" onclick="switchTab('learn')">Want to Learn</button>
       <button class="tab" onclick="switchTab('night')">My Night</button>
       <button class="tab" onclick="switchTab('log')">History</button>
+      <button class="tab admin-tab" id="admin-tab" style="display:none" onclick="switchTab('admin')">&#9733; Manage Bank</button>
     </div>
 
-    <div id="tab-know" class="section visible">
+    <!-- DANCE BANK -->
+    <div id="tab-bank" class="section visible">
+      <p class="section-note">Browse all dances — add any to your personal lists</p>
+      <div class="bank-search-row">
+        <input type="text" id="bank-search" placeholder="Search dances..." oninput="renderBank()">
+      </div>
+      <div id="bank-list"></div>
+    </div>
+
+    <!-- KNOW -->
+    <div id="tab-know" class="section">
       <div class="add-row">
         <input type="text" id="know-input" placeholder="Add a dance you know..." onkeydown="if(event.key==='Enter')addDance('know')">
         <button class="btn primary" onclick="addDance('know')">Add</button>
@@ -357,6 +390,7 @@
       <div id="know-list" class="dance-list"></div>
     </div>
 
+    <!-- LEARN -->
     <div id="tab-learn" class="section">
       <div class="add-row">
         <input type="text" id="learn-input" placeholder="Add a dance to learn..." onkeydown="if(event.key==='Enter')addDance('learn')">
@@ -365,6 +399,7 @@
       <div id="learn-list" class="dance-list"></div>
     </div>
 
+    <!-- NIGHT -->
     <div id="tab-night" class="section">
       <div class="day-header">
         <label>Date:</label>
@@ -386,22 +421,45 @@
       </div>
     </div>
 
+    <!-- LOG -->
     <div id="tab-log" class="section">
       <p class="section-note">Your dance nights, most recent first</p>
       <div id="log-list"></div>
+    </div>
+
+    <!-- ADMIN: MANAGE BANK -->
+    <div id="tab-admin" class="section">
+      <div class="admin-form">
+        <div class="admin-form-title">&#9733; Add a new dance to the bank</div>
+        <div class="admin-form-grid">
+          <input type="text" id="bank-name" placeholder="Dance name" class="full">
+          <input type="url" id="bank-demo" placeholder="Demo link (e.g. YouTube URL)">
+          <input type="url" id="bank-tutorial" placeholder="Tutorial link (e.g. YouTube URL)">
+        </div>
+        <div class="admin-form-row">
+          <button class="btn amber" onclick="adminAddDance()">Add to bank</button>
+        </div>
+      </div>
+      <p class="section-note">All dances in the bank — click Remove to delete</p>
+      <div id="admin-bank-list"></div>
     </div>
   </div>
 
   <script>
     const SUPABASE_URL = 'https://stzfjzylemnnvtafojfh.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_mkiBIeGKW-g7bphzIYkAOg_qzKxy5ZW';
+    const ADMIN_USER = 'drew';
 
     let currentUser = null;
+    let isAdmin = false;
     let state = { know: [], learn: [], nights: {} };
+    let bank = []; // shared dance bank, loaded separately
     let selectedDate = '';
     let nightSelections = {};
     let isSignUp = false;
     let saveTimeout = null;
+
+    // ---- Supabase ----
 
     async function sbFetch(path, options = {}) {
       const headers = {
@@ -438,6 +496,36 @@
       clearTimeout(saveTimeout);
       saveTimeout = setTimeout(saveToCloud, 800);
     }
+
+    // Bank is stored as a separate row with username = '__bank__'
+    async function loadBank() {
+      const r = await sbFetch(`/rest/v1/dances?username=eq.__bank__&select=data`);
+      if (r.ok && r.data && r.data.length > 0) {
+        bank = r.data[0].data.items || [];
+      } else {
+        bank = [];
+      }
+    }
+
+    async function saveBankToCloud() {
+      setSyncStatus('syncing', 'Syncing...');
+      // Check if bank row exists
+      const check = await sbFetch(`/rest/v1/dances?username=eq.__bank__&select=username`);
+      if (check.ok && check.data && check.data.length > 0) {
+        await sbFetch(`/rest/v1/dances?username=eq.__bank__`, {
+          method: 'PATCH', prefer: 'return=minimal',
+          body: JSON.stringify({ data: { items: bank }, updated_at: new Date().toISOString() })
+        });
+      } else {
+        await sbFetch('/rest/v1/dances', {
+          method: 'POST', prefer: 'return=minimal',
+          body: JSON.stringify({ username: '__bank__', password: '__bank__', data: { items: bank } })
+        });
+      }
+      setSyncStatus('synced', 'Synced');
+    }
+
+    // ---- Auth ----
 
     function toggleAuthMode() {
       isSignUp = !isSignUp;
@@ -480,6 +568,7 @@
           btn.disabled = false; btn.textContent = 'Create account'; return;
         }
         state = { know: [], learn: [], nights: {} };
+        await loadBank();
         enterApp(username);
       } else {
         const r = await sbFetch(`/rest/v1/dances?username=eq.${encodeURIComponent(username)}&select=password,data`);
@@ -492,33 +581,38 @@
           btn.disabled = false; btn.textContent = 'Sign in'; return;
         }
         state = r.data[0].data || { know: [], learn: [], nights: {} };
+        await loadBank();
         enterApp(username);
       }
     }
 
     function enterApp(username) {
       currentUser = username;
+      isAdmin = username === ADMIN_USER;
       localStorage.setItem('ld_user', username);
       document.getElementById('auth-wrap').style.display = 'none';
       document.getElementById('app').style.display = 'block';
       document.getElementById('user-label').textContent = username;
+      document.getElementById('admin-badge').style.display = isAdmin ? 'inline' : 'none';
+      document.getElementById('admin-tab').style.display = isAdmin ? 'inline-block' : 'none';
       setSyncStatus('synced', 'Synced');
+      renderBank();
       renderList('know');
       renderList('learn');
       initNightDate();
     }
 
     function logout() {
-      currentUser = null;
+      currentUser = null; isAdmin = false;
       localStorage.removeItem('ld_user');
       state = { know: [], learn: [], nights: {} };
+      bank = [];
       document.getElementById('app').style.display = 'none';
       document.getElementById('auth-wrap').style.display = 'flex';
       document.getElementById('auth-username').value = '';
       document.getElementById('auth-password').value = '';
       const btn = document.getElementById('auth-btn');
-      btn.disabled = false;
-      btn.textContent = 'Sign in';
+      btn.disabled = false; btn.textContent = 'Sign in';
     }
 
     async function tryAutoLogin() {
@@ -527,18 +621,134 @@
       const r = await sbFetch(`/rest/v1/dances?username=eq.${encodeURIComponent(saved)}&select=data`);
       if (r.ok && r.data && r.data.length > 0) {
         state = r.data[0].data || { know: [], learn: [], nights: {} };
+        await loadBank();
         enterApp(saved);
       }
     }
 
+    // ---- Tabs ----
+
     function switchTab(tab) {
-      const tabs = ['know', 'learn', 'night', 'log'];
+      const tabs = ['bank', 'know', 'learn', 'night', 'log', 'admin'];
       document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', tabs[i] === tab));
       document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
       document.getElementById('tab-' + tab).classList.add('visible');
       if (tab === 'night') renderNight();
       if (tab === 'log') renderLog();
+      if (tab === 'admin') renderAdminBank();
+      if (tab === 'bank') renderBank();
     }
+
+    // ---- Dance Bank (shared, read by all) ----
+
+    function isInList(name, listType) {
+      return state[listType].some(d => d.name.toLowerCase() === name.toLowerCase());
+    }
+
+    function renderBank() {
+      const el = document.getElementById('bank-list');
+      const q = (document.getElementById('bank-search')?.value || '').toLowerCase();
+      const filtered = bank.filter(d => !q || d.name.toLowerCase().includes(q));
+
+      if (!filtered.length) {
+        el.innerHTML = `<div class="empty">${bank.length === 0 ? 'No dances in the bank yet. Ask your admin to add some!' : 'No dances match your search.'}</div>`;
+        return;
+      }
+
+      el.innerHTML = filtered.map(d => {
+        const inKnow = isInList(d.name, 'know');
+        const inLearn = isInList(d.name, 'learn');
+        const statusBadge = inKnow
+          ? `<span class="in-bank-badge">In: I Know</span>`
+          : inLearn ? `<span class="in-bank-badge">In: Want to Learn</span>` : '';
+
+        const addButtons = (!inKnow && !inLearn) ? `
+          <button class="btn xs success" onclick="addFromBank('know','${escAttr(d.name)}')">+ I Know It</button>
+          <button class="btn xs info" onclick="addFromBank('learn','${escAttr(d.name)}')">+ Want to Learn</button>
+        ` : inLearn ? `
+          <button class="btn xs success" onclick="addFromBank('know','${escAttr(d.name)}')">+ I Know It</button>
+        ` : '';
+
+        const demoBtn = d.demo ? `<a class="link-btn demo" href="${escAttr(d.demo)}" target="_blank" rel="noopener">&#9654; Demo</a>` : '';
+        const tutBtn = d.tutorial ? `<a class="link-btn tutorial" href="${escAttr(d.tutorial)}" target="_blank" rel="noopener">&#127891; Tutorial</a>` : '';
+
+        return `
+          <div class="bank-item">
+            <div class="bank-item-head">
+              <span class="bank-item-name">${esc(d.name)}</span>
+              <div class="bank-item-links">${demoBtn}${tutBtn}${statusBadge}</div>
+              <div class="bank-actions">${addButtons}</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function addFromBank(type, name) {
+      // Remove from the other list if present
+      const other = type === 'know' ? 'learn' : 'know';
+      state[other] = state[other].filter(d => d.name.toLowerCase() !== name.toLowerCase());
+      // Add to target if not already there
+      if (!isInList(name, type)) {
+        state[type].push({ id: Date.now() + '', name, added: new Date().toISOString() });
+      }
+      renderBank();
+      renderList('know');
+      renderList('learn');
+      scheduleSave();
+    }
+
+    // ---- Admin: manage bank ----
+
+    function adminAddDance() {
+      if (!isAdmin) return;
+      const name = document.getElementById('bank-name').value.trim();
+      const demo = document.getElementById('bank-demo').value.trim();
+      const tutorial = document.getElementById('bank-tutorial').value.trim();
+      if (!name) { alert('Please enter a dance name.'); return; }
+      if (bank.some(d => d.name.toLowerCase() === name.toLowerCase())) {
+        alert('That dance is already in the bank.');
+        return;
+      }
+      bank.push({ id: Date.now() + '', name, demo, tutorial, added: new Date().toISOString() });
+      document.getElementById('bank-name').value = '';
+      document.getElementById('bank-demo').value = '';
+      document.getElementById('bank-tutorial').value = '';
+      saveBankToCloud();
+      renderAdminBank();
+      renderBank();
+    }
+
+    function adminRemoveDance(id) {
+      if (!isAdmin) return;
+      bank = bank.filter(d => d.id !== id);
+      saveBankToCloud();
+      renderAdminBank();
+      renderBank();
+    }
+
+    function renderAdminBank() {
+      const el = document.getElementById('admin-bank-list');
+      if (!bank.length) {
+        el.innerHTML = `<div class="empty">No dances in the bank yet. Add one above!</div>`;
+        return;
+      }
+      el.innerHTML = bank.map(d => `
+        <div class="bank-item">
+          <div class="bank-item-head">
+            <span class="bank-item-name">${esc(d.name)}</span>
+            <div class="bank-item-links">
+              ${d.demo ? `<a class="link-btn demo" href="${escAttr(d.demo)}" target="_blank" rel="noopener">&#9654; Demo</a>` : '<span style="font-size:12px;color:var(--t3)">No demo</span>'}
+              ${d.tutorial ? `<a class="link-btn tutorial" href="${escAttr(d.tutorial)}" target="_blank" rel="noopener">&#127891; Tutorial</a>` : '<span style="font-size:12px;color:var(--t3)">No tutorial</span>'}
+            </div>
+            <div class="bank-actions">
+              <button class="btn xs danger" onclick="adminRemoveDance('${d.id}')">Remove</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ---- My lists ----
 
     function addDance(type) {
       const inp = document.getElementById(type + '-input');
@@ -553,6 +763,7 @@
     function removeDance(type, id) {
       state[type] = state[type].filter(d => d.id !== id);
       renderList(type);
+      renderBank();
       scheduleSave();
     }
 
@@ -563,13 +774,14 @@
       state.know.push({ ...d });
       renderList('learn');
       renderList('know');
+      renderBank();
       scheduleSave();
     }
 
     function renderList(type) {
       const el = document.getElementById(type + '-list');
       if (!state[type].length) {
-        el.innerHTML = `<div class="empty">${type === 'know' ? 'No dances yet — add your first!' : 'No dances on your wish list yet.'}</div>`;
+        el.innerHTML = `<div class="empty">${type === 'know' ? 'No dances yet — browse the Dance Bank or add one above!' : 'No dances on your wish list yet.'}</div>`;
         return;
       }
       el.innerHTML = state[type].map(d => `
@@ -580,6 +792,8 @@
         </div>
       `).join('');
     }
+
+    // ---- Night ----
 
     function initNightDate() {
       const inp = document.getElementById('night-date');
@@ -657,6 +871,8 @@
       setTimeout(() => msg.textContent = '', 2500);
     }
 
+    // ---- History ----
+
     function renderLog() {
       const el = document.getElementById('log-list');
       const nights = Object.entries(state.nights).sort((a, b) => b[0].localeCompare(a[0]));
@@ -679,6 +895,8 @@
       }).join('');
     }
 
+    // ---- Helpers ----
+
     function formatDate(d) {
       const [y, m, day] = d.split('-');
       const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -687,6 +905,10 @@
 
     function esc(s) {
       return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function escAttr(s) {
+      return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     }
 
     tryAutoLogin();
