@@ -264,6 +264,27 @@
     .user-row .uname{flex:1;font-size:14px;font-weight:500;}
     .user-row .udate{font-size:12px;color:var(--t2);}
 
+    /* SUBMISSIONS TAB */
+    .sub-badge{font-size:11px;font-weight:500;padding:2px 9px;border-radius:20px;white-space:nowrap;}
+    .sub-badge.know{background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border);}
+    .sub-badge.learn{background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border);}
+    .sub-item{border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);margin-bottom:8px;overflow:hidden;}
+    .sub-item-head{display:flex;align-items:center;gap:10px;padding:12px 15px;flex-wrap:wrap;}
+    .sub-item-name{font-size:14px;font-weight:500;flex:1;}
+    .sub-item-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .sub-who{font-size:12px;color:var(--t2);}
+    .sub-actions{display:flex;gap:6px;flex-shrink:0;}
+    .sub-add-form{display:none;background:var(--bg2);border-top:0.5px solid var(--b3);padding:12px 15px;}
+    .sub-add-form.open{display:block;}
+    .sub-add-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+    @media(max-width:540px){.sub-add-grid{grid-template-columns:1fr;}}
+    .sub-add-grid input,.sub-add-grid select{padding:7px 10px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;width:100%;}
+    .sub-add-grid input:focus,.sub-add-grid select:focus{outline:none;border-color:var(--b1);}
+    .sub-add-grid input::placeholder{color:var(--t3);}
+    .sub-add-grid .full{grid-column:1/-1;}
+    .sub-add-row{display:flex;justify-content:flex-end;gap:6px;}
+    .sub-empty-note{font-size:13px;color:var(--t2);margin-bottom:.5rem;}
+
     /* DREW'S PICKS */
     .picks-hero{background:var(--blue-bg);border:0.5px solid var(--blue-border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem;text-align:center;}
     .picks-hero h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--blue-text);margin-bottom:4px;}
@@ -343,6 +364,7 @@
     <button class="tab" onclick="switchTab('log')">History</button>
     <button class="tab" onclick="switchTab('dj')">DJ Freestyle</button>
     <button class="tab picks-tab" onclick="switchTab('picks')">&#9733; Drew's Favs</button>
+    <button class="tab admin-tab" id="submissions-tab" style="display:none" onclick="switchTab('submissions')">&#9888; Submissions <span id="submissions-badge" style="display:none;background:var(--red-text);color:#fff;font-size:10px;padding:1px 6px;border-radius:20px;margin-left:4px;"></span></button>
     <button class="tab admin-tab" id="admin-tab" style="display:none" onclick="switchTab('admin')">&#9733; Admin</button>
   </div>
 
@@ -485,6 +507,12 @@
     <div class="picks-list" id="picks-list"></div>
   </div>
 
+  <!-- SUBMISSIONS (admin only) -->
+  <div id="tab-submissions" class="section">
+    <p class="section-note">Dances added manually by users that aren't in the Dance Bank yet. Click "Add to Bank" to review and add them.</p>
+    <div id="submissions-list"></div>
+  </div>
+
   <!-- ADMIN -->
   <div id="tab-admin" class="section">
     <div class="admin-form">
@@ -519,6 +547,7 @@ let currentUser=null,isAdmin=false;
 let state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
 let bank=[];
 let drewPicks=[];
+let submissions=[]; // shared list of user-submitted dances not in bank
 let selectedDate='',nightSelections={};
 let isSignUp=false,saveTimeout=null,nightSaveTimeout=null;
 let bankFilter='all';
@@ -570,7 +599,18 @@ async function savePicksToCloud(){
   setSyncStatus('synced','Synced');
 }
 
-// ---- Auth ----
+async function loadSubmissions(){
+  const r=await sbFetch(`/rest/v1/dances?username=eq.__submissions__&select=data`);
+  submissions=(r.ok&&r.data&&r.data.length>0)?(r.data[0].data.items||[]):[];
+}
+async function saveSubmissionsToCloud(){
+  const check=await sbFetch(`/rest/v1/dances?username=eq.__submissions__&select=username`);
+  if(check.ok&&check.data&&check.data.length>0){
+    await sbFetch(`/rest/v1/dances?username=eq.__submissions__`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:{items:submissions},updated_at:new Date().toISOString()})});
+  } else {
+    await sbFetch('/rest/v1/dances',{method:'POST',prefer:'return=minimal',body:JSON.stringify({username:'__submissions__',password:'__submissions__',data:{items:submissions}})});
+  }
+}
 function toggleAuthMode(){
   isSignUp=!isSignUp;
   document.getElementById('auth-sub').textContent=isSignUp?'Create an account to get started':'Sign in to sync your dances across devices';
@@ -593,7 +633,7 @@ async function authSubmit(){
     const create=await sbFetch('/rest/v1/dances',{method:'POST',prefer:'return=minimal',body:JSON.stringify({username,password,data:{know:[],learn:[],nights:{},djFreestyles:{},favorites:[]}})});
     if(!create.ok){showAuthError('Could not create account. Please try again.');btn.disabled=false;btn.textContent='Create account';return;}
     state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
-    await loadBank();await loadPicks();enterApp(username);
+    await loadBank();await loadPicks();await loadSubmissions();enterApp(username);
   } else {
     const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(username)}&select=password,data`);
     if(!r.ok||!r.data||r.data.length===0){showAuthError('Username not found.');btn.disabled=false;btn.textContent='Sign in';return;}
@@ -601,7 +641,7 @@ async function authSubmit(){
     state=r.data[0].data||{know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
     if(!state.djFreestyles) state.djFreestyles={};
     if(!state.favorites) state.favorites=[];
-    await loadBank();await loadPicks();enterApp(username);
+    await loadBank();await loadPicks();await loadSubmissions();enterApp(username);
   }
 }
 
@@ -613,16 +653,18 @@ function enterApp(username){
   document.getElementById('user-label').textContent=username;
   document.getElementById('admin-badge').style.display=isAdmin?'inline':'none';
   document.getElementById('admin-tab').style.display=isAdmin?'inline-block':'none';
+  document.getElementById('submissions-tab').style.display=isAdmin?'inline-block':'none';
   // Only show picks admin panel for drew
   document.getElementById('picks-admin-panel').style.display=isAdmin?'block':'none';
   setSyncStatus('synced','Synced');
+  updateSubmissionsBadge();
   renderBank();renderList('know');renderList('learn');initNightDate();renderDJRecords();renderPicks();
 }
 
 function logout(){
   currentUser=null;isAdmin=false;
   localStorage.removeItem('ld_user');
-  state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};bank=[];drewPicks=[];
+  state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};bank=[];drewPicks=[];submissions=[];
   document.getElementById('app').style.display='none';
   document.getElementById('auth-wrap').style.display='flex';
   document.getElementById('auth-username').value='';document.getElementById('auth-password').value='';
@@ -636,13 +678,13 @@ async function tryAutoLogin(){
     state=r.data[0].data||{know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
     if(!state.djFreestyles) state.djFreestyles={};
     if(!state.favorites) state.favorites=[];
-    await loadBank();await loadPicks();enterApp(saved);
+    await loadBank();await loadPicks();await loadSubmissions();enterApp(saved);
   }
 }
 
 // ---- Tabs ----
 function switchTab(tab){
-  const tabs=['bank','know','learn','night','log','dj','picks','admin'];
+  const tabs=['bank','know','learn','night','log','dj','picks','submissions','admin'];
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===tab));
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('visible'));
   document.getElementById('tab-'+tab).classList.add('visible');
@@ -652,6 +694,7 @@ function switchTab(tab){
   if(tab==='bank') renderBank();
   if(tab==='dj') renderDJRecords();
   if(tab==='picks') renderPicks();
+  if(tab==='submissions') renderSubmissions();
 }
 
 // ---- Sort helpers ----
@@ -800,6 +843,14 @@ function addDance(type){
   const name=inp.value.trim();if(!name)return;
   state[type].push({id:Date.now()+'',name,added:new Date().toISOString()});
   inp.value='';renderList(type);scheduleSave();
+  // If not in bank, queue as a submission for admin review
+  const inBank=bank.some(d=>d.name.toLowerCase()===name.toLowerCase());
+  const alreadyQueued=submissions.some(s=>s.name.toLowerCase()===name.toLowerCase());
+  if(!inBank&&!alreadyQueued){
+    submissions.push({id:Date.now()+'_sub',name,addedBy:currentUser,list:type,addedAt:new Date().toISOString()});
+    saveSubmissionsToCloud();
+    if(isAdmin) updateSubmissionsBadge();
+  }
 }
 function removeDance(type,id){
   state[type]=state[type].filter(d=>d.id!==id);
@@ -1166,6 +1217,82 @@ function renderPicks(){
       ${p.note?`<span class="picks-note">"${esc(p.note)}"</span>`:''}
       ${isAdmin?`<div class="picks-item-actions"><button class="btn xs danger" onclick="adminRemovePick('${p.id}')">Remove</button></div>`:''}
     </div>`).join('');
+}
+
+// ---- Submissions ----
+function updateSubmissionsBadge(){
+  const badge=document.getElementById('submissions-badge');
+  if(!badge)return;
+  const count=submissions.length;
+  if(count>0){badge.style.display='inline';badge.textContent=count;}
+  else{badge.style.display='none';}
+}
+function dismissSubmission(id){
+  submissions=submissions.filter(s=>s.id!==id);
+  saveSubmissionsToCloud();renderSubmissions();updateSubmissionsBadge();
+}
+function toggleSubForm(id){
+  const f=document.getElementById('sub-form-'+id);
+  if(f) f.classList.toggle('open');
+}
+function addSubmissionToBank(id){
+  const s=submissions.find(x=>x.id===id);if(!s)return;
+  const name=document.getElementById('sub-bn-'+id).value.trim()||s.name;
+  const demo=document.getElementById('sub-bd-'+id).value.trim();
+  const tutorial=document.getElementById('sub-bt-'+id).value.trim();
+  const difficulty=document.getElementById('sub-diff-'+id).value;
+  if(bank.some(d=>d.name.toLowerCase()===name.toLowerCase())){
+    alert('That dance is already in the bank.');return;
+  }
+  bank.push({id:Date.now()+'',name,demo,tutorial,difficulty,added:new Date().toISOString()});
+  saveBankToCloud();renderBank();renderAdminBank();
+  submissions=submissions.filter(x=>x.id!==id);
+  saveSubmissionsToCloud();renderSubmissions();updateSubmissionsBadge();
+}
+function renderSubmissions(){
+  const el=document.getElementById('submissions-list');
+  if(!submissions.length){
+    el.innerHTML=`<div class="empty">No new submissions — all manually added dances are already in the bank!</div>`;
+    return;
+  }
+  el.innerHTML=submissions.map(s=>{
+    const listLabel=s.list==='know'?'Dances I Know':'Want to Learn';
+    const badgeCls=s.list==='know'?'know':'learn';
+    const dateStr=s.addedAt?formatDate(s.addedAt.slice(0,10)):'';
+    return `
+      <div class="sub-item">
+        <div class="sub-item-head">
+          <span class="sub-item-name">${esc(s.name)}</span>
+          <div class="sub-item-meta">
+            <span class="sub-badge ${badgeCls}">${listLabel}</span>
+            <span class="sub-who">Added by <strong>${esc(s.addedBy||'unknown')}</strong>${dateStr?' on '+dateStr:''}</span>
+          </div>
+          <div class="sub-actions">
+            <button class="btn xs success" onclick="toggleSubForm('${s.id}')">Add to Bank</button>
+            <button class="btn xs danger" onclick="dismissSubmission('${s.id}')">Dismiss</button>
+          </div>
+        </div>
+        <div class="sub-add-form" id="sub-form-${s.id}">
+          <div style="font-size:12px;font-weight:500;color:var(--t2);margin-bottom:8px;">Fill in details before adding to the bank</div>
+          <div class="sub-add-grid">
+            <input type="text" id="sub-bn-${s.id}" value="${escA(s.name)}" placeholder="Dance name" class="full">
+            <input type="url" id="sub-bd-${s.id}" placeholder="Demo link (YouTube URL)">
+            <input type="url" id="sub-bt-${s.id}" placeholder="Tutorial link (YouTube URL)">
+            <select id="sub-diff-${s.id}" class="full">
+              <option value="">Difficulty (optional)</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Improver">Improver</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </div>
+          <div class="sub-add-row">
+            <button class="btn xs" onclick="toggleSubForm('${s.id}')">Cancel</button>
+            <button class="btn xs amber" onclick="addSubmissionToBank('${s.id}')">Confirm &amp; Add</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
 }
 
 // ---- Helpers ----
