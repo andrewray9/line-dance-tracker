@@ -98,8 +98,7 @@
     .dance-item{display:flex;align-items:center;gap:10px;padding:11px 15px;border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);}
     .dance-item .name{flex:1;font-size:14px;font-weight:500;}
     .fav-btn{background:none;border:none;cursor:pointer;font-size:18px;line-height:1;padding:0 2px;color:var(--t3);transition:color 0.15s;}
-    .fav-btn.active{color:#D4537E;}
-    .fav-btn:hover{color:#D4537E;}
+    .fav-btn.active{color:#D4537E;}.fav-btn:hover{color:#D4537E;}
 
     /* DANCE BANK */
     .bank-controls{margin-bottom:1.25rem;}
@@ -169,6 +168,36 @@
     .save-row{display:flex;justify-content:flex-end;margin-top:1.25rem;gap:10px;align-items:center;}
     .save-msg{font-size:13px;color:var(--green-dark);font-weight:500;}
 
+    /* HIGHLIGHTS MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;padding:1rem;}
+    .modal-card{background:var(--bg);border-radius:var(--radius-lg);padding:2rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+    .modal-card h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:4px;}
+    .modal-card .modal-date{font-size:13px;color:var(--t2);margin-bottom:1.5rem;}
+    .modal-step{margin-bottom:1.5rem;}
+    .modal-step-label{font-size:12px;font-weight:500;color:var(--t2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;}
+    .modal-step select{width:100%;padding:9px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;}
+    .modal-step select:focus{outline:none;border-color:var(--b1);}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:1.5rem;}
+
+    /* HIGHLIGHTS DISPLAY */
+    .highlights-panel{background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:1.5rem;margin-top:1.25rem;}
+    .highlights-date{font-size:13px;color:var(--t2);text-align:center;margin-bottom:1.5rem;}
+    .highlights-favorites{display:flex;flex-direction:column;gap:10px;align-items:center;margin-bottom:1.5rem;}
+    .highlight-item{display:flex;align-items:center;gap:12px;padding:12px 20px;border-radius:var(--radius-lg);width:100%;max-width:360px;}
+    .highlight-item.rank-1{background:linear-gradient(135deg,#FAEEDA,#FAC775);border:0.5px solid var(--amber-border);}
+    .highlight-item.rank-2{background:var(--bg2);border:0.5px solid var(--b2);}
+    .highlight-item.rank-3{background:var(--bg2);border:0.5px solid var(--b2);}
+    .highlight-rank-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;min-width:32px;text-align:center;}
+    .highlight-item.rank-1 .highlight-rank-num{color:#854F0B;}
+    .highlight-item.rank-2 .highlight-rank-num{color:var(--t3);}
+    .highlight-item.rank-3 .highlight-rank-num{color:#854F0B;opacity:0.6;}
+    .highlight-name{font-size:15px;font-weight:500;flex:1;}
+    .highlight-label{font-size:11px;font-weight:500;color:var(--t2);}
+    .highlights-divider{border:none;border-top:0.5px solid var(--b3);margin:1.25rem 0;}
+    .highlights-total{text-align:center;font-size:14px;color:var(--t2);margin-bottom:1.25rem;}
+    .highlights-total strong{font-size:20px;font-weight:700;color:var(--t1);display:block;}
+    .highlights-all{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
+
     /* HISTORY */
     .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:1.5rem;}
     .stat-card{background:var(--bg2);border-radius:var(--radius-md);padding:1rem;}
@@ -192,18 +221,43 @@
     .day-log.open .day-log-body{display:flex;}
     .log-pill{font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border);}
 
-    /* DJ TAB */
-    .dj-timer-card{background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;text-align:center;}
-    .timer-display{font-family:'Playfair Display',serif;font-size:56px;font-weight:700;letter-spacing:2px;color:var(--t1);margin:1rem 0;}
-    .timer-controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;}
-    .dj-select-row{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;}
-    .dj-select-row label{font-size:13px;color:var(--t2);}
-    .dj-select-row input{padding:7px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;min-width:160px;}
-    .dj-select-row input:focus{outline:none;border-color:var(--b1);}
-    .dj-record-item{display:flex;align-items:center;gap:10px;padding:11px 15px;border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);margin-bottom:6px;flex-wrap:wrap;}
+    /* ALL DANCES ACCORDION */
+    .accordion{border:0.5px solid var(--b3);border-radius:var(--radius-lg);overflow:hidden;margin-top:1rem;}
+    .accordion-head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg2);cursor:pointer;user-select:none;}
+    .accordion-head-title{font-size:14px;font-weight:500;flex:1;}
+    .accordion-body{display:none;padding:12px 16px;background:var(--bg);}
+    .accordion.open .accordion-body{display:block;}
+    .accordion.open .caret{transform:rotate(180deg);}
+    .all-dances-list{display:flex;flex-direction:column;gap:4px;}
+    .all-dance-row{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--radius-md);}
+    .all-dance-row:nth-child(odd){background:var(--bg2);}
+    .all-dance-name{flex:1;font-size:13px;}
+    .all-dance-count{font-size:12px;color:var(--t2);white-space:nowrap;}
+
+    /* DJ TAB - manual entry */
+    .dj-entry-card{background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;}
+    .dj-entry-title{font-size:14px;font-weight:500;margin-bottom:1rem;}
+    .dj-entry-grid{display:grid;grid-template-columns:1fr 80px 80px auto;gap:8px;align-items:end;margin-bottom:8px;}
+    @media(max-width:600px){.dj-entry-grid{grid-template-columns:1fr 1fr;}}
+    .dj-entry-grid label{font-size:11px;font-weight:500;color:var(--t2);display:block;margin-bottom:4px;}
+    .dj-entry-grid input{padding:8px 10px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;width:100%;}
+    .dj-entry-grid input:focus{outline:none;border-color:var(--b1);}
+    .dj-entry-grid input::placeholder{color:var(--t3);}
+    .dj-record-item{border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);margin-bottom:8px;overflow:hidden;}
+    .dj-record-head{display:flex;align-items:center;gap:10px;padding:11px 15px;flex-wrap:wrap;}
     .dj-record-name{flex:1;font-size:14px;font-weight:500;min-width:100px;}
     .dj-stat{font-size:12px;color:var(--t2);}
     .dj-stat strong{color:var(--t1);font-weight:500;}
+    .dj-sessions-body{display:none;padding:10px 15px;border-top:0.5px solid var(--b3);background:var(--bg2);}
+    .dj-record-item.open .dj-sessions-body{display:block;}
+    .dj-session-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:var(--radius-md);margin-bottom:4px;background:var(--bg);}
+    .dj-session-row:last-child{margin-bottom:0;}
+    .dj-session-num{font-size:11px;color:var(--t3);min-width:20px;}
+    .dj-session-time{flex:1;font-size:13px;}
+    .dj-session-edit{display:none;flex:1;gap:4px;}
+    .dj-session-edit.open{display:flex;}
+    .dj-session-edit input{padding:4px 8px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:12px;font-family:'DM Sans',sans-serif;width:50px;}
+    .dj-session-edit input:focus{outline:none;border-color:var(--b1);}
 
     /* ADMIN USERS */
     .user-row{display:flex;align-items:center;gap:10px;padding:10px 15px;border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);margin-bottom:6px;}
@@ -230,6 +284,30 @@
   </style>
 </head>
 <body>
+
+<!-- HIGHLIGHTS MODAL -->
+<div class="modal-overlay" id="highlights-modal" style="display:none">
+  <div class="modal-card">
+    <h2>&#9733; Night Highlights</h2>
+    <div class="modal-date" id="highlights-modal-date"></div>
+    <div class="modal-step">
+      <div class="modal-step-label">1st favorite dance of the night</div>
+      <select id="hl-pick-1"><option value="">Select a dance...</option></select>
+    </div>
+    <div class="modal-step">
+      <div class="modal-step-label">2nd favorite dance of the night</div>
+      <select id="hl-pick-2"><option value="">Select a dance...</option></select>
+    </div>
+    <div class="modal-step">
+      <div class="modal-step-label">3rd favorite dance of the night</div>
+      <select id="hl-pick-3"><option value="">Select a dance...</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeHighlightsModal()">Cancel</button>
+      <button class="btn primary" onclick="saveHighlights()">Show Highlights</button>
+    </div>
+  </div>
+</div>
 
 <!-- AUTH -->
 <div class="auth-wrap" id="auth-wrap">
@@ -263,7 +341,7 @@
     <button class="tab" onclick="switchTab('learn')">Want to Learn</button>
     <button class="tab" onclick="switchTab('night')">My Night</button>
     <button class="tab" onclick="switchTab('log')">History</button>
-    <button class="tab" onclick="switchTab('dj')">DJ Timer</button>
+    <button class="tab" onclick="switchTab('dj')">DJ Freestyle</button>
     <button class="tab picks-tab" onclick="switchTab('picks')">&#9733; Drew's Favs</button>
     <button class="tab admin-tab" id="admin-tab" style="display:none" onclick="switchTab('admin')">&#9733; Admin</button>
   </div>
@@ -320,7 +398,7 @@
       <label>Date:</label>
       <input type="date" id="night-date">
       <label>DJ:</label>
-      <input type="text" id="night-dj" placeholder="DJ name (optional)" style="min-width:160px;">
+      <input type="text" id="night-dj" placeholder="DJ name (optional)" style="min-width:160px;" oninput="scheduleNightSave()">
     </div>
     <div class="night-grid">
       <div class="night-panel">
@@ -340,8 +418,9 @@
     </div>
     <div class="save-row">
       <span class="save-msg" id="save-msg"></span>
-      <button class="btn primary" onclick="saveNight()">Save Night</button>
+      <button class="btn info" onclick="openHighlightsModal()">&#9733; Night Highlights</button>
     </div>
+    <div id="highlights-display"></div>
   </div>
 
   <!-- HISTORY -->
@@ -351,23 +430,39 @@
     <div class="top5-list" id="top5-list"></div>
     <div class="section-title">All nights</div>
     <div id="log-list"></div>
+    <div class="accordion" id="all-dances-accordion">
+      <div class="accordion-head" onclick="toggleAllDancesAccordion()">
+        <span class="accordion-head-title">All dances A–Z with counts</span>
+        <span class="caret">&#9660;</span>
+      </div>
+      <div class="accordion-body">
+        <div class="all-dances-list" id="all-dances-list"></div>
+      </div>
+    </div>
   </div>
 
-  <!-- DJ TIMER -->
+  <!-- DJ FREESTYLE -->
   <div id="tab-dj" class="section">
-    <div class="dj-timer-card">
-      <div class="dj-select-row">
-        <label>DJ name:</label>
-        <input type="text" id="dj-timer-name" placeholder="Enter DJ name">
+    <div class="dj-entry-card">
+      <div class="dj-entry-title">Log a freestyle session</div>
+      <div class="dj-entry-grid">
+        <div>
+          <label>DJ name</label>
+          <input type="text" id="dj-entry-name" placeholder="DJ name">
+        </div>
+        <div>
+          <label>Minutes</label>
+          <input type="number" id="dj-entry-min" placeholder="0" min="0" max="59">
+        </div>
+        <div>
+          <label>Seconds</label>
+          <input type="number" id="dj-entry-sec" placeholder="0" min="0" max="59">
+        </div>
+        <div style="padding-bottom:1px;">
+          <button class="btn primary" onclick="djAddSession()" style="height:38px;">Add</button>
+        </div>
       </div>
-      <div class="timer-display" id="timer-display">00:00</div>
-      <div class="timer-controls">
-        <button class="btn primary" id="timer-start-btn" onclick="timerStart()">Start</button>
-        <button class="btn" id="timer-pause-btn" onclick="timerPause()" disabled>Pause</button>
-        <button class="btn danger" onclick="timerReset()">Reset</button>
-        <button class="btn success" onclick="timerSave()">Save this freestyle</button>
-      </div>
-      <p style="font-size:12px;color:var(--t2)">Start the timer when the freestyle section begins, pause or save when it ends.</p>
+      <p style="font-size:12px;color:var(--t2)">Enter the duration of a freestyle section manually.</p>
     </div>
     <div class="section-title">Freestyle records by DJ</div>
     <div id="dj-records-list"></div>
@@ -384,7 +479,7 @@
         <div class="title">&#9733; Add a pick</div>
         <input type="text" id="pick-dance-name" placeholder="Dance name">
         <textarea id="pick-dance-note" placeholder="Why you love it"></textarea>
-        <div class="row"><button class="btn blue" onclick="adminAddPick()">Add to picks</button></div>
+        <div class="row"><button class="btn info" onclick="adminAddPick()">Add to picks</button></div>
       </div>
     </div>
     <div class="picks-list" id="picks-list"></div>
@@ -423,13 +518,12 @@ const ADMIN_USER='drew';
 let currentUser=null,isAdmin=false;
 let state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
 let bank=[];
-let drewPicks=[]; // stored in __picks__ bank row
+let drewPicks=[];
 let selectedDate='',nightSelections={};
-let isSignUp=false,saveTimeout=null;
+let isSignUp=false,saveTimeout=null,nightSaveTimeout=null;
 let bankFilter='all';
 let sortState={bank:false,know:false,learn:false,pick:false};
 let favFilterActive=false;
-let timerInterval=null,timerSeconds=0,timerRunning=false;
 
 // ---- Supabase ----
 async function sbFetch(path,options={}){
@@ -461,7 +555,6 @@ async function saveBankToCloud(){
   }
   setSyncStatus('synced','Synced');
 }
-
 async function loadPicks(){
   const r=await sbFetch(`/rest/v1/dances?username=eq.__picks__&select=data`);
   drewPicks=(r.ok&&r.data&&r.data.length>0)?(r.data[0].data.picks||[]):[];
@@ -520,7 +613,8 @@ function enterApp(username){
   document.getElementById('user-label').textContent=username;
   document.getElementById('admin-badge').style.display=isAdmin?'inline':'none';
   document.getElementById('admin-tab').style.display=isAdmin?'inline-block':'none';
-  if(isAdmin) document.getElementById('picks-admin-panel').style.display='block';
+  // Only show picks admin panel for drew
+  document.getElementById('picks-admin-panel').style.display=isAdmin?'block':'none';
   setSyncStatus('synced','Synced');
   renderBank();renderList('know');renderList('learn');initNightDate();renderDJRecords();renderPicks();
 }
@@ -529,7 +623,6 @@ function logout(){
   currentUser=null;isAdmin=false;
   localStorage.removeItem('ld_user');
   state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};bank=[];drewPicks=[];
-  timerStop();timerSeconds=0;updateTimerDisplay();
   document.getElementById('app').style.display='none';
   document.getElementById('auth-wrap').style.display='flex';
   document.getElementById('auth-username').value='';document.getElementById('auth-password').value='';
@@ -565,7 +658,7 @@ function switchTab(tab){
 function toggleSort(key){
   sortState[key]=!sortState[key];
   const btn=document.getElementById(key+'-sort-btn');
-  if(btn){btn.classList.toggle('active',sortState[key]);}
+  if(btn) btn.classList.toggle('active',sortState[key]);
   if(key==='bank') renderBank();
   else if(key==='know') renderList('know');
   else if(key==='learn') renderList('learn');
@@ -588,11 +681,9 @@ function toggleFavFilter(){
 function setBankFilter(diff,el){
   bankFilter=diff;
   document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));
-  el.classList.add('active');
-  renderBank();
+  el.classList.add('active');renderBank();
 }
 function isInList(name,type){return state[type].some(d=>d.name.toLowerCase()===name.toLowerCase());}
-
 function renderBank(){
   const el=document.getElementById('bank-list');
   const q=(document.getElementById('bank-search')?.value||'');
@@ -610,7 +701,6 @@ function renderBank(){
     return `<div class="bank-item"><div class="bank-item-head"><span class="bank-item-name">${esc(d.name)}</span><div class="bank-item-meta">${diffBadge}${demoBtn}${tutBtn}${statusBadge}</div><div class="bank-actions">${addBtns}</div></div></div>`;
   }).join('');
 }
-
 function addFromBank(type,name){
   const other=type==='know'?'learn':'know';
   state[other]=state[other].filter(d=>d.name.toLowerCase()!==name.toLowerCase());
@@ -743,19 +833,19 @@ function renderList(type){
     </div>`).join('');
 }
 
-// ---- Night ----
+// ---- Night (auto-save) ----
 function getNightData(date){
   const n=state.nights[date];
-  if(!n) return{dances:[],dj:''};
-  if(Array.isArray(n)) return{dances:n,dj:''};
-  return n;
+  if(!n) return{dances:[],dj:'',highlights:null};
+  if(Array.isArray(n)) return{dances:n,dj:'',highlights:null};
+  return{highlights:null,...n};
 }
 function initNightDate(){
   const inp=document.getElementById('night-date');
   const today=new Date().toISOString().slice(0,10);
   inp.value=today;selectedDate=today;
-  loadNightSelections();renderPickList();renderDidList();loadNightDJ();
-  inp.onchange=()=>{selectedDate=inp.value;loadNightSelections();renderPickList();renderDidList();loadNightDJ();};
+  loadNightSelections();renderPickList();renderDidList();loadNightDJ();renderHighlightsDisplay();
+  inp.onchange=()=>{selectedDate=inp.value;loadNightSelections();renderPickList();renderDidList();loadNightDJ();renderHighlightsDisplay();};
 }
 function loadNightSelections(){
   nightSelections={};const nd=getNightData(selectedDate);nd.dances.forEach(id=>nightSelections[id]=true);
@@ -764,7 +854,7 @@ function loadNightDJ(){document.getElementById('night-dj').value=getNightData(se
 function renderNight(){
   if(!selectedDate)initNightDate();
   selectedDate=document.getElementById('night-date').value||new Date().toISOString().slice(0,10);
-  loadNightSelections();renderPickList();renderDidList();loadNightDJ();
+  loadNightSelections();renderPickList();renderDidList();loadNightDJ();renderHighlightsDisplay();
 }
 function renderPickList(){
   const el=document.getElementById('pick-list');
@@ -785,22 +875,81 @@ function renderDidList(){
 }
 function togglePick(id){
   if(nightSelections[id])delete nightSelections[id];else nightSelections[id]=true;
-  renderPickList();renderDidList();
+  renderPickList();renderDidList();scheduleNightSave();
 }
-async function saveNight(){
-  if(!selectedDate)return;
-  const dj=document.getElementById('night-dj').value.trim();
-  state.nights[selectedDate]={dances:Object.keys(nightSelections),dj};
-  const msg=document.getElementById('save-msg');msg.textContent='Saving...';
-  await saveToCloud();msg.textContent='Saved!';setTimeout(()=>msg.textContent='',2500);
+// Auto-save night on any change
+function scheduleNightSave(){
+  clearTimeout(nightSaveTimeout);
+  nightSaveTimeout=setTimeout(()=>{
+    if(!selectedDate)return;
+    const dj=document.getElementById('night-dj').value.trim();
+    const existing=getNightData(selectedDate);
+    state.nights[selectedDate]={...existing,dances:Object.keys(nightSelections),dj};
+    const msg=document.getElementById('save-msg');
+    msg.textContent='Saved';
+    setTimeout(()=>msg.textContent='',2000);
+    scheduleSave();
+  },600);
+}
+
+// ---- Highlights ----
+function openHighlightsModal(){
+  const dances=state.know.filter(d=>nightSelections[d.id]);
+  if(!dances.length){alert('Select some dances for tonight first!');return;}
+  document.getElementById('highlights-modal-date').textContent=formatDate(selectedDate);
+  ['hl-pick-1','hl-pick-2','hl-pick-3'].forEach(id=>{
+    const sel=document.getElementById(id);
+    sel.innerHTML='<option value="">Select a dance...</option>'+dances.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
+  });
+  // Restore existing picks if any
+  const existing=getNightData(selectedDate);
+  if(existing.highlights){
+    if(existing.highlights[0]) document.getElementById('hl-pick-1').value=existing.highlights[0];
+    if(existing.highlights[1]) document.getElementById('hl-pick-2').value=existing.highlights[1];
+    if(existing.highlights[2]) document.getElementById('hl-pick-3').value=existing.highlights[2];
+  }
+  document.getElementById('highlights-modal').style.display='flex';
+}
+function closeHighlightsModal(){document.getElementById('highlights-modal').style.display='none';}
+function saveHighlights(){
+  const h1=document.getElementById('hl-pick-1').value;
+  const h2=document.getElementById('hl-pick-2').value;
+  const h3=document.getElementById('hl-pick-3').value;
+  const existing=getNightData(selectedDate);
+  state.nights[selectedDate]={...existing,highlights:[h1,h2,h3]};
+  scheduleSave();closeHighlightsModal();renderHighlightsDisplay();
+}
+function renderHighlightsDisplay(){
+  const el=document.getElementById('highlights-display');
+  const nd=getNightData(selectedDate);
+  if(!nd.highlights||!nd.highlights.some(Boolean)){el.innerHTML='';return;}
+  const allDances=state.know.filter(d=>nightSelections[d.id]);
+  const getName=id=>state.know.find(d=>d.id===id)?.name||'';
+  const labels=['1st favorite','2nd favorite','3rd favorite'];
+  const rankCls=['rank-1','rank-2','rank-3'];
+  const favItems=nd.highlights.map((id,i)=>{
+    if(!id) return '';
+    return `<div class="highlight-item ${rankCls[i]}">
+      <span class="highlight-rank-num">${i+1}</span>
+      <div><div class="highlight-name">${esc(getName(id))}</div><div class="highlight-label">${labels[i]}</div></div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`
+    <div class="highlights-panel">
+      <div class="highlights-date">${formatDate(selectedDate)}</div>
+      <div class="highlights-favorites">${favItems}</div>
+      <hr class="highlights-divider">
+      <div class="highlights-total"><strong>${allDances.length}</strong> total dances tonight</div>
+      <div class="highlights-all">${allDances.map(d=>`<span class="log-pill">${esc(d.name)}</span>`).join('')}</div>
+    </div>`;
 }
 
 // ---- History ----
 function getAllDanceCounts(){
   const counts={};
   Object.values(state.nights).forEach(val=>{
-    const nd=Array.isArray(val)?{dances:val,dj:''}:val;
-    nd.dances.forEach(id=>{counts[id]=(counts[id]||0)+1;});
+    const nd=Array.isArray(val)?{dances:val}:val;
+    (nd.dances||[]).forEach(id=>{counts[id]=(counts[id]||0)+1;});
   });
   return counts;
 }
@@ -813,7 +962,7 @@ function renderHistoryStats(){
   const djNights={};
   Object.entries(state.nights).forEach(([date,val])=>{
     const nd=Array.isArray(val)?{dances:val,dj:''}:val;
-    const dc=nd.dances.length;
+    const dc=(nd.dances||[]).length;
     if(date.startsWith(thisMonth)) monthCount+=dc;
     if(date.startsWith(thisYear)) yearCount+=dc;
     if(dc>0) totalNights++;
@@ -849,7 +998,7 @@ function renderLog(){
   if(!nights.length){el.innerHTML=`<div class="empty">No nights logged yet. Go dance!</div>`;return;}
   el.innerHTML=nights.map(([date,val])=>{
     const nd=Array.isArray(val)?{dances:val,dj:''}:val;
-    const dances=nd.dances.map(id=>state.know.find(d=>d.id===id)).filter(Boolean);
+    const dances=(nd.dances||[]).map(id=>state.know.find(d=>d.id===id)).filter(Boolean);
     const pills=dances.map(d=>`<span class="log-pill">${esc(d.name)}</span>`).join('');
     const djLabel=nd.dj?`<span class="dj-name">DJ: ${esc(nd.dj)}</span>`:'';
     return `
@@ -864,60 +1013,131 @@ function renderLog(){
       </div>`;
   }).join('');
 }
+function toggleAllDancesAccordion(){
+  const acc=document.getElementById('all-dances-accordion');
+  acc.classList.toggle('open');
+  if(acc.classList.contains('open')) renderAllDances();
+}
+function renderAllDances(){
+  const el=document.getElementById('all-dances-list');
+  const counts=getAllDanceCounts();
+  // Build name-based map
+  const named=Object.entries(counts).map(([id,count])=>{
+    const dance=state.know.find(d=>d.id===id);
+    return dance?{name:dance.name,count}:null;
+  }).filter(Boolean).sort((a,b)=>a.name.localeCompare(b.name));
+  if(!named.length){el.innerHTML=`<div class="empty">No dances recorded yet.</div>`;return;}
+  el.innerHTML=named.map(x=>`
+    <div class="all-dance-row">
+      <span class="all-dance-name">${esc(x.name)}</span>
+      <span class="all-dance-count">${x.count} time${x.count!==1?'s':''}</span>
+    </div>`).join('');
+}
 
-// ---- DJ Timer ----
-function updateTimerDisplay(){
-  const m=Math.floor(timerSeconds/60),s=timerSeconds%60;
-  document.getElementById('timer-display').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+// ---- DJ Freestyle (manual entry) ----
+function fmtSecs(s){const m=Math.floor(s/60),sec=s%60;return`${m}m ${String(sec).padStart(2,'0')}s`;}
+function parseEntryToSecs(){
+  const m=parseInt(document.getElementById('dj-entry-min').value)||0;
+  const s=parseInt(document.getElementById('dj-entry-sec').value)||0;
+  return m*60+s;
 }
-function timerStart(){
-  if(timerRunning)return;timerRunning=true;
-  timerInterval=setInterval(()=>{timerSeconds++;updateTimerDisplay();},1000);
-  document.getElementById('timer-start-btn').disabled=true;
-  document.getElementById('timer-pause-btn').disabled=false;
-}
-function timerPause(){
-  if(!timerRunning)return;timerStop();
-  document.getElementById('timer-start-btn').disabled=false;
-  document.getElementById('timer-start-btn').textContent='Resume';
-}
-function timerStop(){clearInterval(timerInterval);timerInterval=null;timerRunning=false;}
-function timerReset(){
-  timerStop();timerSeconds=0;updateTimerDisplay();
-  document.getElementById('timer-start-btn').disabled=false;
-  document.getElementById('timer-start-btn').textContent='Start';
-  document.getElementById('timer-pause-btn').disabled=true;
-}
-function timerSave(){
-  if(timerSeconds===0){alert('Start the timer first!');return;}
-  const djName=document.getElementById('dj-timer-name').value.trim();
+function djAddSession(){
+  const djName=document.getElementById('dj-entry-name').value.trim();
   if(!djName){alert('Please enter a DJ name.');return;}
-  timerStop();
+  const secs=parseEntryToSecs();
+  if(secs===0){alert('Please enter a duration greater than 0.');return;}
   if(!state.djFreestyles) state.djFreestyles={};
   if(!state.djFreestyles[djName]) state.djFreestyles[djName]=[];
-  state.djFreestyles[djName].push(timerSeconds);
-  scheduleSave();timerReset();renderDJRecords();
-  alert(`Saved! ${fmtSecs(timerSeconds)} freestyle for ${djName}.`);
+  // Store as objects with id for edit/delete
+  state.djFreestyles[djName].push({id:Date.now()+'',secs});
+  document.getElementById('dj-entry-min').value='';
+  document.getElementById('dj-entry-sec').value='';
+  scheduleSave();renderDJRecords();
 }
-function fmtSecs(s){const m=Math.floor(s/60),sec=s%60;return`${m}m ${sec}s`;}
+function toggleDJSessions(djName){
+  const el=document.getElementById('dj-sessions-'+cssId(djName));
+  if(el) el.closest('.dj-record-item').classList.toggle('open');
+}
+function djDeleteSession(djName,sessionId){
+  if(!confirm('Delete this session?'))return;
+  const arr=state.djFreestyles[djName];
+  if(!arr)return;
+  state.djFreestyles[djName]=arr.filter(s=>(s.id||'')!==sessionId);
+  if(!state.djFreestyles[djName].length) delete state.djFreestyles[djName];
+  scheduleSave();renderDJRecords();
+}
+function djStartEdit(djName,sessionId){
+  document.getElementById('dj-view-'+sessionId).style.display='none';
+  document.getElementById('dj-edit-'+sessionId).classList.add('open');
+  const arr=state.djFreestyles[djName]||[];
+  const s=arr.find(x=>x.id===sessionId);
+  if(s){
+    document.getElementById('dj-edit-m-'+sessionId).value=Math.floor(s.secs/60);
+    document.getElementById('dj-edit-s-'+sessionId).value=s.secs%60;
+  }
+}
+function djCancelEdit(sessionId){
+  document.getElementById('dj-view-'+sessionId).style.display='';
+  document.getElementById('dj-edit-'+sessionId).classList.remove('open');
+}
+function djSaveEdit(djName,sessionId){
+  const m=parseInt(document.getElementById('dj-edit-m-'+sessionId).value)||0;
+  const s=parseInt(document.getElementById('dj-edit-s-'+sessionId).value)||0;
+  const secs=m*60+s;
+  if(secs===0){alert('Duration must be greater than 0.');return;}
+  const arr=state.djFreestyles[djName]||[];
+  const entry=arr.find(x=>x.id===sessionId);
+  if(entry) entry.secs=secs;
+  scheduleSave();renderDJRecords();
+}
+function cssId(s){return s.replace(/[^a-zA-Z0-9]/g,'_');}
 function renderDJRecords(){
   const el=document.getElementById('dj-records-list');
-  const djs=Object.entries(state.djFreestyles||{}).filter(([,arr])=>arr&&arr.length>0);
-  if(!djs.length){el.innerHTML=`<div class="empty">No freestyle sessions saved yet.</div>`;return;}
+  if(!state.djFreestyles){el.innerHTML=`<div class="empty">No freestyle sessions logged yet.</div>`;return;}
+  // Normalise: entries may be plain numbers (legacy) or {id,secs}
+  Object.keys(state.djFreestyles).forEach(dj=>{
+    state.djFreestyles[dj]=state.djFreestyles[dj].map(x=>{
+      if(typeof x==='number') return{id:Date.now()+Math.random()+'',secs:x};
+      return x;
+    });
+  });
+  const djs=Object.entries(state.djFreestyles).filter(([,arr])=>arr&&arr.length>0);
+  if(!djs.length){el.innerHTML=`<div class="empty">No freestyle sessions logged yet.</div>`;return;}
   const djNights={};
   Object.values(state.nights).forEach(val=>{
     const nd=Array.isArray(val)?{dances:val,dj:''}:val;
     if(nd.dj) djNights[nd.dj]=(djNights[nd.dj]||0)+1;
   });
-  el.innerHTML=djs.map(([name,times])=>{
-    const avg=Math.round(times.reduce((a,b)=>a+b,0)/times.length);
+  el.innerHTML=djs.map(([name,sessions])=>{
+    const totalSecs=sessions.reduce((a,s)=>a+s.secs,0);
+    const avg=Math.round(totalSecs/sessions.length);
     const nights=djNights[name]||0;
+    const sid=cssId(name);
+    const sessionRows=sessions.map((s,i)=>`
+      <div class="dj-session-row">
+        <span class="dj-session-num">${i+1}.</span>
+        <span class="dj-session-time" id="dj-view-${s.id}">${fmtSecs(s.secs)}</span>
+        <div class="dj-session-edit" id="dj-edit-${s.id}">
+          <input type="number" id="dj-edit-m-${s.id}" min="0" max="59" placeholder="m" style="width:50px;">
+          <span style="font-size:12px;color:var(--t2)">m</span>
+          <input type="number" id="dj-edit-s-${s.id}" min="0" max="59" placeholder="s" style="width:50px;">
+          <span style="font-size:12px;color:var(--t2)">s</span>
+          <button class="btn xs success" onclick="djSaveEdit('${escA(name)}','${s.id}')">Save</button>
+          <button class="btn xs" onclick="djCancelEdit('${s.id}')">Cancel</button>
+        </div>
+        <button class="btn xs info" onclick="djStartEdit('${escA(name)}','${s.id}')" title="Edit">Edit</button>
+        <button class="btn xs danger" onclick="djDeleteSession('${escA(name)}','${s.id}')" title="Delete">Delete</button>
+      </div>`).join('');
     return `
-      <div class="dj-record-item">
-        <span class="dj-record-name">${esc(name)}</span>
-        <span class="dj-stat">Sessions: <strong>${times.length}</strong></span>
-        <span class="dj-stat">Avg freestyle: <strong>${fmtSecs(avg)}</strong></span>
-        <span class="dj-stat">Nights DJ'd: <strong>${nights}</strong></span>
+      <div class="dj-record-item" id="dj-item-${sid}">
+        <div class="dj-record-head" onclick="toggleDJSessions('${escA(name)}')" style="cursor:pointer">
+          <span class="dj-record-name">${esc(name)}</span>
+          <span class="dj-stat">Sessions: <strong>${sessions.length}</strong></span>
+          <span class="dj-stat">Avg: <strong>${fmtSecs(avg)}</strong></span>
+          <span class="dj-stat">Nights DJ'd: <strong>${nights}</strong></span>
+          <span class="caret" style="font-size:11px;color:var(--t2)">&#9660;</span>
+        </div>
+        <div class="dj-sessions-body" id="dj-sessions-${sid}">${sessionRows}</div>
       </div>`;
   }).join('');
 }
@@ -929,20 +1149,16 @@ function adminAddPick(){
   const note=document.getElementById('pick-dance-note').value.trim();
   if(!name){alert('Please enter a dance name.');return;}
   drewPicks.push({id:Date.now()+'',name,note,added:new Date().toISOString()});
-  document.getElementById('pick-dance-name').value='';
-  document.getElementById('pick-dance-note').value='';
+  document.getElementById('pick-dance-name').value='';document.getElementById('pick-dance-note').value='';
   savePicksToCloud();renderPicks();
 }
 function adminRemovePick(id){
   if(!isAdmin)return;
-  drewPicks=drewPicks.filter(p=>p.id!==id);
-  savePicksToCloud();renderPicks();
+  drewPicks=drewPicks.filter(p=>p.id!==id);savePicksToCloud();renderPicks();
 }
 function renderPicks(){
   const el=document.getElementById('picks-list');
-  if(!drewPicks.length){
-    el.innerHTML=`<div class="empty">${isAdmin?'Add your first pick above!':'No picks yet — check back soon!'}</div>`;return;
-  }
+  if(!drewPicks.length){el.innerHTML=`<div class="empty">${isAdmin?'Add your first pick above!':'No picks yet — check back soon!'}</div>`;return;}
   el.innerHTML=drewPicks.map((p,i)=>`
     <div class="picks-item">
       <span class="picks-num">${i+1}</span>
@@ -954,6 +1170,7 @@ function renderPicks(){
 
 // ---- Helpers ----
 function formatDate(d){
+  if(!d) return '';
   const[y,m,day]=d.split('-');
   const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   return`${months[+m-1]} ${+day}, ${y}`;
