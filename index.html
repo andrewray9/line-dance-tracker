@@ -1,0 +1,2119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Line Dance Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="https://i.imgur.com/WDByZ1N.png">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --bg:#ffffff;--bg2:#f5f4f0;--bg3:#eeede9;
+      --t1:#1a1a18;--t2:#6b6a66;--t3:#a8a7a3;
+      --b1:rgba(0,0,0,0.4);--b2:rgba(0,0,0,0.3);--b3:rgba(0,0,0,0.15);
+      --radius-md:8px;--radius-lg:12px;
+      --green-bg:#EAF3DE;--green-border:#C0DD97;--green-text:#27500A;--green-dark:#3B6D11;
+      --red-bg:#FCEBEB;--red-border:#F7C1C1;--red-text:#A32D2D;
+      --blue-bg:#E6F1FB;--blue-border:#B5D4F4;--blue-text:#0C447C;
+      --amber-bg:#FAEEDA;--amber-border:#FAC775;--amber-text:#633806;
+      --purple-bg:#EEEDFE;--purple-border:#AFA9EC;--purple-text:#3C3489;
+      --pink-bg:#FBEAF0;--pink-border:#ED93B1;--pink-text:#72243E;
+    }
+    @media(prefers-color-scheme:dark){
+      :root{
+        --bg:#1c1c1a;--bg2:#252523;--bg3:#2e2e2b;
+        --t1:#f0efe9;--t2:#9e9d98;--t3:#5a5955;
+        --b1:rgba(255,255,255,0.4);--b2:rgba(255,255,255,0.3);--b3:rgba(255,255,255,0.12);
+        /* Green tokens remapped for dark mode so selected/active states stay legible */
+        --green-bg:#1a2e10;--green-border:#3B6D11;--green-text:#9fd870;--green-dark:#7ec84a;
+        /* All other color tokens remapped for dark mode to match green pill style */
+        --red-bg:#2e1010;--red-border:#8b2020;--red-text:#f47272;
+        --blue-bg:#0e1e2e;--blue-border:#1a5a9e;--blue-text:#6ab4f5;
+        --amber-bg:#2a1d08;--amber-border:#7a4a0a;--amber-text:#f0a840;
+        --purple-bg:#1a1830;--purple-border:#4e46a0;--purple-text:#a09cf5;
+        --pink-bg:#2a1020;--pink-border:#8a2050;--pink-text:#f07ab0;
+      }
+    }
+    html,body{min-height:100vh;background:var(--bg3);color:var(--t1);font-family:'DM Sans',sans-serif;}
+
+    /* AUTH */
+    .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+    .auth-card{background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:2.5rem 2rem;width:100%;max-width:380px;}
+    .auth-card h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-bottom:4px;}
+    .auth-card .sub{font-size:13px;color:var(--t2);margin-bottom:2rem;}
+    .field{margin-bottom:14px;}
+    .field label{display:block;font-size:12px;font-weight:500;color:var(--t2);margin-bottom:5px;}
+    .field input{width:100%;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;}
+    .field input:focus{outline:none;border-color:var(--b1);background:var(--bg);}
+    .auth-btn{width:100%;padding:10px;background:var(--t1);color:var(--bg);border:none;border-radius:var(--radius-md);font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;margin-top:6px;transition:opacity 0.12s;}
+    .auth-btn:hover{opacity:0.82;}.auth-btn:disabled{opacity:0.45;cursor:not-allowed;}
+    .auth-toggle{text-align:center;margin-top:1.25rem;font-size:13px;color:var(--t2);}
+    .auth-toggle span{color:var(--t1);cursor:pointer;font-weight:500;text-decoration:underline;}
+    .auth-error{font-size:13px;color:var(--red-text);background:var(--red-bg);border:0.5px solid var(--red-border);border-radius:var(--radius-md);padding:8px 12px;margin-bottom:14px;display:none;}
+
+    /* APP SHELL */
+    .app{max-width:880px;margin:0 auto;padding:2rem 1.25rem 4rem;display:none;}
+    .app-header{display:flex;align-items:center;gap:12px;margin-bottom:4px;flex-wrap:wrap;}
+    h1{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;letter-spacing:-0.5px;flex:1;}
+    .user-pill{font-size:12px;color:var(--t2);background:var(--bg2);border:0.5px solid var(--b3);border-radius:20px;padding:4px 12px;display:flex;align-items:center;gap:8px;}
+    .user-pill .logout{cursor:pointer;color:var(--t3);font-size:15px;line-height:1;background:none;border:none;font-family:inherit;padding:0;}
+    .user-pill .logout:hover{color:var(--red-text);}
+    .admin-badge{font-size:11px;font-weight:500;background:var(--amber-bg);color:var(--amber-text);border:0.5px solid var(--amber-border);border-radius:20px;padding:3px 9px;}
+    .subtitle{font-size:13px;color:var(--t2);margin-bottom:1.25rem;}
+    .sync-bar{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t2);margin-bottom:1.25rem;}
+    .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--t3);flex-shrink:0;}
+    .sync-dot.synced{background:var(--green-dark);}.sync-dot.syncing{background:#BA7517;animation:pulse 1s infinite;}.sync-dot.error{background:var(--red-text);}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+    /* TABS */
+    .tab-row{display:flex;gap:2px;border-bottom:0.5px solid var(--b3);margin-bottom:1.5rem;overflow-x:auto;}
+    .tab{font-size:13px;font-weight:500;padding:8px 13px;cursor:pointer;border:none;background:none;color:var(--t2);border-bottom:2px solid transparent;margin-bottom:-0.5px;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:color 0.15s;}
+    .tab.active{color:var(--t1);border-bottom-color:var(--t1);}
+    .tab:hover:not(.active){color:var(--t1);}
+    .tab.admin-tab{color:var(--amber-text);}.tab.admin-tab.active{border-bottom-color:#BA7517;color:var(--amber-text);}
+    .tab.picks-tab{color:var(--blue-text);}.tab.picks-tab.active{border-bottom-color:var(--blue-text);color:var(--blue-text);}
+    .section{display:none;}.section.visible{display:block;}
+
+    /* BUTTONS */
+    button.btn{padding:9px 18px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.12s,opacity 0.12s;white-space:nowrap;}
+    button.btn:hover{background:var(--bg2);}
+    button.btn.primary{background:var(--t1);color:var(--bg);border-color:var(--t1);}button.btn.primary:hover{opacity:0.82;}
+    button.btn.sm{padding:5px 11px;font-size:12px;}button.btn.xs{padding:3px 8px;font-size:11px;}
+    button.btn.danger{color:var(--red-text);border-color:var(--red-border);}button.btn.danger:hover{background:var(--red-bg);}
+    button.btn.success{color:var(--green-text);border-color:var(--green-border);}button.btn.success:hover{background:var(--green-bg);}
+    button.btn.info{color:var(--blue-text);border-color:var(--blue-border);}button.btn.info:hover{background:var(--blue-bg);}
+    button.btn.amber{background:#BA7517;color:#fff;border-color:#BA7517;}button.btn.amber:hover{opacity:0.85;}
+    button.btn.pink{background:var(--pink-text);color:#fff;border-color:var(--pink-text);}button.btn.pink:hover{opacity:0.85;}
+
+    /* INPUTS */
+    .add-row{display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;}
+    .add-row input,.add-row select{flex:1;min-width:120px;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;}
+    .add-row input:focus,.add-row select:focus{outline:none;border-color:var(--b1);}
+    .add-row input::placeholder{color:var(--t3);}
+    .search-sort-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+    .search-sort-row input{flex:1;min-width:160px;padding:8px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;}
+    .search-sort-row input:focus{outline:none;border-color:var(--b1);}
+    .search-sort-row input::placeholder{color:var(--t3);}
+    .sort-btn{padding:7px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t2);font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:background 0.1s;}
+    .sort-btn.active{background:var(--t1);color:var(--bg);border-color:var(--t1);}
+    .sort-btn:hover:not(.active){background:var(--bg2);}
+    .empty{text-align:center;padding:3rem 1rem;color:var(--t3);font-size:14px;}
+    .section-note{font-size:13px;color:var(--t2);margin-bottom:1rem;}
+    .section-title{font-size:12px;font-weight:500;color:var(--t2);letter-spacing:.05em;text-transform:uppercase;margin:1.5rem 0 .75rem;}
+
+    /* MY LISTS */
+    .dance-list{display:flex;flex-direction:column;gap:6px;}
+    .dance-item{display:flex;align-items:center;gap:10px;padding:11px 15px;border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);}
+    .dance-item .name{flex:1;font-size:14px;font-weight:500;}
+    .fav-btn{background:none;border:none;cursor:pointer;font-size:18px;line-height:1;padding:0 2px;color:var(--t3);transition:color 0.15s;}
+    .fav-btn.active{color:#D4537E;}.fav-btn:hover{color:#D4537E;}
+
+    /* DANCE BANK */
+    .bank-controls{margin-bottom:1.25rem;}
+    .bank-search-row{display:flex;gap:8px;margin-bottom:8px;}
+    .bank-search-row input{flex:1;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;}
+    .bank-search-row input:focus{outline:none;border-color:var(--b1);}
+    .bank-search-row input::placeholder{color:var(--t3);}
+    .bank-filter-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+    .filter-pill{font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;border:0.5px solid var(--b3);background:var(--bg2);color:var(--t2);cursor:pointer;transition:background 0.1s;}
+    .filter-pill.active{background:var(--t1);color:var(--bg);border-color:var(--t1);}
+    .bank-item{border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);margin-bottom:8px;overflow:hidden;}
+    .bank-item-head{display:flex;align-items:center;gap:8px;padding:12px 15px;cursor:pointer;user-select:none;transition:background 0.1s;}
+    .bank-item-head:hover{background:var(--bg2);}
+    .bank-item.open .bank-item-head{background:var(--bg2);}
+    .bank-item-name{font-size:14px;font-weight:500;flex:1;}
+    .bank-item-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+    .bank-item-body{display:none;padding:12px 15px;border-top:0.5px solid var(--b3);background:var(--bg);}
+    .bank-item.open .bank-item-body{display:block;}
+    .bank-item.open .bank-item-caret{transform:rotate(180deg);}
+    .bank-item-caret{font-size:11px;color:var(--t3);transition:transform 0.2s;flex-shrink:0;}
+    .bank-detail-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+    .bank-detail-stat{font-size:12px;color:var(--t2);background:var(--bg2);border:0.5px solid var(--b3);border-radius:20px;padding:3px 10px;white-space:nowrap;}
+    .bank-detail-stat strong{color:var(--t1);font-weight:500;}
+    .bank-detail-links{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+    .bank-detail-actions{display:flex;gap:6px;flex-wrap:wrap;}
+    .diff-badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap;}
+    .diff-Beginner{background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border);}
+    .diff-Improver{background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border);}
+    .diff-Intermediate{background:var(--amber-bg);color:var(--amber-text);border:0.5px solid var(--amber-border);}
+    .diff-Advanced{background:var(--red-bg);color:var(--red-text);border:0.5px solid var(--red-border);}
+    .link-btn{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;padding:5px 12px;border-radius:20px;text-decoration:none;cursor:pointer;border:0.5px solid var(--b3);color:var(--t2);background:var(--bg2);transition:background 0.1s;}
+    .link-btn.demo{background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue-border);}
+    .link-btn.tutorial{background:var(--green-bg);color:var(--green-text);border-color:var(--green-border);}
+    .in-bank-badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border);white-space:nowrap;}
+
+    /* ADMIN FORM */
+    .admin-form{background:var(--amber-bg);border:0.5px solid var(--amber-border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.5rem;}
+    .admin-form-title{font-size:13px;font-weight:500;color:var(--amber-text);margin-bottom:1rem;}
+    .admin-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+    @media(max-width:540px){.admin-form-grid{grid-template-columns:1fr;}}
+    .admin-form-grid input,.admin-form-grid select{padding:8px 12px;border:0.5px solid var(--amber-border);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;width:100%;}
+    .admin-form-grid input:focus,.admin-form-grid select:focus{outline:none;border-color:#BA7517;}
+    .admin-form-grid input::placeholder{color:var(--t3);}
+    .admin-form-grid .full{grid-column:1/-1;}
+    .admin-form-row{display:flex;justify-content:flex-end;gap:8px;}
+    .edit-form{background:var(--bg2);border-top:0.5px solid var(--b3);padding:12px 15px;display:none;}
+    .edit-form.open{display:block;}
+    .edit-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+    @media(max-width:540px){.edit-form-grid{grid-template-columns:1fr;}}
+    .edit-form-grid input,.edit-form-grid select{padding:7px 10px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;width:100%;}
+    .edit-form-grid input:focus,.edit-form-grid select:focus{outline:none;border-color:var(--b1);}
+    .edit-form-grid input::placeholder{color:var(--t3);}
+    .edit-form-grid .full{grid-column:1/-1;}
+    .edit-form-row{display:flex;justify-content:flex-end;gap:6px;}
+
+    /* NIGHT TAB */
+    .night-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:1rem;}
+    .night-top label{font-size:13px;color:var(--t2);}
+    .night-top input[type=date],.night-top input[type=text]{padding:8px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;}
+    .night-top input[type=date]:focus,.night-top input[type=text]:focus{outline:none;}
+    .night-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    @media(max-width:540px){.night-grid{grid-template-columns:1fr;}}
+    .night-panel{border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);overflow:hidden;}
+    .night-panel-head{padding:10px 15px;border-bottom:0.5px solid var(--b3);font-size:13px;font-weight:500;color:var(--t2);background:var(--bg2);}
+    .night-panel-search{padding:8px 10px;border-bottom:0.5px solid var(--b3);}
+    .night-panel-search input{width:100%;padding:6px 10px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:12px;font-family:'DM Sans',sans-serif;}
+    .night-panel-search input:focus{outline:none;border-color:var(--b1);}
+    .night-panel-search input::placeholder{color:var(--t3);}
+    .night-panel-body{padding:10px;display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto;}
+    .pick-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border:0.5px solid var(--b3);border-radius:var(--radius-md);cursor:pointer;transition:background 0.1s;background:var(--bg);user-select:none;}
+    .pick-item:hover{background:var(--bg2);}.pick-item.selected{border-color:var(--green-dark);background:var(--green-bg);}
+    .pick-item .check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--b2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;}
+    .pick-item.selected .check{background:var(--green-dark);border-color:var(--green-dark);color:#fff;}
+    .pick-item .pname{font-size:13px;font-weight:500;flex:1;}
+    .pick-item.selected .pname{color:var(--green-text);}
+    .did-item{padding:9px 13px;border:0.5px solid var(--green-border);border-radius:var(--radius-md);background:var(--green-bg);font-size:13px;font-weight:500;color:var(--green-text);display:flex;align-items:center;gap:8px;}
+    .did-item .remove{margin-left:auto;cursor:pointer;color:var(--green-dark);font-size:18px;line-height:1;background:none;border:none;font-family:inherit;}
+    .save-row{display:flex;justify-content:flex-end;margin-top:1.25rem;gap:10px;align-items:center;}
+    .save-msg{font-size:13px;color:var(--green-dark);font-weight:500;}
+
+    /* HIGHLIGHTS MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;padding:1rem;}
+    .modal-card{background:var(--bg);border-radius:var(--radius-lg);padding:2rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+    .modal-card h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:4px;}
+    .modal-card .modal-date{font-size:13px;color:var(--t2);margin-bottom:1.5rem;}
+    .modal-step{margin-bottom:1.5rem;}
+    .modal-step-label{font-size:12px;font-weight:500;color:var(--t2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;}
+    .modal-step select{width:100%;padding:9px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;}
+    .modal-step select:focus{outline:none;border-color:var(--b1);}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:1.5rem;}
+
+    /* HIGHLIGHTS DISPLAY */
+    .highlights-panel{background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:1.5rem;margin-top:1.25rem;}
+    .highlights-date{font-size:13px;color:var(--t2);text-align:center;margin-bottom:1.5rem;}
+    .highlights-favorites{display:flex;flex-direction:column;gap:10px;align-items:center;margin-bottom:1.5rem;}
+    .highlight-item{display:flex;align-items:center;gap:12px;padding:12px 20px;border-radius:var(--radius-lg);width:100%;max-width:360px;}
+    .highlight-item.rank-1{background:linear-gradient(135deg,#FAEEDA,#FAC775);border:0.5px solid var(--amber-border);}
+    .highlight-item.rank-2{background:var(--bg2);border:0.5px solid var(--b2);}
+    .highlight-item.rank-3{background:var(--bg2);border:0.5px solid var(--b2);}
+    .highlight-rank-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;min-width:32px;text-align:center;}
+    .highlight-item.rank-1 .highlight-rank-num{color:#854F0B;}
+    .highlight-item.rank-2 .highlight-rank-num{color:var(--t3);}
+    .highlight-item.rank-3 .highlight-rank-num{color:#854F0B;opacity:0.6;}
+    .highlight-name{font-size:15px;font-weight:500;flex:1;}
+    .highlight-label{font-size:11px;font-weight:500;color:var(--t2);}
+    .highlight-item.rank-1 .highlight-name{color:#1a1a18 !important;}
+    .highlight-item.rank-1 .highlight-label{color:#5a3a0a !important;}
+    .highlights-divider{border:none;border-top:0.5px solid var(--b3);margin:1.25rem 0;}
+    .highlights-total{text-align:center;font-size:14px;color:var(--t2);margin-bottom:1.25rem;}
+    .highlights-total strong{font-size:20px;font-weight:700;color:var(--t1);display:block;}
+    .highlights-all{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
+
+    /* HISTORY */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:1.5rem;}
+    .stat-card{background:var(--bg2);border-radius:var(--radius-md);padding:1rem;}
+    .stat-card .stat-label{font-size:12px;color:var(--t2);margin-bottom:4px;}
+    .stat-card .stat-value{font-size:24px;font-weight:500;color:var(--t1);}
+    .stat-card .stat-sub{font-size:11px;color:var(--t3);margin-top:2px;}
+    .top5-list{display:flex;flex-direction:column;gap:6px;margin-bottom:1.5rem;}
+    .top5-item{display:flex;align-items:center;gap:12px;padding:10px 15px;border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);}
+    .top5-rank{font-size:18px;font-weight:700;color:var(--t3);min-width:28px;font-family:'Playfair Display',serif;}
+    .top5-rank.gold{color:#BA7517;}.top5-rank.silver{color:#6b6a66;}.top5-rank.bronze{color:#854F0B;}
+    .top5-name{flex:1;font-size:14px;font-weight:500;}
+    .top5-count{font-size:12px;color:var(--t2);}
+    .day-log{border:0.5px solid var(--b3);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:8px;}
+    .day-log-head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg2);cursor:pointer;user-select:none;}
+    .day-log-head .date{font-size:14px;font-weight:500;flex:1;}
+    .day-log-head .dj-name{font-size:12px;color:var(--t2);}
+    .day-log-head .count{font-size:12px;color:var(--t2);}
+    .caret{font-size:11px;color:var(--t2);transition:transform 0.2s;}
+    .day-log.open .caret{transform:rotate(180deg);}
+    .day-log-body{padding:12px 16px;display:none;flex-wrap:wrap;gap:6px;border-top:0.5px solid var(--b3);background:var(--bg);}
+    .day-log.open .day-log-body{display:flex;}
+    .log-pill{font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border);}
+
+    /* ALL DANCES ACCORDION */
+    .accordion{border:0.5px solid var(--b3);border-radius:var(--radius-lg);overflow:hidden;margin-top:1rem;}
+    .accordion-head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg2);cursor:pointer;user-select:none;}
+    .accordion-head-title{font-size:14px;font-weight:500;flex:1;}
+    .accordion-body{display:none;padding:12px 16px;background:var(--bg);}
+    .accordion.open .accordion-body{display:block;}
+    .accordion.open .caret{transform:rotate(180deg);}
+    .all-dances-list{display:flex;flex-direction:column;gap:4px;}
+    .all-dance-row{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--radius-md);}
+    .all-dance-row:nth-child(odd){background:var(--bg2);}
+    .all-dance-name{flex:1;font-size:13px;}
+    .all-dance-count{font-size:12px;color:var(--t2);white-space:nowrap;}
+
+    /* DJ TAB - manual entry */
+    .dj-entry-card{background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;}
+    .dj-entry-title{font-size:14px;font-weight:500;margin-bottom:1rem;}
+    .dj-entry-grid{display:grid;grid-template-columns:1fr 80px 80px auto;gap:8px;align-items:end;margin-bottom:8px;}
+    @media(max-width:600px){.dj-entry-grid{grid-template-columns:1fr 1fr;}}
+    .dj-entry-grid label{font-size:11px;font-weight:500;color:var(--t2);display:block;margin-bottom:4px;}
+    .dj-entry-grid input{padding:8px 10px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;width:100%;}
+    .dj-entry-grid input:focus{outline:none;border-color:var(--b1);}
+    .dj-entry-grid input::placeholder{color:var(--t3);}
+    .dj-record-item{border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);margin-bottom:8px;overflow:hidden;}
+    .dj-record-head{display:flex;align-items:center;gap:10px;padding:11px 15px;flex-wrap:wrap;}
+    .dj-record-name{flex:1;font-size:14px;font-weight:500;min-width:100px;}
+    .dj-stat{font-size:12px;color:var(--t2);}
+    .dj-stat strong{color:var(--t1);font-weight:500;}
+    .dj-sessions-body{display:none;padding:10px 15px;border-top:0.5px solid var(--b3);background:var(--bg2);}
+    .dj-record-item.open .dj-sessions-body{display:block;}
+    .dj-session-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:var(--radius-md);margin-bottom:4px;background:var(--bg);}
+    .dj-session-row:last-child{margin-bottom:0;}
+    .dj-session-num{font-size:11px;color:var(--t3);min-width:20px;}
+    .dj-session-time{flex:1;font-size:13px;}
+    .dj-session-edit{display:none;flex:1;gap:4px;}
+    .dj-session-edit.open{display:flex;}
+    .dj-session-edit input{padding:4px 8px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:12px;font-family:'DM Sans',sans-serif;width:50px;}
+    .dj-session-edit input:focus{outline:none;border-color:var(--b1);}
+
+    /* ADMIN USERS */
+    .user-row{display:flex;align-items:center;gap:10px;padding:10px 15px;border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);margin-bottom:6px;}
+    .user-row .uname{flex:1;font-size:14px;font-weight:500;}
+    .user-row .udate{font-size:12px;color:var(--t2);}
+
+    /* SUBMISSIONS TAB */
+    .sub-badge{font-size:11px;font-weight:500;padding:2px 9px;border-radius:20px;white-space:nowrap;}
+    .sub-badge.know{background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border);}
+    .sub-badge.learn{background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border);}
+    .sub-item{border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);margin-bottom:8px;overflow:hidden;}
+    .sub-item-head{display:flex;align-items:center;gap:10px;padding:12px 15px;flex-wrap:wrap;}
+    .sub-item-name{font-size:14px;font-weight:500;flex:1;}
+    .sub-item-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .sub-who{font-size:12px;color:var(--t2);}
+    .sub-actions{display:flex;gap:6px;flex-shrink:0;}
+    .sub-add-form{display:none;background:var(--bg2);border-top:0.5px solid var(--b3);padding:12px 15px;}
+    .sub-add-form.open{display:block;}
+    .sub-add-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+    @media(max-width:540px){.sub-add-grid{grid-template-columns:1fr;}}
+    .sub-add-grid input,.sub-add-grid select{padding:7px 10px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;width:100%;}
+    .sub-add-grid input:focus,.sub-add-grid select:focus{outline:none;border-color:var(--b1);}
+    .sub-add-grid input::placeholder{color:var(--t3);}
+    .sub-add-grid .full{grid-column:1/-1;}
+    .sub-add-row{display:flex;justify-content:flex-end;gap:6px;}
+    .sub-empty-note{font-size:13px;color:var(--t2);margin-bottom:.5rem;}
+
+    /* DREW'S PICKS */
+    .picks-hero{background:var(--blue-bg);border:0.5px solid var(--blue-border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem;text-align:center;}
+    .picks-hero h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--blue-text);margin-bottom:4px;}
+    .picks-hero p{font-size:13px;color:var(--blue-text);opacity:0.8;}
+    .picks-list{display:flex;flex-direction:column;gap:8px;}
+    .picks-item{display:flex;align-items:center;gap:12px;padding:13px 16px;border:0.5px solid var(--blue-border);border-radius:var(--radius-lg);background:var(--bg);transition:opacity 0.15s,box-shadow 0.15s;}
+    .picks-item[draggable=true]{cursor:default;}
+    .picks-item.dragging{opacity:0.4;}
+    .picks-item.drag-over{box-shadow:0 0 0 2px var(--blue-text);}
+    .picks-num{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--blue-border);min-width:28px;}
+    .picks-name{flex:1;font-size:14px;font-weight:500;}
+    .picks-note{font-size:12px;color:var(--t2);font-style:italic;}
+    .picks-admin-form{background:var(--blue-bg);border:0.5px solid var(--blue-border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.5rem;}
+    .picks-admin-form .title{font-size:13px;font-weight:500;color:var(--blue-text);margin-bottom:1rem;}
+    .picks-admin-form input,.picks-admin-form textarea{width:100%;padding:8px 12px;border:0.5px solid var(--blue-border);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;margin-bottom:8px;}
+    .picks-admin-form input:focus,.picks-admin-form textarea:focus{outline:none;border-color:var(--blue-text);}
+    .picks-admin-form input::placeholder,.picks-admin-form textarea::placeholder{color:var(--t3);}
+    .picks-admin-form textarea{resize:vertical;min-height:60px;}
+    .picks-admin-form .row{display:flex;justify-content:flex-end;gap:8px;}
+    .picks-item-actions{display:flex;gap:6px;}
+
+    /* FRIENDS TAB */
+    .friends-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:1rem;}
+    .friend-card{border-radius:16px;overflow:hidden;border:0.5px solid var(--b3);cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;}
+    .friend-card:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,0.13);}
+    .fc-header{padding:1.5rem 1.5rem 1.25rem;position:relative;}
+    .fc-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);margin-bottom:2px;}
+    .fc-username{font-size:12px;color:rgba(255,255,255,0.75);font-weight:500;}
+    .fc-body{background:var(--bg);padding:1rem 1.25rem;}
+    .fc-section-label{font-size:10px;font-weight:500;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
+    .fc-fav-list{display:flex;flex-direction:column;gap:4px;margin-bottom:1rem;}
+    .fc-fav-row{display:flex;align-items:center;gap:8px;font-size:13px;}
+    .fc-fav-num{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--t3);min-width:16px;}
+    .fc-pills{display:flex;flex-wrap:wrap;gap:4px;}
+    .fc-pill{font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;background:var(--bg2);color:var(--t2);border:0.5px solid var(--b3);}
+    .friend-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:2000;padding:1rem;}
+    .friend-modal{background:var(--bg);border-radius:var(--radius-lg);padding:2rem;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
+    .friend-modal h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:6px;}
+    .friend-modal .sub{font-size:13px;color:var(--t2);margin-bottom:1.5rem;}
+    .friend-modal label{display:block;font-size:12px;font-weight:500;color:var(--t2);margin-bottom:5px;}
+    .friend-modal input[type=text]{width:100%;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;margin-bottom:1rem;}
+    .friend-modal input[type=text]:focus{outline:none;border-color:var(--b1);}
+    .fav-pick-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;margin-bottom:1.25rem;}
+    .fav-pick-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border:0.5px solid var(--b3);border-radius:var(--radius-md);cursor:pointer;transition:background 0.1s;background:var(--bg);user-select:none;}
+    .fav-pick-item:hover{background:var(--bg2);}
+    .fav-pick-item.selected{border-color:var(--green-dark);background:var(--green-bg);}
+    .fav-pick-item .fcheck{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--b2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;}
+    .fav-pick-item.selected .fcheck{background:var(--green-dark);border-color:var(--green-dark);color:#fff;}
+    .fav-pick-name{font-size:13px;font-weight:500;flex:1;}
+    .fav-pick-item.selected .fav-pick-name{color:var(--green-text);}
+    .fav-pick-rank{font-size:11px;color:var(--t2);}
+    .gradient-picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px;margin-bottom:1.25rem;}
+    .grad-swatch{height:40px;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:transform 0.1s,border-color 0.1s;}
+    .grad-swatch:hover{transform:scale(1.1);}
+    .grad-swatch.active{border-color:var(--t1);}
+    .fm-actions{display:flex;justify-content:flex-end;gap:8px;}
+    .my-card-wrap{margin-bottom:1.5rem;}
+    .my-card-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+    .fav-list-admin-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border:0.5px solid var(--b3);border-radius:var(--radius-md);background:var(--bg);transition:opacity 0.15s,box-shadow 0.15s;}
+    .fav-list-admin-item[draggable=true]{cursor:grab;}
+    .fav-list-admin-item.dragging{opacity:0.4;}
+    .fav-list-admin-item.drag-over{box-shadow:0 0 0 2px var(--blue-text);}
+    .fadm-num{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--t3);min-width:18px;}
+    .fadm-name{flex:1;font-size:13px;font-weight:500;}
+    .fadm-handle{cursor:grab;color:var(--t3);font-size:14px;flex-shrink:0;}
+  </style>
+</head>
+<body>
+
+<!-- HIGHLIGHTS MODAL -->
+<div class="modal-overlay" id="highlights-modal" style="display:none">
+  <div class="modal-card">
+    <h2>&#9733; Night Highlights</h2>
+    <div class="modal-date" id="highlights-modal-date"></div>
+    <div class="modal-step">
+      <div class="modal-step-label">1st favorite dance of the night</div>
+      <select id="hl-pick-1"><option value="">Select a dance...</option></select>
+    </div>
+    <div class="modal-step">
+      <div class="modal-step-label">2nd favorite dance of the night</div>
+      <select id="hl-pick-2"><option value="">Select a dance...</option></select>
+    </div>
+    <div class="modal-step">
+      <div class="modal-step-label">3rd favorite dance of the night</div>
+      <select id="hl-pick-3"><option value="">Select a dance...</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeHighlightsModal()">Cancel</button>
+      <button class="btn primary" onclick="saveHighlights()">Show Highlights</button>
+    </div>
+  </div>
+</div>
+
+<!-- FRIEND SETUP MODAL -->
+<div class="friend-modal-overlay" id="friend-setup-modal" style="display:none">
+  <div class="friend-modal">
+    <h2>Create your card</h2>
+    <p class="sub">This is your public dance card — visible to everyone in the group!</p>
+    <label>Your display name</label>
+    <input type="text" id="fc-display-name" placeholder="e.g. Sarah J.">
+    <label>Pick your top 5 favorite dances <span id="fc-pick-count" style="color:var(--t2)">(0 of 5)</span></label>
+    <div class="fav-pick-list" id="fc-pick-list"></div>
+    <div id="fc-reorder-section" style="display:none;margin-bottom:1.25rem">
+      <div style="font-size:12px;font-weight:500;color:var(--t2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">Drag or tap arrows to reorder favorites</div>
+      <div id="fc-reorder-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+    </div>
+    <label style="margin-bottom:8px">Choose a card gradient</label>
+    <div class="gradient-picker" id="fc-grad-picker"></div>
+    <div class="fm-actions">
+      <button class="btn" onclick="closeFriendSetup()">Cancel</button>
+      <button class="btn primary" onclick="saveFriendCard()">Save card</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUGGEST A DANCE MODAL -->
+<div class="friend-modal-overlay" id="suggest-modal" style="display:none" onclick="if(event.target===this)closeSuggestModal()">
+  <div class="friend-modal" style="max-width:420px">
+    <h2>Suggest a Dance</h2>
+    <p class="sub">Don't see a dance in the bank? Suggest it and Drew can review and add it!</p>
+    <div id="suggest-error" style="display:none;font-size:13px;color:var(--red-text);background:var(--red-bg);border:0.5px solid var(--red-border);border-radius:var(--radius-md);padding:8px 12px;margin-bottom:14px;"></div>
+    <label>Dance name <span style="color:var(--red-text)">*</span></label>
+    <input type="text" id="suggest-name" placeholder="e.g. Boot Scootin' Boogie">
+    <label style="margin-top:.5rem">Any notes? <span style="font-size:11px;color:var(--t3)">(optional)</span></label>
+    <input type="text" id="suggest-notes" placeholder="e.g. heard it at the last event" style="margin-bottom:1.5rem">
+    <div class="fm-actions">
+      <button class="btn" onclick="closeSuggestModal()">Cancel</button>
+      <button class="btn primary" onclick="submitSuggestion()">Submit suggestion</button>
+    </div>
+  </div>
+</div>
+
+<!-- FRIEND DETAIL MODAL -->
+<div class="friend-modal-overlay" id="friend-detail-modal" style="display:none" onclick="if(event.target===this)closeFriendDetail()">
+  <div class="friend-modal" id="friend-detail-content"></div>
+</div>
+
+<!-- AUTH -->
+<div class="auth-wrap" id="auth-wrap">
+  <div class="auth-card">
+    <h1>Line Dance Tracker</h1>
+    <p class="sub" id="auth-sub">Sign in to sync your dances across devices</p>
+    <div class="auth-error" id="auth-error"></div>
+    <div class="field"><label>Username</label><input type="text" id="auth-username" placeholder="e.g. mama_jones" autocomplete="username"></div>
+    <div class="field"><label>Password</label><input type="password" id="auth-password" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')authSubmit()"></div>
+    <button class="auth-btn" id="auth-btn" onclick="authSubmit()">Sign in</button>
+    <div class="auth-toggle" id="auth-toggle">No account? <span onclick="toggleAuthMode()">Create one</span></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <div class="app-header">
+    <h1>Line Dance Tracker</h1>
+    <div class="user-pill">
+      <span id="user-label"></span>
+      <span class="admin-badge" id="admin-badge" style="display:none">Admin</span>
+      <button class="logout" onclick="logout()" title="Sign out">&#215;</button>
+    </div>
+  </div>
+  <p class="subtitle">Track your dances, your progress, and your nights out</p>
+  <div class="sync-bar"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">Not synced</span></div>
+
+  <div class="tab-row">
+    <button class="tab active" onclick="switchTab('bank')">Dance Bank</button>
+    <button class="tab" onclick="switchTab('know')">Dances I Know</button>
+    <button class="tab" onclick="switchTab('learn')">Want to Learn</button>
+    <button class="tab" onclick="switchTab('night')">My Night</button>
+    <button class="tab" onclick="switchTab('log')">History</button>
+    <button class="tab" onclick="switchTab('dj')">DJ Freestyle</button>
+  <!--   <button class="tab picks-tab" onclick="switchTab('picks')">&#9733; Drew's Favs</button> -->
+    <button class="tab" onclick="switchTab('friends')" style="color:#03a3ff">Friends</button>
+    <button class="tab admin-tab" id="submissions-tab" style="display:none" onclick="switchTab('submissions')">&#9888; Submissions <span id="submissions-badge" style="display:none;background:var(--red-text);color:#fff;font-size:10px;padding:1px 6px;border-radius:20px;margin-left:4px;"></span></button>
+    <button class="tab admin-tab" id="admin-tab" style="display:none" onclick="switchTab('admin')">&#9733; Admin</button>
+    <button class="tab admin-tab" id="editpeople-tab" style="display:none" onclick="switchTab('editpeople')">&#9998; Edit People</button>
+  </div>
+
+  <!-- DANCE BANK -->
+  <div id="tab-bank" class="section visible">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:.75rem;">
+      <p class="section-note" style="margin-bottom:0">Browse all dances</p>
+      <button class="btn sm info" onclick="openSuggestModal()">&#43; Suggest a Dance</button>
+    </div>
+    <div class="bank-controls">
+      <div class="bank-search-row">
+        <input type="text" id="bank-search" placeholder="Search dances..." oninput="renderBank()">
+      </div>
+      <div class="bank-filter-row">
+        <span class="filter-pill active" onclick="setBankFilter('all',this)">All</span>
+        <span class="filter-pill" onclick="setBankFilter('Beginner',this)">Beginner</span>
+        <span class="filter-pill" onclick="setBankFilter('Improver',this)">Improver</span>
+        <span class="filter-pill" onclick="setBankFilter('Intermediate',this)">Intermediate</span>
+        <span class="filter-pill" onclick="setBankFilter('Advanced',this)">Advanced</span>
+        <button class="sort-btn active" id="bank-sort-btn" onclick="toggleSort('bank')">A–Z</button>
+      </div>
+    </div>
+    <div id="bank-list"></div>
+  </div>
+
+  <!-- KNOW -->
+  <div id="tab-know" class="section">
+    <div class="search-sort-row">
+      <input type="text" id="know-search" placeholder="Search..." oninput="renderList('know')">
+      <button class="sort-btn active" id="know-sort-btn" onclick="toggleSort('know')">A–Z</button>
+      <button class="sort-btn" id="know-fav-btn" onclick="toggleFavFilter()">&#9829; Favorites</button>
+    </div>
+    <div id="know-list" class="dance-list"></div>
+  </div>
+
+  <!-- LEARN -->
+  <div id="tab-learn" class="section">
+    <div class="search-sort-row">
+      <input type="text" id="learn-search" placeholder="Search..." oninput="renderList('learn')">
+      <button class="sort-btn active" id="learn-sort-btn" onclick="toggleSort('learn')">A–Z</button>
+    </div>
+    <div id="learn-list" class="dance-list"></div>
+  </div>
+
+  <!-- MY NIGHT -->
+  <div id="tab-night" class="section">
+    <div class="night-top">
+      <label>Date:</label>
+      <input type="date" id="night-date">
+      <label>DJ:</label>
+      <input type="text" id="night-dj" placeholder="DJ name (optional)" style="min-width:160px;" oninput="scheduleNightSave()">
+    </div>
+    <div class="night-grid">
+      <div class="night-panel">
+        <div class="night-panel-head">Dances Performed</div>
+        <div class="night-panel-search">
+          <input type="text" id="pick-search" placeholder="Search..." oninput="renderPickList()">
+        </div>
+        <div style="display:flex;gap:6px;padding:6px 10px;border-bottom:0.5px solid var(--b3);">
+          <button class="sort-btn active" id="pick-sort-btn" onclick="toggleSort('pick')" style="font-size:11px;padding:4px 10px;">A–Z</button>
+        </div>
+        <div class="night-panel-body" id="pick-list"></div>
+      </div>
+      <div class="night-panel">
+        <div class="night-panel-head">Tonight's dances</div>
+        <div class="night-panel-body" id="did-list"></div>
+      </div>
+    </div>
+    <div class="save-row">
+      <span class="save-msg" id="save-msg"></span>
+      <button class="btn info" onclick="openHighlightsModal()">&#9733; Night Highlights</button>
+    </div>
+    <div id="highlights-display"></div>
+  </div>
+
+  <!-- HISTORY -->
+  <div id="tab-log" class="section">
+    <div class="stats-grid" id="history-stats"></div>
+    <div class="section-title">Top 5 most danced</div>
+    <div class="top5-list" id="top5-list"></div>
+    <div class="section-title">All nights</div>
+    <div id="log-list"></div>
+    <div class="accordion" id="all-dances-accordion">
+      <div class="accordion-head" onclick="toggleAllDancesAccordion()">
+        <span class="accordion-head-title">All Dance Totals</span>
+        <span class="caret">&#9660;</span>
+      </div>
+      <div class="accordion-body">
+        <div class="all-dances-list" id="all-dances-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DJ FREESTYLE -->
+  <div id="tab-dj" class="section">
+    <div class="dj-entry-card">
+      <div class="dj-entry-title">Log a freestyle session</div>
+      <div class="dj-entry-grid">
+        <div>
+          <label>DJ name</label>
+          <input type="text" id="dj-entry-name" placeholder="DJ name">
+        </div>
+        <div>
+          <label>Minutes</label>
+          <input type="number" id="dj-entry-min" placeholder="0" min="0" max="59">
+        </div>
+        <div>
+          <label>Seconds</label>
+          <input type="number" id="dj-entry-sec" placeholder="0" min="0" max="59">
+        </div>
+        <div style="padding-bottom:1px;">
+          <button class="btn primary" onclick="djAddSession()" style="height:38px;">Add</button>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--t2)">Enter the duration of a freestyle section manually.</p>
+    </div>
+    <div class="section-title">Freestyle records by DJ</div>
+    <div id="dj-records-list"></div>
+  </div>
+
+  <!-- DREW'S PICKS -->
+  <div id="tab-picks" class="section">
+    <div class="picks-hero">
+      <h2>Drew's Current Favorites</h2>
+      <p>my favorite dances right now! :)</p>
+    </div>
+    <div id="picks-admin-panel" style="display:none">
+      <div class="picks-admin-form">
+        <div class="title">&#9733; Add a pick</div>
+        <input type="text" id="pick-dance-name" placeholder="Dance name">
+        <textarea id="pick-dance-note" placeholder="Why you love it"></textarea>
+        <div class="row"><button class="btn info" onclick="adminAddPick()">Add to picks</button></div>
+      </div>
+    </div>
+    <div class="picks-list" id="picks-list"></div>
+  </div>
+
+  <!-- FRIENDS -->
+  <div id="tab-friends" class="section">
+    <div id="my-card-section"></div>
+    <div style="margin-top:2rem;"></div>
+    <div class="section-title" style="margin-top:0" id="friends-list-title">Everyone's cards</div>
+    <div class="friends-grid" id="friends-grid"></div>
+  </div>
+
+  <!-- SUBMISSIONS (admin only) -->
+  <div id="tab-submissions" class="section">
+    <p class="section-note">User dance suggestions and manually-added dances not yet in the bank. Review and add them below.</p>
+    <div id="submissions-list"></div>
+  </div>
+
+  <!-- EDIT PEOPLE (admin only) -->
+  <div id="tab-editpeople" class="section">
+    <p class="section-note">Select a user to edit their dances, nights, and friend card.</p>
+    <div style="display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center;">
+      <select id="ep-user-select" style="flex:1;min-width:160px;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;" onchange="epLoadUser()">
+        <option value="">— Select a user —</option>
+      </select>
+      <button class="btn amber" onclick="epRefreshUsers()">Refresh Users</button>
+    </div>
+    <div id="ep-content" style="display:none;">
+      <!-- Dances I Know -->
+      <div class="section-title" style="margin-top:0">Dances I Know</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+        <input type="text" id="ep-know-input" placeholder="Add dance to know list..." style="flex:1;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;">
+        <button class="btn success" onclick="epAddDance('know')">Add</button>
+      </div>
+      <div id="ep-know-list" class="dance-list" style="margin-bottom:1.5rem;"></div>
+      <!-- Want to Learn -->
+      <div class="section-title">Want to Learn</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+        <input type="text" id="ep-learn-input" placeholder="Add dance to learn list..." style="flex:1;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;">
+        <button class="btn info" onclick="epAddDance('learn')">Add</button>
+      </div>
+      <div id="ep-learn-list" class="dance-list" style="margin-bottom:1.5rem;"></div>
+      <!-- Nights -->
+      <div class="section-title">Nights</div>
+      <div id="ep-nights-list" style="margin-bottom:1.5rem;"></div>
+      <!-- Friend Card -->
+      <div class="section-title">Friend Card</div>
+      <div id="ep-card-section" style="margin-bottom:1.5rem;"></div>
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="tab-admin" class="section">
+    <div class="admin-form">
+      <div class="admin-form-title">&#9733; Add a new dance to the bank</div>
+      <div class="admin-form-grid">
+        <input type="text" id="bank-name" placeholder="Dance name" class="full">
+        <input type="url" id="bank-demo" placeholder="Demo link (YouTube URL)">
+        <input type="url" id="bank-tutorial" placeholder="Tutorial link (YouTube URL)">
+        <select id="bank-diff" class="full">
+          <option value="">Difficulty (optional)</option>
+          <option value="Beginner">Beginner</option>
+          <option value="Improver">Improver</option>
+          <option value="Intermediate">Intermediate</option>
+          <option value="Advanced">Advanced</option>
+        </select>
+        <input type="number" id="bank-counts" placeholder="Counts (e.g. 32)" min="0">
+        <input type="number" id="bank-walls" placeholder="Walls (e.g. 4)" min="0">
+        <input type="number" id="bank-tags" placeholder="Tags (e.g. 0)" min="0">
+      </div>
+      <div class="admin-form-row"><button class="btn amber" onclick="adminAddDance()">Add to bank</button></div>
+    </div>
+    <div class="section-title">All dances in the bank</div>
+    <div id="admin-bank-list"></div>
+    <div class="section-title">Registered users</div>
+    <div id="admin-users-list"><p class="section-note">Loading...</p></div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL='https://stzfjzylemnnvtafojfh.supabase.co';
+const SUPABASE_KEY='sb_publishable_mkiBIeGKW-g7bphzIYkAOg_qzKxy5ZW';
+const ADMIN_USER='drew';
+
+let currentUser=null,isAdmin=false;
+let state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
+let bank=[];
+let drewPicks=[];
+let submissions=[]; // shared list of user-submitted dances not in bank
+let friendCards=[]; // shared list of friend profile cards
+let selectedDate='',nightSelections={};
+let isSignUp=false,saveTimeout=null,nightSaveTimeout=null;
+let bankFilter='all';
+let sortState={bank:true,know:true,learn:true,pick:true};
+let favFilterActive=false;
+
+// ---- Supabase ----
+async function sbFetch(path,options={}){
+  const headers={'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
+  if(options.prefer) headers['Prefer']=options.prefer;
+  const res=await fetch(SUPABASE_URL+path,{method:options.method||'GET',headers,body:options.body||undefined});
+  const text=await res.text();
+  return{ok:res.ok,status:res.status,data:text?JSON.parse(text):null};
+}
+function setSyncStatus(t,l){document.getElementById('sync-dot').className='sync-dot '+t;document.getElementById('sync-label').textContent=l;}
+async function saveToCloud(){
+  setSyncStatus('syncing','Syncing...');
+  const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(currentUser)}`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:state,updated_at:new Date().toISOString()})});
+  setSyncStatus(r.ok?'synced':'error',r.ok?'Synced':'Sync failed');
+}
+function scheduleSave(){clearTimeout(saveTimeout);saveTimeout=setTimeout(saveToCloud,800);}
+
+async function loadBank(){
+  const r=await sbFetch(`/rest/v1/dances?username=eq.__bank__&select=data`);
+  bank=(r.ok&&r.data&&r.data.length>0)?(r.data[0].data.items||[]):[];
+}
+async function saveBankToCloud(){
+  setSyncStatus('syncing','Syncing...');
+  const check=await sbFetch(`/rest/v1/dances?username=eq.__bank__&select=username`);
+  if(check.ok&&check.data&&check.data.length>0){
+    await sbFetch(`/rest/v1/dances?username=eq.__bank__`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:{items:bank},updated_at:new Date().toISOString()})});
+  } else {
+    await sbFetch('/rest/v1/dances',{method:'POST',prefer:'return=minimal',body:JSON.stringify({username:'__bank__',password:'__bank__',data:{items:bank}})});
+  }
+  setSyncStatus('synced','Synced');
+}
+async function loadPicks(){
+  const r=await sbFetch(`/rest/v1/dances?username=eq.__picks__&select=data`);
+  drewPicks=(r.ok&&r.data&&r.data.length>0)?(r.data[0].data.picks||[]):[];
+}
+async function savePicksToCloud(){
+  setSyncStatus('syncing','Syncing...');
+  const check=await sbFetch(`/rest/v1/dances?username=eq.__picks__&select=username`);
+  if(check.ok&&check.data&&check.data.length>0){
+    await sbFetch(`/rest/v1/dances?username=eq.__picks__`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:{picks:drewPicks},updated_at:new Date().toISOString()})});
+  } else {
+    await sbFetch('/rest/v1/dances',{method:'POST',prefer:'return=minimal',body:JSON.stringify({username:'__picks__',password:'__picks__',data:{picks:drewPicks}})});
+  }
+  setSyncStatus('synced','Synced');
+}
+
+async function loadSubmissions(){
+  const r=await sbFetch(`/rest/v1/dances?username=eq.__submissions__&select=data`);
+  submissions=(r.ok&&r.data&&r.data.length>0)?(r.data[0].data.items||[]):[];
+}
+async function saveSubmissionsToCloud(){
+  const check=await sbFetch(`/rest/v1/dances?username=eq.__submissions__&select=username`);
+  if(check.ok&&check.data&&check.data.length>0){
+    await sbFetch(`/rest/v1/dances?username=eq.__submissions__`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:{items:submissions},updated_at:new Date().toISOString()})});
+  } else {
+    await sbFetch('/rest/v1/dances',{method:'POST',prefer:'return=minimal',body:JSON.stringify({username:'__submissions__',password:'__submissions__',data:{items:submissions}})});
+  }
+}
+async function loadFriendCards(){
+  const r=await sbFetch(`/rest/v1/dances?username=eq.__friendcards__&select=data`);
+  friendCards=(r.ok&&r.data&&r.data.length>0)?(r.data[0].data.cards||[]):[];
+}
+async function saveFriendCardsToCloud(){
+  const check=await sbFetch(`/rest/v1/dances?username=eq.__friendcards__&select=username`);
+  if(check.ok&&check.data&&check.data.length>0){
+    await sbFetch(`/rest/v1/dances?username=eq.__friendcards__`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:{cards:friendCards},updated_at:new Date().toISOString()})});
+  } else {
+    await sbFetch('/rest/v1/dances',{method:'POST',prefer:'return=minimal',body:JSON.stringify({username:'__friendcards__',password:'__friendcards__',data:{cards:friendCards}})});
+  }
+}
+function toggleAuthMode(){
+  isSignUp=!isSignUp;
+  document.getElementById('auth-sub').textContent=isSignUp?'Create an account to get started':'Sign in to sync your dances across devices';
+  document.getElementById('auth-btn').textContent=isSignUp?'Create account':'Sign in';
+  document.getElementById('auth-toggle').innerHTML=isSignUp?'Already have an account? <span onclick="toggleAuthMode()">Sign in</span>':'No account? <span onclick="toggleAuthMode()">Create one</span>';
+  document.getElementById('auth-error').style.display='none';
+}
+function showAuthError(msg){const el=document.getElementById('auth-error');el.textContent=msg;el.style.display='block';}
+
+async function authSubmit(){
+  const username=document.getElementById('auth-username').value.trim().toLowerCase();
+  const password=document.getElementById('auth-password').value;
+  if(!username||!password){showAuthError('Please enter a username and password.');return;}
+  const btn=document.getElementById('auth-btn');
+  btn.disabled=true;btn.textContent=isSignUp?'Creating...':'Signing in...';
+  document.getElementById('auth-error').style.display='none';
+  if(isSignUp){
+    const check=await sbFetch(`/rest/v1/dances?username=eq.${enc(username)}&select=username`);
+    if(check.ok&&check.data&&check.data.length>0){showAuthError('That username is already taken.');btn.disabled=false;btn.textContent='Create account';return;}
+    const create=await sbFetch('/rest/v1/dances',{method:'POST',prefer:'return=minimal',body:JSON.stringify({username,password,data:{know:[],learn:[],nights:{},djFreestyles:{},favorites:[]}})});
+    if(!create.ok){showAuthError('Could not create account. Please try again.');btn.disabled=false;btn.textContent='Create account';return;}
+    state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
+    await loadBank();await loadPicks();await loadSubmissions();await loadFriendCards();enterApp(username);
+  } else {
+    const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(username)}&select=password,data`);
+    if(!r.ok||!r.data||r.data.length===0){showAuthError('Username not found.');btn.disabled=false;btn.textContent='Sign in';return;}
+    if(r.data[0].password!==password){showAuthError('Incorrect password.');btn.disabled=false;btn.textContent='Sign in';return;}
+    state=r.data[0].data||{know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
+    if(!state.djFreestyles) state.djFreestyles={};
+    if(!state.favorites) state.favorites=[];
+    await loadBank();await loadPicks();await loadSubmissions();await loadFriendCards();enterApp(username);
+  }
+}
+
+function enterApp(username){
+  currentUser=username;isAdmin=username===ADMIN_USER;
+  localStorage.setItem('ld_user',username);
+  document.getElementById('auth-wrap').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('user-label').textContent=username;
+  document.getElementById('admin-badge').style.display=isAdmin?'inline':'none';
+  document.getElementById('admin-tab').style.display=isAdmin?'inline-block':'none';
+  document.getElementById('submissions-tab').style.display=isAdmin?'inline-block':'none';
+  document.getElementById('editpeople-tab').style.display=isAdmin?'inline-block':'none';
+  // Only show picks admin panel for drew
+  document.getElementById('picks-admin-panel').style.display=isAdmin?'block':'none';
+  setSyncStatus('synced','Synced');
+  updateSubmissionsBadge();
+  renderBank();renderList('know');renderList('learn');initNightDate();renderDJRecords();renderPicks();
+}
+
+function logout(){
+  currentUser=null;isAdmin=false;
+  localStorage.removeItem('ld_user');
+  state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};bank=[];drewPicks=[];submissions=[];friendCards=[];
+  document.getElementById('app').style.display='none';
+  document.getElementById('auth-wrap').style.display='flex';
+  document.getElementById('auth-username').value='';document.getElementById('auth-password').value='';
+  document.getElementById('auth-btn').disabled=false;document.getElementById('auth-btn').textContent='Sign in';
+}
+
+async function tryAutoLogin(){
+  const saved=localStorage.getItem('ld_user');if(!saved)return;
+  const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(saved)}&select=data`);
+  if(r.ok&&r.data&&r.data.length>0){
+    state=r.data[0].data||{know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
+    if(!state.djFreestyles) state.djFreestyles={};
+    if(!state.favorites) state.favorites=[];
+    await loadBank();await loadPicks();await loadSubmissions();await loadFriendCards();enterApp(saved);
+  }
+}
+
+// ---- Tabs ----
+function switchTab(tab){
+  const tabs=['bank','know','learn','night','log','dj','picks','friends','submissions','admin','editpeople'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===tab));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('visible'));
+  document.getElementById('tab-'+tab).classList.add('visible');
+  if(tab==='night') renderNight();
+  if(tab==='log'){renderHistoryStats();renderTop5();renderLog();}
+  if(tab==='admin'){renderAdminBank();loadAdminUsers();}
+  if(tab==='bank') renderBank();
+  if(tab==='dj') renderDJRecords();
+  if(tab==='picks') renderPicks();
+  if(tab==='submissions') renderSubmissions();
+  if(tab==='friends') renderFriendsTab();
+  if(tab==='editpeople') epRefreshUsers();
+}
+
+// ---- Sort helpers ----
+function toggleSort(key){
+  sortState[key]=!sortState[key];
+  const btn=document.getElementById(key+'-sort-btn');
+  if(btn) btn.classList.toggle('active',sortState[key]);
+  if(key==='bank') renderBank();
+  else if(key==='know') renderList('know');
+  else if(key==='learn') renderList('learn');
+  else if(key==='pick') renderPickList();
+}
+function applySortAndSearch(items,searchVal,sorted){
+  let result=[...items];
+  if(searchVal) result=result.filter(d=>d.name.toLowerCase().includes(searchVal.toLowerCase()));
+  if(sorted) result.sort((a,b)=>a.name.localeCompare(b.name));
+  return result;
+}
+function toggleFavFilter(){
+  favFilterActive=!favFilterActive;
+  const btn=document.getElementById('know-fav-btn');
+  if(btn) btn.classList.toggle('active',favFilterActive);
+  renderList('know');
+}
+
+// ---- Dance Bank ----
+function setBankFilter(diff,el){
+  bankFilter=diff;
+  document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');renderBank();
+}
+function isInList(name,type){return state[type].some(d=>d.name.toLowerCase()===name.toLowerCase());}
+function renderBank(){
+  const el=document.getElementById('bank-list');
+  const q=(document.getElementById('bank-search')?.value||'');
+  let items=bank.filter(d=>!q||d.name.toLowerCase().includes(q.toLowerCase()));
+  if(bankFilter!=='all') items=items.filter(d=>d.difficulty===bankFilter);
+  if(sortState.bank) items.sort((a,b)=>a.name.localeCompare(b.name));
+  if(!items.length){el.innerHTML=`<div class="empty">${bank.length===0?'No dances in the bank yet.':'No dances match your search.'}</div>`;return;}
+  el.innerHTML=items.map(d=>{
+    const inKnow=isInList(d.name,'know'),inLearn=isInList(d.name,'learn');
+    const diffBadge=d.difficulty?`<span class="diff-badge diff-${d.difficulty}">${d.difficulty}</span>`:'';
+    const statusPill=inKnow?`<span class="diff-badge" style="background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border)">&#10003; I Know It</span>`:inLearn?`<span class="diff-badge" style="background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border)">&#9733; Learning</span>`:'';
+    const demoBtn=d.demo?`<a class="link-btn demo" href="${escA(d.demo)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#9654; Demo</a>`:'';
+    const tutBtn=d.tutorial?`<a class="link-btn tutorial" href="${escA(d.tutorial)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#127891; Tutorial</a>`:'';
+    const statPills=[
+      d.counts!=null?`<span class="bank-detail-stat"><strong>${d.counts}</strong> counts</span>`:'',
+      d.walls!=null?`<span class="bank-detail-stat"><strong>${d.walls}</strong> walls</span>`:'',
+      d.tags!=null?`<span class="bank-detail-stat"><strong>${d.tags}</strong> tags</span>`:'',
+    ].filter(Boolean).join('');
+    const addBtns=(!inKnow&&!inLearn)
+      ?`<button class="btn sm success" onclick="addFromBankById('know','${d.id}')">&#43; I Know It</button><button class="btn sm info" onclick="addFromBankById('learn','${d.id}')">&#43; Want to Learn</button>`
+      :inLearn?`<button class="btn sm success" onclick="addFromBankById('know','${d.id}')">&#43; I Know It</button>`:'';
+    const hasBody=demoBtn||tutBtn||statPills||addBtns;
+    return `<div class="bank-item" id="bitem-${d.id}">
+      <div class="bank-item-head" onclick="toggleBankItem('${d.id}')">
+        <span class="bank-item-name">${esc(d.name)}</span>
+        <div class="bank-item-meta">${diffBadge}${statusPill}</div>
+        <span class="bank-item-caret">&#9660;</span>
+      </div>
+      ${hasBody?`<div class="bank-item-body">
+        ${statPills?`<div class="bank-detail-row">${statPills}</div>`:''}
+        ${(demoBtn||tutBtn)?`<div class="bank-detail-links">${demoBtn}${tutBtn}</div>`:''}
+        ${addBtns?`<div class="bank-detail-actions">${addBtns}</div>`:''}
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+function toggleBankItem(id){
+  const el=document.getElementById('bitem-'+id);
+  if(el) el.classList.toggle('open');
+}
+function addFromBankById(type,bankId){
+  const d=bank.find(x=>x.id===bankId);if(!d)return;
+  const name=d.name;
+  const other=type==='know'?'learn':'know';
+  state[other]=state[other].filter(x=>x.name.toLowerCase()!==name.toLowerCase());
+  if(!isInList(name,type)) state[type].push({id:Date.now()+'',name,added:new Date().toISOString()});
+  renderBank();renderList('know');renderList('learn');scheduleSave();syncMyCard();
+}
+function addFromBank(type,name){
+  const other=type==='know'?'learn':'know';
+  state[other]=state[other].filter(d=>d.name.toLowerCase()!==name.toLowerCase());
+  if(!isInList(name,type)) state[type].push({id:Date.now()+'',name,added:new Date().toISOString()});
+  renderBank();renderList('know');renderList('learn');scheduleSave();syncMyCard();
+}
+
+// ---- Admin bank ----
+function adminAddDance(){
+  if(!isAdmin)return;
+  const name=document.getElementById('bank-name').value.trim();
+  const demo=document.getElementById('bank-demo').value.trim();
+  const tutorial=document.getElementById('bank-tutorial').value.trim();
+  const difficulty=document.getElementById('bank-diff').value;
+  const counts=document.getElementById('bank-counts').value.trim();
+  const walls=document.getElementById('bank-walls').value.trim();
+  const tags=document.getElementById('bank-tags').value.trim();
+  if(!name){alert('Please enter a dance name.');return;}
+  if(bank.some(d=>d.name.toLowerCase()===name.toLowerCase())){alert('That dance is already in the bank.');return;}
+  bank.push({id:Date.now()+'',name,demo,tutorial,difficulty,counts:counts?Number(counts):null,walls:walls?Number(walls):null,tags:tags?Number(tags):null,added:new Date().toISOString()});
+  document.getElementById('bank-name').value='';document.getElementById('bank-demo').value='';document.getElementById('bank-tutorial').value='';document.getElementById('bank-diff').value='';document.getElementById('bank-counts').value='';document.getElementById('bank-walls').value='';document.getElementById('bank-tags').value='';
+  saveBankToCloud();renderAdminBank();renderBank();
+}
+function adminRemoveDance(id){
+  if(!isAdmin)return;if(!confirm('Remove this dance from the bank?'))return;
+  bank=bank.filter(d=>d.id!==id);saveBankToCloud();renderAdminBank();renderBank();
+}
+function toggleEditForm(id){const f=document.getElementById('edit-'+id);if(f)f.classList.toggle('open');}
+function adminSaveEdit(id){
+  const d=bank.find(x=>x.id===id);if(!d)return;
+  const oldName=d.name;
+  const newName=document.getElementById('edit-name-'+id).value.trim()||d.name;
+  d.name=newName;
+  d.demo=document.getElementById('edit-demo-'+id).value.trim();
+  d.tutorial=document.getElementById('edit-tut-'+id).value.trim();
+  d.difficulty=document.getElementById('edit-diff-'+id).value;
+  const counts=document.getElementById('edit-counts-'+id).value.trim();
+  const walls=document.getElementById('edit-walls-'+id).value.trim();
+  const tags=document.getElementById('edit-tags-'+id).value.trim();
+  d.counts=counts?Number(counts):null;
+  d.walls=walls?Number(walls):null;
+  d.tags=tags?Number(tags):null;
+  // Propagate name change to current user's state
+  if(oldName!==newName){
+    propagateDanceRename(oldName,newName,state);
+    scheduleSave();
+  }
+  saveBankToCloud();renderAdminBank();renderBank();renderList('know');renderList('learn');
+  // Also update all other users asynchronously
+  if(oldName!==newName) propagateRenameToAllUsers(oldName,newName);
+}
+function renderAdminBank(){
+  const el=document.getElementById('admin-bank-list');
+  if(!bank.length){el.innerHTML=`<div class="empty">No dances in the bank yet.</div>`;return;}
+  const sorted=[...bank].sort((a,b)=>a.name.localeCompare(b.name));
+  el.innerHTML=sorted.map(d=>{
+    const diffBadge=d.difficulty?`<span class="diff-badge diff-${d.difficulty}">${d.difficulty}</span>`:'';
+    const demoLink=d.demo?`<a class="link-btn demo" href="${escA(d.demo)}" target="_blank" rel="noopener">&#9654; Demo</a>`:`<span style="font-size:12px;color:var(--t3)">No demo</span>`;
+    const tutLink=d.tutorial?`<a class="link-btn tutorial" href="${escA(d.tutorial)}" target="_blank" rel="noopener">&#127891; Tutorial</a>`:`<span style="font-size:12px;color:var(--t3)">No tutorial</span>`;
+    const statPills=[
+      d.counts!=null?`<span class="bank-detail-stat"><strong>${d.counts}</strong> counts</span>`:'',
+      d.walls!=null?`<span class="bank-detail-stat"><strong>${d.walls}</strong> walls</span>`:'',
+      d.tags!=null?`<span class="bank-detail-stat"><strong>${d.tags}</strong> tags</span>`:'',
+    ].filter(Boolean).join('');
+    return `
+      <div class="bank-item">
+        <div class="bank-item-head" onclick="toggleEditForm('${d.id}')">
+          <span class="bank-item-name">${esc(d.name)}</span>
+          <div class="bank-item-meta">${diffBadge}${statPills}</div>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            <button class="btn xs info" onclick="event.stopPropagation();toggleEditForm('${d.id}')">Edit</button>
+            <button class="btn xs danger" onclick="event.stopPropagation();adminRemoveDance('${d.id}')">Remove</button>
+          </div>
+          <span class="bank-item-caret">&#9660;</span>
+        </div>
+        <div class="edit-form" id="edit-${d.id}">
+          <div style="display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+            ${demoLink}${tutLink}
+          </div>
+          <div class="edit-form-grid">
+            <input type="text" id="edit-name-${d.id}" value="${escA(d.name)}" placeholder="Dance name" class="full">
+            <input type="url" id="edit-demo-${d.id}" value="${escA(d.demo||'')}" placeholder="Demo link">
+            <input type="url" id="edit-tut-${d.id}" value="${escA(d.tutorial||'')}" placeholder="Tutorial link">
+            <select id="edit-diff-${d.id}" class="full">
+              <option value="">No difficulty</option>
+              <option value="Beginner" ${d.difficulty==='Beginner'?'selected':''}>Beginner</option>
+              <option value="Improver" ${d.difficulty==='Improver'?'selected':''}>Improver</option>
+              <option value="Intermediate" ${d.difficulty==='Intermediate'?'selected':''}>Intermediate</option>
+              <option value="Advanced" ${d.difficulty==='Advanced'?'selected':''}>Advanced</option>
+            </select>
+            <input type="number" id="edit-counts-${d.id}" value="${d.counts!=null?d.counts:''}" placeholder="Counts (e.g. 32)" min="0">
+            <input type="number" id="edit-walls-${d.id}" value="${d.walls!=null?d.walls:''}" placeholder="Walls (e.g. 4)" min="0">
+            <input type="number" id="edit-tags-${d.id}" value="${d.tags!=null?d.tags:''}" placeholder="Tags (e.g. 0)" min="0">
+          </div>
+          <div class="edit-form-row">
+            <button class="btn xs" onclick="toggleEditForm('${d.id}')">Cancel</button>
+            <button class="btn xs amber" onclick="adminSaveEdit('${d.id}')">Save changes</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+async function loadAdminUsers(){
+  const el=document.getElementById('admin-users-list');el.innerHTML='<p class="section-note">Loading...</p>';
+  const r=await sbFetch(`/rest/v1/dances?username=neq.__bank__&username=neq.__picks__&select=username,updated_at&order=username.asc`);
+  if(!r.ok||!r.data){el.innerHTML='<p class="section-note">Could not load users.</p>';return;}
+  const users=r.data.filter(u=>u.username!=='__bank__'&&u.username!=='__picks__');
+  if(!users.length){el.innerHTML='<div class="empty">No users yet.</div>';return;}
+  el.innerHTML=users.map(u=>`
+    <div class="user-row">
+      <span class="uname">${esc(u.username)}</span>
+      ${u.username===ADMIN_USER?'<span class="admin-badge">Admin</span>':''}
+      <span class="udate">Last active: ${u.updated_at?formatDate(u.updated_at.slice(0,10)):'—'}</span>
+    </div>`).join('');
+}
+
+// ---- My lists ----
+function isFav(id){return(state.favorites||[]).includes(id);}
+function toggleFav(id){
+  if(!state.favorites) state.favorites=[];
+  if(isFav(id)) state.favorites=state.favorites.filter(f=>f!==id);
+  else state.favorites.push(id);
+  renderList('know');scheduleSave();
+}
+function syncMyCard(){
+  const idx=friendCards.findIndex(c=>c.username===currentUser);
+  if(idx<0) return;
+  friendCards[idx].know=state.know.map(d=>d.name);
+  friendCards[idx].learn=state.learn.map(d=>d.name);
+  // Remove favs that no longer exist in know, keep favNames in sync
+  const knowIds=new Set(state.know.map(d=>d.id));
+  friendCards[idx].favs=friendCards[idx].favs.filter(id=>knowIds.has(id));
+  friendCards[idx].favNames=friendCards[idx].favs.map(id=>state.know.find(d=>d.id===id)?.name||'').filter(Boolean);
+  friendCards[idx].updatedAt=new Date().toISOString();
+  saveFriendCardsToCloud();
+}
+function addDance(type){
+  const inp=document.getElementById(type+'-input');
+  const name=inp.value.trim();if(!name)return;
+  state[type].push({id:Date.now()+'',name,added:new Date().toISOString()});
+  inp.value='';renderList(type);scheduleSave();syncMyCard();
+  // If not in bank, queue as a submission for admin review
+  const inBank=bank.some(d=>d.name.toLowerCase()===name.toLowerCase());
+  const alreadyQueued=submissions.some(s=>s.name.toLowerCase()===name.toLowerCase());
+  if(!inBank&&!alreadyQueued){
+    submissions.push({id:Date.now()+'_sub',name,addedBy:currentUser,list:type,addedAt:new Date().toISOString()});
+    saveSubmissionsToCloud();
+    if(isAdmin) updateSubmissionsBadge();
+  }
+}
+function removeDance(type,id){
+  state[type]=state[type].filter(d=>d.id!==id);
+  if(type==='know') state.favorites=(state.favorites||[]).filter(f=>f!==id);
+  renderList(type);renderBank();scheduleSave();syncMyCard();
+}
+function moveToKnow(id){
+  const d=state.learn.find(x=>x.id===id);if(!d)return;
+  state.learn=state.learn.filter(x=>x.id!==id);state.know.push({...d});
+  renderList('learn');renderList('know');renderBank();scheduleSave();syncMyCard();
+}
+function renderList(type){
+  const el=document.getElementById(type+'-list');
+  const searchEl=document.getElementById(type+'-search');
+  const q=searchEl?searchEl.value:'';
+  let items=applySortAndSearch(state[type],q,sortState[type]);
+  if(type==='know'&&favFilterActive) items=items.filter(d=>isFav(d.id));
+  if(!items.length){
+    el.innerHTML=`<div class="empty">${
+      favFilterActive&&type==='know'?'No favorites yet — click the heart on any dance!'
+      :type==='know'?'No dances yet — browse the Dance Bank or add one above!'
+      :'No dances on your wish list yet.'
+    }</div>`;return;
+  }
+  el.innerHTML=items.map(d=>`
+    <div class="dance-item">
+      ${type==='know'?`<button class="fav-btn ${isFav(d.id)?'active':''}" onclick="toggleFav('${d.id}')" title="${isFav(d.id)?'Unfavorite':'Favorite'}">&#9829;</button>`:''}
+      <span class="name">${esc(d.name)}</span>
+      ${type==='learn'?`<button class="btn sm success" onclick="moveToKnow('${d.id}')">I know it now!</button>`:''}
+      <button class="btn sm danger" onclick="removeDance('${type}','${d.id}')">Remove</button>
+    </div>`).join('');
+}
+
+// ---- Night (auto-save) ----
+function getNightData(date){
+  const n=state.nights[date];
+  if(!n) return{dances:[],dj:'',highlights:null};
+  if(Array.isArray(n)) return{dances:n,dj:'',highlights:null};
+  return{highlights:null,...n};
+}
+function localDateStr(){
+  // Roll the "day" over at 4am — before 4am counts as the previous day
+  const d=new Date();
+  if(d.getHours()<4) d.setDate(d.getDate()-1);
+  return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function initNightDate(){
+  const inp=document.getElementById('night-date');
+  const today=localDateStr();
+  inp.value=today;selectedDate=today;
+  loadNightSelections();renderPickList();renderDidList();loadNightDJ();renderHighlightsDisplay();
+  inp.onchange=()=>{selectedDate=inp.value;loadNightSelections();renderPickList();renderDidList();loadNightDJ();renderHighlightsDisplay();};
+}
+function loadNightSelections(){
+  nightSelections={};const nd=getNightData(selectedDate);nd.dances.forEach(id=>nightSelections[id]=true);
+}
+function loadNightDJ(){document.getElementById('night-dj').value=getNightData(selectedDate).dj||'';}
+function renderNight(){
+  if(!selectedDate)initNightDate();
+  selectedDate=document.getElementById('night-date').value||localDateStr();
+  loadNightSelections();renderPickList();renderDidList();loadNightDJ();renderHighlightsDisplay();
+}
+function renderPickList(){
+  const el=document.getElementById('pick-list');
+  if(!state.know.length){el.innerHTML=`<div class="empty" style="padding:1.5rem .5rem">Add dances to "Dances I Know" first</div>`;return;}
+  const q=(document.getElementById('pick-search')?.value||'');
+  let items=applySortAndSearch(state.know,q,sortState.pick);
+  el.innerHTML=items.map(d=>`
+    <div class="pick-item ${nightSelections[d.id]?'selected':''}" onclick="togglePick('${d.id}')">
+      <div class="check">${nightSelections[d.id]?'&#10003;':''}</div>
+      <span class="pname">${esc(d.name)}</span>
+    </div>`).join('');
+}
+function renderDidList(){
+  const el=document.getElementById('did-list');
+  const dances=state.know.filter(d=>nightSelections[d.id]);
+  if(!dances.length){el.innerHTML=`<div class="empty" style="padding:1.5rem .5rem">Nothing selected yet</div>`;return;}
+  el.innerHTML=dances.map(d=>`<div class="did-item">${esc(d.name)}<button class="remove" onclick="togglePick('${d.id}')" title="Remove">&#215;</button></div>`).join('');
+}
+function togglePick(id){
+  if(nightSelections[id])delete nightSelections[id];else nightSelections[id]=true;
+  renderPickList();renderDidList();scheduleNightSave();
+}
+// Auto-save night on any change
+function scheduleNightSave(){
+  clearTimeout(nightSaveTimeout);
+  nightSaveTimeout=setTimeout(()=>{
+    if(!selectedDate)return;
+    const dj=document.getElementById('night-dj').value.trim();
+    const existing=getNightData(selectedDate);
+    state.nights[selectedDate]={...existing,dances:Object.keys(nightSelections),dj};
+    const msg=document.getElementById('save-msg');
+    msg.textContent='Saved';
+    setTimeout(()=>msg.textContent='',2000);
+    scheduleSave();
+  },600);
+}
+
+// ---- Highlights ----
+function openHighlightsModal(){
+  const dances=state.know.filter(d=>nightSelections[d.id]);
+  if(!dances.length){alert('Select some dances for tonight first!');return;}
+  document.getElementById('highlights-modal-date').textContent=formatDate(selectedDate);
+  ['hl-pick-1','hl-pick-2','hl-pick-3'].forEach(id=>{
+    const sel=document.getElementById(id);
+    sel.innerHTML='<option value="">Select a dance...</option>'+dances.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
+  });
+  // Restore existing picks if any
+  const existing=getNightData(selectedDate);
+  if(existing.highlights){
+    if(existing.highlights[0]) document.getElementById('hl-pick-1').value=existing.highlights[0];
+    if(existing.highlights[1]) document.getElementById('hl-pick-2').value=existing.highlights[1];
+    if(existing.highlights[2]) document.getElementById('hl-pick-3').value=existing.highlights[2];
+  }
+  document.getElementById('highlights-modal').style.display='flex';
+}
+function closeHighlightsModal(){document.getElementById('highlights-modal').style.display='none';}
+function saveHighlights(){
+  const h1=document.getElementById('hl-pick-1').value;
+  const h2=document.getElementById('hl-pick-2').value;
+  const h3=document.getElementById('hl-pick-3').value;
+  const existing=getNightData(selectedDate);
+  state.nights[selectedDate]={...existing,highlights:[h1,h2,h3]};
+  scheduleSave();closeHighlightsModal();renderHighlightsDisplay();
+}
+function renderHighlightsDisplay(){
+  const el=document.getElementById('highlights-display');
+  const nd=getNightData(selectedDate);
+  if(!nd.highlights||!nd.highlights.some(Boolean)){el.innerHTML='';return;}
+  const allDances=state.know.filter(d=>nightSelections[d.id]);
+  const getName=id=>state.know.find(d=>d.id===id)?.name||'';
+  const labels=['1st favorite','2nd favorite','3rd favorite'];
+  const rankCls=['rank-1','rank-2','rank-3'];
+  const favItems=nd.highlights.map((id,i)=>{
+    if(!id) return '';
+    return `<div class="highlight-item ${rankCls[i]}">
+      <span class="highlight-rank-num">${i+1}</span>
+      <div><div class="highlight-name">${esc(getName(id))}</div><div class="highlight-label">${labels[i]}</div></div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`
+    <div class="highlights-panel">
+      <div class="highlights-date">${formatDate(selectedDate)}</div>
+      <div class="highlights-favorites">${favItems}</div>
+      <hr class="highlights-divider">
+      <div class="highlights-total"><strong>${allDances.length}</strong> total dances tonight</div>
+      <div class="highlights-all">${allDances.map(d=>`<span class="log-pill">${esc(d.name)}</span>`).join('')}</div>
+    </div>`;
+}
+
+// ---- History ----
+function getAllDanceCounts(){
+  const counts={};
+  Object.values(state.nights).forEach(val=>{
+    const nd=Array.isArray(val)?{dances:val}:val;
+    (nd.dances||[]).forEach(id=>{counts[id]=(counts[id]||0)+1;});
+  });
+  return counts;
+}
+function renderHistoryStats(){
+  const el=document.getElementById('history-stats');
+  const now=new Date();
+  const thisMonth=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const thisYear=`${now.getFullYear()}`;
+  let monthCount=0,yearCount=0,totalNights=0;
+  const djNights={};
+  Object.entries(state.nights).forEach(([date,val])=>{
+    const nd=Array.isArray(val)?{dances:val,dj:''}:val;
+    const dc=(nd.dances||[]).length;
+    if(date.startsWith(thisMonth)) monthCount+=dc;
+    if(date.startsWith(thisYear)) yearCount+=dc;
+    if(dc>0) totalNights++;
+    if(nd.dj) djNights[nd.dj]=(djNights[nd.dj]||0)+1;
+  });
+  const topDJ=Object.entries(djNights).sort((a,b)=>b[1]-a[1])[0];
+  el.innerHTML=`
+    <div class="stat-card"><div class="stat-label">Dances this month</div><div class="stat-value">${monthCount}</div></div>
+    <div class="stat-card"><div class="stat-label">Dances this year</div><div class="stat-value">${yearCount}</div></div>
+    <div class="stat-card"><div class="stat-label">Nights logged</div><div class="stat-value">${totalNights}</div></div>
+    <div class="stat-card"><div class="stat-label">Top DJ</div><div class="stat-value" style="font-size:18px">${topDJ?esc(topDJ[0]):'—'}</div><div class="stat-sub">${topDJ?topDJ[1]+' night'+(topDJ[1]!==1?'s':''):''}</div></div>`;
+}
+function renderTop5(){
+  const el=document.getElementById('top5-list');
+  const counts=getAllDanceCounts();
+  const ranked=Object.entries(counts)
+    .map(([id,count])=>({id,count,dance:state.know.find(d=>d.id===id)}))
+    .filter(x=>x.dance)
+    .sort((a,b)=>b.count-a.count)
+    .slice(0,5);
+  if(!ranked.length){el.innerHTML=`<div class="empty">Dance some nights to see your top dances!</div>`;return;}
+  const rankClass=['gold','silver','bronze','',''];
+  el.innerHTML=ranked.map((x,i)=>`
+    <div class="top5-item">
+      <span class="top5-rank ${rankClass[i]}">${i+1}</span>
+      <span class="top5-name">${esc(x.dance.name)}</span>
+      <span class="top5-count">${x.count} time${x.count!==1?'s':''}</span>
+    </div>`).join('');
+}
+function deleteNight(date,e){
+  e.stopPropagation();
+  if(!confirm(`Delete the night of ${formatDate(date)}? This cannot be undone.`))return;
+  delete state.nights[date];
+  scheduleSave();renderHistoryStats();renderTop5();renderLog();
+  if(document.getElementById('all-dances-accordion').classList.contains('open')) renderAllDances();
+}
+function renderLog(){
+  const el=document.getElementById('log-list');
+  const nights=Object.entries(state.nights).sort((a,b)=>b[0].localeCompare(a[0]));
+  if(!nights.length){el.innerHTML=`<div class="empty">No nights logged yet. Go dance!</div>`;return;}
+  el.innerHTML=nights.map(([date,val])=>{
+    const nd=Array.isArray(val)?{dances:val,dj:''}:val;
+    const dances=(nd.dances||[]).map(id=>state.know.find(d=>d.id===id)).filter(Boolean);
+    const pills=dances.map(d=>`<span class="log-pill">${esc(d.name)}</span>`).join('');
+    const djLabel=nd.dj?`<span class="dj-name">DJ: ${esc(nd.dj)}</span>`:'';
+    return `
+      <div class="day-log" onclick="this.classList.toggle('open')">
+        <div class="day-log-head">
+          <span class="date">${formatDate(date)}</span>
+          ${djLabel}
+          <span class="count">${dances.length} dance${dances.length!==1?'s':''}</span>
+          <button class="btn xs danger" onclick="deleteNight('${date}',event)" title="Delete this night" style="margin-left:4px">Delete</button>
+          <span class="caret">&#9660;</span>
+        </div>
+        <div class="day-log-body">${pills||'<span style="font-size:13px;color:var(--t3)">No dances recorded</span>'}</div>
+      </div>`;
+  }).join('');
+}
+function toggleAllDancesAccordion(){
+  const acc=document.getElementById('all-dances-accordion');
+  acc.classList.toggle('open');
+  if(acc.classList.contains('open')) renderAllDances();
+}
+function renderAllDances(){
+  const el=document.getElementById('all-dances-list');
+  const counts=getAllDanceCounts();
+  // Build name-based map
+  const named=Object.entries(counts).map(([id,count])=>{
+    const dance=state.know.find(d=>d.id===id);
+    return dance?{name:dance.name,count}:null;
+  }).filter(Boolean).sort((a,b)=>a.name.localeCompare(b.name));
+  if(!named.length){el.innerHTML=`<div class="empty">No dances recorded yet.</div>`;return;}
+  el.innerHTML=named.map(x=>`
+    <div class="all-dance-row">
+      <span class="all-dance-name">${esc(x.name)}</span>
+      <span class="all-dance-count">${x.count} time${x.count!==1?'s':''}</span>
+    </div>`).join('');
+}
+
+// ---- DJ Freestyle (manual entry) ----
+function fmtSecs(s){const m=Math.floor(s/60),sec=s%60;return`${m}m ${String(sec).padStart(2,'0')}s`;}
+function parseEntryToSecs(){
+  const m=parseInt(document.getElementById('dj-entry-min').value)||0;
+  const s=parseInt(document.getElementById('dj-entry-sec').value)||0;
+  return m*60+s;
+}
+function djAddSession(){
+  const djName=document.getElementById('dj-entry-name').value.trim();
+  if(!djName){alert('Please enter a DJ name.');return;}
+  const secs=parseEntryToSecs();
+  if(secs===0){alert('Please enter a duration greater than 0.');return;}
+  if(!state.djFreestyles) state.djFreestyles={};
+  if(!state.djFreestyles[djName]) state.djFreestyles[djName]=[];
+  // Store as objects with id for edit/delete
+  state.djFreestyles[djName].push({id:Date.now()+'',secs});
+  document.getElementById('dj-entry-min').value='';
+  document.getElementById('dj-entry-sec').value='';
+  scheduleSave();renderDJRecords();
+}
+function toggleDJSessions(djName){
+  const el=document.getElementById('dj-sessions-'+cssId(djName));
+  if(el) el.closest('.dj-record-item').classList.toggle('open');
+}
+function djDeleteSession(djName,sessionId){
+  if(!confirm('Delete this session?'))return;
+  const arr=state.djFreestyles[djName];
+  if(!arr)return;
+  state.djFreestyles[djName]=arr.filter(s=>(s.id||'')!==sessionId);
+  if(!state.djFreestyles[djName].length) delete state.djFreestyles[djName];
+  scheduleSave();renderDJRecords();
+}
+function djStartEdit(djName,sessionId){
+  document.getElementById('dj-view-'+sessionId).style.display='none';
+  document.getElementById('dj-edit-'+sessionId).classList.add('open');
+  const arr=state.djFreestyles[djName]||[];
+  const s=arr.find(x=>x.id===sessionId);
+  if(s){
+    document.getElementById('dj-edit-m-'+sessionId).value=Math.floor(s.secs/60);
+    document.getElementById('dj-edit-s-'+sessionId).value=s.secs%60;
+  }
+}
+function djCancelEdit(sessionId){
+  document.getElementById('dj-view-'+sessionId).style.display='';
+  document.getElementById('dj-edit-'+sessionId).classList.remove('open');
+}
+function djSaveEdit(djName,sessionId){
+  const m=parseInt(document.getElementById('dj-edit-m-'+sessionId).value)||0;
+  const s=parseInt(document.getElementById('dj-edit-s-'+sessionId).value)||0;
+  const secs=m*60+s;
+  if(secs===0){alert('Duration must be greater than 0.');return;}
+  const arr=state.djFreestyles[djName]||[];
+  const entry=arr.find(x=>x.id===sessionId);
+  if(entry) entry.secs=secs;
+  scheduleSave();renderDJRecords();
+}
+function cssId(s){return s.replace(/[^a-zA-Z0-9]/g,'_');}
+function renderDJRecords(){
+  const el=document.getElementById('dj-records-list');
+  if(!state.djFreestyles){el.innerHTML=`<div class="empty">No freestyle sessions logged yet.</div>`;return;}
+  // Normalise: entries may be plain numbers (legacy) or {id,secs}
+  Object.keys(state.djFreestyles).forEach(dj=>{
+    state.djFreestyles[dj]=state.djFreestyles[dj].map(x=>{
+      if(typeof x==='number') return{id:Date.now()+Math.random()+'',secs:x};
+      return x;
+    });
+  });
+  const djs=Object.entries(state.djFreestyles).filter(([,arr])=>arr&&arr.length>0);
+  if(!djs.length){el.innerHTML=`<div class="empty">No freestyle sessions logged yet.</div>`;return;}
+  const djNights={};
+  Object.values(state.nights).forEach(val=>{
+    const nd=Array.isArray(val)?{dances:val,dj:''}:val;
+    if(nd.dj) djNights[nd.dj]=(djNights[nd.dj]||0)+1;
+  });
+  el.innerHTML=djs.map(([name,sessions])=>{
+    const totalSecs=sessions.reduce((a,s)=>a+s.secs,0);
+    const avg=Math.round(totalSecs/sessions.length);
+    const nights=djNights[name]||0;
+    const sid=cssId(name);
+    const sessionRows=sessions.map((s,i)=>`
+      <div class="dj-session-row">
+        <span class="dj-session-num">${i+1}.</span>
+        <span class="dj-session-time" id="dj-view-${s.id}">${fmtSecs(s.secs)}</span>
+        <div class="dj-session-edit" id="dj-edit-${s.id}">
+          <input type="number" id="dj-edit-m-${s.id}" min="0" max="59" placeholder="m" style="width:50px;">
+          <span style="font-size:12px;color:var(--t2)">m</span>
+          <input type="number" id="dj-edit-s-${s.id}" min="0" max="59" placeholder="s" style="width:50px;">
+          <span style="font-size:12px;color:var(--t2)">s</span>
+          <button class="btn xs success" onclick="djSaveEdit('${escA(name)}','${s.id}')">Save</button>
+          <button class="btn xs" onclick="djCancelEdit('${s.id}')">Cancel</button>
+        </div>
+        <button class="btn xs info" onclick="djStartEdit('${escA(name)}','${s.id}')" title="Edit">Edit</button>
+        <button class="btn xs danger" onclick="djDeleteSession('${escA(name)}','${s.id}')" title="Delete">Delete</button>
+      </div>`).join('');
+    return `
+      <div class="dj-record-item" id="dj-item-${sid}">
+        <div class="dj-record-head" onclick="toggleDJSessions('${escA(name)}')" style="cursor:pointer">
+          <span class="dj-record-name">${esc(name)}</span>
+          <span class="dj-stat">Sessions: <strong>${sessions.length}</strong></span>
+          <span class="dj-stat">Avg: <strong>${fmtSecs(avg)}</strong></span>
+          <span class="dj-stat">Nights DJ'd: <strong>${nights}</strong></span>
+          <span class="caret" style="font-size:11px;color:var(--t2)">&#9660;</span>
+        </div>
+        <div class="dj-sessions-body" id="dj-sessions-${sid}">${sessionRows}</div>
+      </div>`;
+  }).join('');
+}
+
+// ---- Drew's Favs (drag-and-drop) ----
+let picksDragSrc=null;
+function adminAddPick(){
+  if(!isAdmin)return;
+  const name=document.getElementById('pick-dance-name').value.trim();
+  const note=document.getElementById('pick-dance-note').value.trim();
+  if(!name){alert('Please enter a dance name.');return;}
+  drewPicks.push({id:Date.now()+'',name,note,added:new Date().toISOString()});
+  document.getElementById('pick-dance-name').value='';document.getElementById('pick-dance-note').value='';
+  savePicksToCloud();renderPicks();
+}
+function adminRemovePick(id){
+  if(!isAdmin)return;
+  drewPicks=drewPicks.filter(p=>p.id!==id);savePicksToCloud();renderPicks();
+}
+function renderPicks(){
+  const el=document.getElementById('picks-list');
+  if(!drewPicks.length){el.innerHTML=`<div class="empty">${isAdmin?'Add your first pick above!':'No picks yet — check back soon!'}</div>`;return;}
+  el.innerHTML=drewPicks.map((p,i)=>`
+    <div class="picks-item" draggable="${isAdmin}" data-id="${p.id}"
+      ondragstart="picksDragStart(event,'${p.id}')"
+      ondragover="picksDragOver(event)"
+      ondragleave="picksDragLeave(event)"
+      ondrop="picksDrop(event,'${p.id}')"
+      ondragend="picksDragEnd(event)">
+      ${isAdmin?`<span class="drag-handle" title="Drag to reorder" style="cursor:grab;color:var(--t3);font-size:16px;flex-shrink:0">&#8597;</span>`:''}
+      <span class="picks-num">${i+1}</span>
+      <span class="picks-name">${esc(p.name)}</span>
+      ${p.note?`<span class="picks-note">"${esc(p.note)}"</span>`:''}
+      ${isAdmin?`<div class="picks-item-actions"><button class="btn xs danger" onclick="adminRemovePick('${p.id}')">Remove</button></div>`:''}
+    </div>`).join('');
+}
+function picksDragStart(e,id){picksDragSrc=id;e.currentTarget.classList.add('dragging');e.dataTransfer.effectAllowed='move';}
+function picksDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';e.currentTarget.classList.add('drag-over');}
+function picksDragLeave(e){e.currentTarget.classList.remove('drag-over');}
+function picksDrop(e,targetId){
+  e.preventDefault();e.currentTarget.classList.remove('drag-over');
+  if(!picksDragSrc||picksDragSrc===targetId)return;
+  const from=drewPicks.findIndex(p=>p.id===picksDragSrc);
+  const to=drewPicks.findIndex(p=>p.id===targetId);
+  if(from<0||to<0)return;
+  const[moved]=drewPicks.splice(from,1);
+  drewPicks.splice(to,0,moved);
+  savePicksToCloud();renderPicks();
+}
+function picksDragEnd(e){e.currentTarget.classList.remove('dragging');picksDragSrc=null;}
+
+// ---- Friends ----
+const GRADIENTS=[
+  'linear-gradient(135deg,#667eea,#764ba2)',
+  'linear-gradient(135deg,#f093fb,#f5576c)',
+  'linear-gradient(135deg,#4facfe,#00f2fe)',
+  'linear-gradient(135deg,#43e97b,#38f9d7)',
+  'linear-gradient(135deg,#fa709a,#fee140)',
+  'linear-gradient(135deg,#a18cd1,#fbc2eb)',
+  'linear-gradient(135deg,#fccb90,#d57eeb)',
+  'linear-gradient(135deg,#a1c4fd,#c2e9fb)',
+  'linear-gradient(135deg,#fd7043,#ff8a65)',
+  'linear-gradient(135deg,#1de9b6,#1565c0)',
+  'linear-gradient(135deg,#f7971e,#ffd200)',
+  'linear-gradient(135deg,#56ab2f,#a8e063)',
+  'linear-gradient(135deg,#ee9ca7,#ffdde1)',
+  'linear-gradient(135deg,#2980b9,#6dd5fa)',
+  'linear-gradient(135deg,#373b44,#4286f4)',
+  'linear-gradient(135deg,#c94b4b,#4b134f)',
+  'linear-gradient(135deg,#11998e,#38ef7d)',
+  'linear-gradient(135deg,#8e2de2,#4a00e0)',
+  'linear-gradient(135deg,#fc5c7d,#6a82fb)',
+  'linear-gradient(135deg,#3a1c71,#d76d77,#ffaf7b)',
+  'linear-gradient(135deg,#0f0c29,#302b63,#24243e)',
+  'linear-gradient(135deg,#fddb92,#d1fdff)',
+  'linear-gradient(135deg,#e0c3fc,#8ec5fc)',
+  'linear-gradient(135deg,#f6d365,#fda085)',
+  'linear-gradient(135deg,#96fbc4,#f9f586)',
+  'linear-gradient(135deg,#89f7fe,#66a6ff)',
+  'linear-gradient(135deg,#fdfc47,#24fe41)',
+  'linear-gradient(135deg,#f83600,#f9d423)',
+  'linear-gradient(135deg,#30cfd0,#330867)',
+  'linear-gradient(135deg,#a8edea,#fed6e3)',
+  'linear-gradient(135deg,#d4fc79,#96e6a1)',
+  'linear-gradient(135deg,#84fab0,#8fd3f4)',
+  'linear-gradient(135deg,#ffecd2,#fcb69f)',
+  'linear-gradient(135deg,#ff9a9e,#fad0c4)',
+  'linear-gradient(135deg,#a18cd1,#fbc2eb)',
+  'linear-gradient(135deg,#ffd1ff,#fad0c4)',
+];
+
+let fcPickSelections=[]; // ordered array of dance ids, up to 5
+let fcSelectedGrad=0;
+let fcDragSrc=null;
+
+function myCard(){return friendCards.find(c=>c.username===currentUser)||null;}
+
+function openFriendSetup(editMode=false){
+  const card=myCard();
+  document.getElementById('fc-display-name').value=card?card.displayName:'';
+  fcPickSelections=card?[...card.favs]:[];
+  fcSelectedGrad=card?card.grad:0;
+  // Build gradient picker
+  const picker=document.getElementById('fc-grad-picker');
+  picker.innerHTML=GRADIENTS.map((g,i)=>`<div class="grad-swatch ${i===fcSelectedGrad?'active':''}" style="background:${g}" onclick="selectGrad(${i})" title="Gradient ${i+1}"></div>`).join('');
+  // Build pick list
+  renderFcPickList();
+  document.getElementById('friend-setup-modal').style.display='flex';
+}
+function closeFriendSetup(){document.getElementById('friend-setup-modal').style.display='none';}
+function selectGrad(i){
+  fcSelectedGrad=i;
+  document.querySelectorAll('.grad-swatch').forEach((s,idx)=>s.classList.toggle('active',idx===i));
+}
+function renderFcPickList(){
+  const el=document.getElementById('fc-pick-list');
+  const count=document.getElementById('fc-pick-count');
+  count.textContent=`(${fcPickSelections.length} of 5)`;
+  if(!state.know.length){el.innerHTML=`<div style="font-size:13px;color:var(--t3);padding:.5rem 0">Add dances to "Dances I Know" first</div>`;renderFcReorderList();return;}
+  el.innerHTML=[...state.know].sort((a,b)=>a.name.localeCompare(b.name)).map(d=>{
+    const rank=fcPickSelections.indexOf(d.id);
+    const sel=rank>=0;
+    return `<div class="fav-pick-item ${sel?'selected':''}" onclick="toggleFcPick('${d.id}')">
+      <div class="fcheck">${sel?'&#10003;':''}</div>
+      <span class="fav-pick-name">${esc(d.name)}</span>
+      ${sel?`<span class="fav-pick-rank">#${rank+1}</span>`:''}
+    </div>`;
+  }).join('');
+  renderFcReorderList();
+}
+function renderFcReorderList(){
+  const sec=document.getElementById('fc-reorder-section');
+  const el=document.getElementById('fc-reorder-list');
+  if(!fcPickSelections.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  const items=fcPickSelections.map(id=>state.know.find(d=>d.id===id)).filter(Boolean);
+  el.innerHTML=items.map((d,i)=>`
+    <div class="fav-list-admin-item" draggable="true" data-id="${d.id}"
+      ondragstart="fcFavDragStart(event,'${d.id}')"
+      ondragover="fcFavDragOver(event)"
+      ondragleave="fcFavDragLeave(event)"
+      ondrop="fcFavDropModal(event,'${d.id}')"
+      ondragend="fcFavDragEnd(event)">
+      <span class="fadm-handle" style="touch-action:none">&#8597;</span>
+      <span class="fadm-num">${i+1}</span>
+      <span class="fadm-name">${esc(d.name)}</span>
+      <div style="display:flex;gap:4px;margin-left:auto">
+        ${i>0?`<button onclick="fcMoveUp(${i})" style="background:none;border:0.5px solid var(--b3);border-radius:6px;width:24px;height:24px;cursor:pointer;color:var(--t2);font-size:12px;display:flex;align-items:center;justify-content:center">&#8593;</button>`:'<span style="width:28px"></span>'}
+        ${i<items.length-1?`<button onclick="fcMoveDown(${i})" style="background:none;border:0.5px solid var(--b3);border-radius:6px;width:24px;height:24px;cursor:pointer;color:var(--t2);font-size:12px;display:flex;align-items:center;justify-content:center">&#8595;</button>`:''}
+      </div>
+    </div>`).join('');
+}
+function fcMoveUp(i){
+  if(i<=0)return;
+  [fcPickSelections[i-1],fcPickSelections[i]]=[fcPickSelections[i],fcPickSelections[i-1]];
+  renderFcReorderList();renderFcPickList();
+}
+function fcMoveDown(i){
+  if(i>=fcPickSelections.length-1)return;
+  [fcPickSelections[i],fcPickSelections[i+1]]=[fcPickSelections[i+1],fcPickSelections[i]];
+  renderFcReorderList();renderFcPickList();
+}
+function fcFavDropModal(e,targetId){
+  e.preventDefault();e.currentTarget.classList.remove('drag-over');
+  if(!fcDragSrc||fcDragSrc===targetId)return;
+  const from=fcPickSelections.indexOf(fcDragSrc);
+  const to=fcPickSelections.indexOf(targetId);
+  if(from<0||to<0)return;
+  const[moved]=fcPickSelections.splice(from,1);
+  fcPickSelections.splice(to,0,moved);
+  renderFcReorderList();renderFcPickList();
+}
+function toggleFcPick(id){
+  const idx=fcPickSelections.indexOf(id);
+  if(idx>=0) fcPickSelections.splice(idx,1);
+  else if(fcPickSelections.length<5) fcPickSelections.push(id);
+  else{alert('You can only pick 5 favorites. Remove one first.');return;}
+  renderFcPickList();
+}
+function saveFriendCard(){
+  const displayName=document.getElementById('fc-display-name').value.trim();
+  if(!displayName){alert('Please enter a display name.');return;}
+  // Store both the id (for drag-reorder ownership) and the resolved name
+  const favEntries=fcPickSelections.map(id=>{
+    const d=state.know.find(x=>x.id===id);
+    return{id,name:d?d.name:''};
+  }).filter(f=>f.name);
+  const card={
+    username:currentUser,
+    displayName,
+    favs:favEntries.map(f=>f.id),       // ids for owner reorder
+    favNames:favEntries.map(f=>f.name), // names for everyone to read
+    know:state.know.map(d=>d.name),
+    learn:state.learn.map(d=>d.name),
+    grad:fcSelectedGrad,
+    updatedAt:new Date().toISOString()
+  };
+  const idx=friendCards.findIndex(c=>c.username===currentUser);
+  if(idx>=0) friendCards[idx]=card; else friendCards.push(card);
+  saveFriendCardsToCloud();
+  closeFriendSetup();
+  renderFriendsTab();
+}
+
+function renderFriendsTab(){
+  const myCardEl=document.getElementById('my-card-section');
+  const grid=document.getElementById('friends-grid');
+  const card=myCard();
+  // My card section
+  if(card){
+    myCardEl.innerHTML=`
+      <div class="section-title" style="margin-top:0">My card</div>
+      ${buildCardHTML(card,true)}`;
+    attachFavDragListeners();
+  } else {
+    myCardEl.innerHTML=`
+      <div style="background:var(--bg);border:0.5px dashed var(--b2);border-radius:var(--radius-lg);padding:2rem;text-align:center;margin-bottom:1.5rem;">
+        <div style="font-size:15px;font-weight:500;margin-bottom:6px">You don't have a card yet!</div>
+        <div style="font-size:13px;color:var(--t2);margin-bottom:1rem">Create your dancer profile to show up in the Friends list</div>
+        <button class="btn primary" onclick="openFriendSetup(false)">Create my card</button>
+      </div>`;
+  }
+  // Everyone's cards
+  const others=friendCards.filter(c=>c.username!==currentUser);
+  if(!others.length){
+    grid.innerHTML=`<div style="font-size:13px;color:var(--t3);grid-column:1/-1">No other cards yet — invite your friends!</div>`;
+  } else {
+    grid.innerHTML=others.map(c=>buildCardHTML(c,false)).join('');
+  }
+}
+
+function buildCardHTML(card,isMe){
+  const grad=GRADIENTS[card.grad||0];
+  // For the card owner, resolve from local state (most up-to-date). For others use stored favNames.
+  let favNames;
+  if(isMe){
+    favNames=card.favs.map(id=>state.know.find(d=>d.id===id)?.name).filter(Boolean);
+  } else {
+    favNames=card.favNames||card.favs.map(id=>state.know.find(d=>d.id===id)?.name||'').filter(Boolean);
+  }
+  const favHTML=favNames.length
+    ? favNames.map((n,i)=>`<div class="fc-fav-row"><span class="fc-fav-num">${i+1}</span><span>${esc(n)}</span></div>`).join('')
+    : `<div style="font-size:12px;color:var(--t3)">No favorites set</div>`;
+  const knowPills=(card.know||[]).slice().sort((a,b)=>a.localeCompare(b)).slice(0,8).map(n=>`<span class="fc-pill">${esc(n)}</span>`).join('');
+  const learnPills=(card.learn||[]).slice().sort((a,b)=>a.localeCompare(b)).slice(0,6).map(n=>`<span class="fc-pill">${esc(n)}</span>`).join('');
+  const knowCount=(card.know||[]).length;
+  const learnCount=(card.learn||[]).length;
+  const clickAttr=`onclick="${isMe?`openMyCardDetail()`:`openFriendDetail('${escA(card.username)}')`}"`;
+  const editBtn=isMe?`<button onclick="event.stopPropagation();openFriendSetup(true)" style="position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.22);border:none;border-radius:20px;color:#fff;font-size:11px;font-weight:500;padding:4px 10px;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:.01em;backdrop-filter:blur(4px)">Edit</button>`:'';
+  return `<div class="friend-card" ${clickAttr}>
+    <div class="fc-header" style="background:${grad};position:relative">
+      <div class="fc-name">${esc(card.displayName)}</div>
+      <div class="fc-username">@${esc(card.username)}</div>
+      ${editBtn}
+    </div>
+    <div class="fc-body">
+      <div class="fc-section-label">Top favorites</div>
+      <div class="fc-fav-list">${favHTML}</div>
+      ${knowPills?`<div class="fc-section-label">Dances they know (${knowCount})</div><div class="fc-pills" style="margin-bottom:10px">${knowPills}${knowCount>8?`<span class="fc-pill">+${knowCount-8} more</span>`:''}</div>`:''}
+      ${learnPills?`<div class="fc-section-label">Want to learn (${learnCount})</div><div class="fc-pills">${learnPills}${learnCount>6?`<span class="fc-pill">+${learnCount-6} more</span>`:''}</div>`:''}
+    </div>
+  </div>`;
+}
+
+function buildFavAdminHTML(card){
+  const favNames=card.favs.map(id=>({id,name:state.know.find(d=>d.id===id)?.name||id})).filter(f=>f.name);
+  if(!favNames.length) return '';
+  const rows=favNames.map((f,i)=>`
+    <div class="fav-list-admin-item" draggable="true" data-id="${f.id}"
+      ondragstart="fcFavDragStart(event,'${f.id}')"
+      ondragover="fcFavDragOver(event)"
+      ondragleave="fcFavDragLeave(event)"
+      ondrop="fcFavDrop(event,'${f.id}')"
+      ondragend="fcFavDragEnd(event)">
+      <span class="fadm-handle">&#8597;</span>
+      <span class="fadm-num">${i+1}</span>
+      <span class="fadm-name">${esc(f.name)}</span>
+    </div>`).join('');
+  return `<div style="flex:1"><div style="font-size:11px;font-weight:500;color:var(--t2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">Drag to reorder favorites</div><div id="fav-admin-list">${rows}</div></div>`;
+}
+
+function attachFavDragListeners(){}// drag handled inline via HTML attrs
+
+function fcFavDragStart(e,id){fcDragSrc=id;e.currentTarget.classList.add('dragging');e.dataTransfer.effectAllowed='move';}
+function fcFavDragOver(e){e.preventDefault();e.currentTarget.classList.add('drag-over');}
+function fcFavDragLeave(e){e.currentTarget.classList.remove('drag-over');}
+function fcFavDrop(e,targetId){
+  e.preventDefault();e.currentTarget.classList.remove('drag-over');
+  if(!fcDragSrc||fcDragSrc===targetId)return;
+  const card=myCard();if(!card)return;
+  const from=card.favs.indexOf(fcDragSrc);
+  const to=card.favs.indexOf(targetId);
+  if(from<0||to<0)return;
+  const[moved]=card.favs.splice(from,1);
+  card.favs.splice(to,0,moved);
+  saveFriendCardsToCloud();renderFriendsTab();
+}
+function fcFavDragEnd(e){e.currentTarget.classList.remove('dragging');fcDragSrc=null;}
+
+function openFriendDetail(username){
+  const card=friendCards.find(c=>c.username===username);if(!card)return;
+  const grad=GRADIENTS[card.grad||0];
+  // Use stored favNames so viewers see actual dance names
+  const favNames=card.favNames||card.favs.map(id=>state.know.find(d=>d.id===id)?.name||'').filter(Boolean);
+  const knowList=(card.know||[]).slice().sort((a,b)=>a.localeCompare(b)).map(n=>`<span class="fc-pill">${esc(n)}</span>`).join('');
+  const learnList=(card.learn||[]).slice().sort((a,b)=>a.localeCompare(b)).map(n=>`<span class="fc-pill">${esc(n)}</span>`).join('');
+  document.getElementById('friend-detail-content').innerHTML=`
+    <div style="background:${grad};border-radius:12px;padding:1.5rem;margin:-2rem -2rem 1.5rem;position:relative;">
+      <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3)">${esc(card.displayName)}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px">@${esc(card.username)}</div>
+      <button onclick="closeFriendDetail()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:28px;height:28px;color:#fff;font-size:16px;cursor:pointer;line-height:1">&#215;</button>
+    </div>
+    ${favNames.length?`<div class="section-title" style="margin-top:0">Top favorites</div><div style="display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem">${favNames.map((n,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:0.5px solid var(--b3);border-radius:var(--radius-md);background:var(--bg2)"><span style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--t3);min-width:20px">${i+1}</span><span style="font-size:14px;font-weight:500">${esc(n)}</span></div>`).join('')}</div>`:''}
+    ${knowList?`<div class="section-title">Dances they know (${(card.know||[]).length})</div><div class="fc-pills" style="margin-bottom:1.25rem">${knowList}</div>`:''}
+    ${learnList?`<div class="section-title">Want to learn (${(card.learn||[]).length})</div><div class="fc-pills">${learnList}</div>`:''}
+  `;
+  document.getElementById('friend-detail-modal').style.display='flex';
+}
+function closeFriendDetail(){document.getElementById('friend-detail-modal').style.display='none';}
+
+function openMyCardDetail(){
+  const card=myCard();if(!card)return;
+  const grad=GRADIENTS[card.grad||0];
+  const favNames=card.favs.map(id=>state.know.find(d=>d.id===id)?.name).filter(Boolean);
+  const knowList=(card.know||[]).slice().sort((a,b)=>a.localeCompare(b)).map(n=>`<span class="fc-pill">${esc(n)}</span>`).join('');
+  const learnList=(card.learn||[]).slice().sort((a,b)=>a.localeCompare(b)).map(n=>`<span class="fc-pill">${esc(n)}</span>`).join('');
+  document.getElementById('friend-detail-content').innerHTML=`
+    <div style="background:${grad};border-radius:12px;padding:1.5rem;margin:-2rem -2rem 1.5rem;position:relative;">
+      <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3)">${esc(card.displayName)}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px">@${esc(card.username)}</div>
+      <button onclick="closeFriendDetail()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:28px;height:28px;color:#fff;font-size:16px;cursor:pointer;line-height:1">&#215;</button>
+    </div>
+    ${favNames.length?`<div class="section-title" style="margin-top:0">Top favorites</div><div style="display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem">${favNames.map((n,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:0.5px solid var(--b3);border-radius:var(--radius-md);background:var(--bg2)"><span style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--t3);min-width:20px">${i+1}</span><span style="font-size:14px;font-weight:500">${esc(n)}</span></div>`).join('')}</div>`:''}
+    ${knowList?`<div class="section-title">Dances I know (${(card.know||[]).length})</div><div class="fc-pills" style="margin-bottom:1.25rem">${knowList}</div>`:''}
+    ${learnList?`<div class="section-title">Want to learn (${(card.learn||[]).length})</div><div class="fc-pills">${learnList}</div>`:''}
+  `;
+  document.getElementById('friend-detail-modal').style.display='flex';
+}
+
+// ---- Suggest a Dance ----
+function openSuggestModal(){
+  document.getElementById('suggest-name').value='';
+  document.getElementById('suggest-notes').value='';
+  document.getElementById('suggest-error').style.display='none';
+  document.getElementById('suggest-modal').style.display='flex';
+  setTimeout(()=>document.getElementById('suggest-name').focus(),100);
+}
+function closeSuggestModal(){document.getElementById('suggest-modal').style.display='none';}
+function submitSuggestion(){
+  const name=document.getElementById('suggest-name').value.trim();
+  const notes=document.getElementById('suggest-notes').value.trim();
+  const errEl=document.getElementById('suggest-error');
+  if(!name){errEl.textContent='Please enter a dance name.';errEl.style.display='block';return;}
+  if(bank.some(d=>d.name.toLowerCase()===name.toLowerCase())){
+    errEl.textContent='That dance is already in the bank!';errEl.style.display='block';return;
+  }
+  const alreadyQueued=submissions.some(s=>s.name.toLowerCase()===name.toLowerCase()&&s.type==='suggestion');
+  if(alreadyQueued){errEl.textContent='That dance has already been suggested.';errEl.style.display='block';return;}
+  submissions.push({id:Date.now()+'_sug',name,notes,addedBy:currentUser,list:'suggestion',type:'suggestion',addedAt:new Date().toISOString()});
+  saveSubmissionsToCloud();
+  if(isAdmin) updateSubmissionsBadge();
+  closeSuggestModal();
+  // Brief confirmation
+  const btn=document.querySelector('[onclick="openSuggestModal()"]');
+  if(btn){const orig=btn.textContent;btn.textContent='✓ Suggested!';setTimeout(()=>btn.textContent=orig,2000);}
+}
+
+// ---- Submissions ----
+function updateSubmissionsBadge(){
+  const badge=document.getElementById('submissions-badge');
+  if(!badge)return;
+  const count=submissions.length;
+  if(count>0){badge.style.display='inline';badge.textContent=count;}
+  else{badge.style.display='none';}
+}
+function dismissSubmission(id){
+  submissions=submissions.filter(s=>s.id!==id);
+  saveSubmissionsToCloud();renderSubmissions();updateSubmissionsBadge();
+}
+function toggleSubForm(id){
+  const f=document.getElementById('sub-form-'+id);
+  if(f) f.classList.toggle('open');
+}
+function addSubmissionToBank(id){
+  const s=submissions.find(x=>x.id===id);if(!s)return;
+  const name=document.getElementById('sub-bn-'+id).value.trim()||s.name;
+  const demo=document.getElementById('sub-bd-'+id).value.trim();
+  const tutorial=document.getElementById('sub-bt-'+id).value.trim();
+  const difficulty=document.getElementById('sub-diff-'+id).value;
+  const counts=document.getElementById('sub-counts-'+id).value.trim();
+  const walls=document.getElementById('sub-walls-'+id).value.trim();
+  const tags=document.getElementById('sub-tags-'+id).value.trim();
+  if(bank.some(d=>d.name.toLowerCase()===name.toLowerCase())){
+    alert('That dance is already in the bank.');return;
+  }
+  bank.push({id:Date.now()+'',name,demo,tutorial,difficulty,counts:counts?Number(counts):null,walls:walls?Number(walls):null,tags:tags?Number(tags):null,added:new Date().toISOString()});
+  saveBankToCloud();renderBank();renderAdminBank();
+  submissions=submissions.filter(x=>x.id!==id);
+  saveSubmissionsToCloud();renderSubmissions();updateSubmissionsBadge();
+}
+function renderSubmissions(){
+  const el=document.getElementById('submissions-list');
+  if(!submissions.length){
+    el.innerHTML=`<div class="empty">No new submissions or suggestions yet!</div>`;
+    return;
+  }
+  const suggestions=submissions.filter(s=>s.type==='suggestion');
+  const autoQueued=submissions.filter(s=>s.type!=='suggestion');
+  function buildSubItem(s){
+    const isSug=s.type==='suggestion';
+    const listLabel=isSug?'Dance Suggestion':s.list==='know'?'Dances I Know':'Want to Learn';
+    const badgeCls=isSug?'learn':s.list==='know'?'know':'learn';
+    const dateStr=s.addedAt?formatDate(s.addedAt.slice(0,10)):'';
+    const notesRow=isSug&&s.notes?`<div style="font-size:12px;color:var(--t2);padding:4px 15px 10px;font-style:italic">"${esc(s.notes)}"</div>`:'';
+    return `
+      <div class="sub-item">
+        <div class="sub-item-head">
+          <span class="sub-item-name">${esc(s.name)}</span>
+          <div class="sub-item-meta">
+            <span class="sub-badge ${badgeCls}">${listLabel}</span>
+            <span class="sub-who">${isSug?'Suggested':'Added'} by <strong>${esc(s.addedBy||'unknown')}</strong>${dateStr?' on '+dateStr:''}</span>
+          </div>
+          <div class="sub-actions">
+            <button class="btn xs success" onclick="toggleSubForm('${s.id}')">Add to Bank</button>
+            <button class="btn xs danger" onclick="dismissSubmission('${s.id}')">Dismiss</button>
+          </div>
+        </div>
+        ${notesRow}
+        <div class="sub-add-form" id="sub-form-${s.id}">
+          <div style="font-size:12px;font-weight:500;color:var(--t2);margin-bottom:8px;">Fill in details before adding to the bank</div>
+          <div class="sub-add-grid">
+            <input type="text" id="sub-bn-${s.id}" value="${escA(s.name)}" placeholder="Dance name" class="full">
+            <input type="url" id="sub-bd-${s.id}" placeholder="Demo link (YouTube URL)">
+            <input type="url" id="sub-bt-${s.id}" placeholder="Tutorial link (YouTube URL)">
+            <select id="sub-diff-${s.id}" class="full">
+              <option value="">Difficulty (optional)</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Improver">Improver</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+            <input type="number" id="sub-counts-${s.id}" placeholder="Counts (e.g. 32)" min="0">
+            <input type="number" id="sub-walls-${s.id}" placeholder="Walls (e.g. 4)" min="0">
+            <input type="number" id="sub-tags-${s.id}" placeholder="Tags (e.g. 0)" min="0">
+          </div>
+          <div class="sub-add-row">
+            <button class="btn xs" onclick="toggleSubForm('${s.id}')">Cancel</button>
+            <button class="btn xs amber" onclick="addSubmissionToBank('${s.id}')">Confirm &amp; Add</button>
+          </div>
+        </div>
+      </div>`;
+  }
+  let html='';
+  if(suggestions.length){
+    html+=`<div class="section-title" style="margin-top:0">Dance suggestions (${suggestions.length})</div>`;
+    html+=suggestions.map(buildSubItem).join('');
+  }
+  if(autoQueued.length){
+    html+=`<div class="section-title" ${suggestions.length?'':'style="margin-top:0"'}>Auto-queued (added manually, not in bank) (${autoQueued.length})</div>`;
+    html+=autoQueued.map(buildSubItem).join('');
+  }
+  el.innerHTML=html;
+}
+
+// ---- Helpers ----
+function formatDate(d){
+  if(!d) return '';
+  const[y,m,day]=d.split('-');
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return`${months[+m-1]} ${+day}, ${y}`;
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function escA(s){return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function enc(s){return encodeURIComponent(s);}
+
+// ---- Dance rename propagation ----
+function propagateDanceRename(oldName,newName,userState){
+  // know list
+  userState.know.forEach(d=>{if(d.name===oldName)d.name=newName;});
+  // learn list
+  userState.learn.forEach(d=>{if(d.name===oldName)d.name=newName;});
+  // nights: dance ids in nights refer to know-list ids, names are stored in know so already updated
+  // friend cards for current user handled via syncMyCard
+}
+async function propagateRenameToAllUsers(oldName,newName){
+  // Update friend cards
+  let changed=false;
+  friendCards.forEach(card=>{
+    if(card.know){card.know=card.know.map(n=>n===oldName?newName:n);changed=true;}
+    if(card.learn){card.learn=card.learn.map(n=>n===oldName?newName:n);changed=true;}
+    if(card.favNames){card.favNames=card.favNames.map(n=>n===oldName?newName:n);changed=true;}
+  });
+  if(changed) saveFriendCardsToCloud();
+  // Load all users and patch their data
+  const r=await sbFetch(`/rest/v1/dances?username=neq.__bank__&username=neq.__picks__&username=neq.__submissions__&username=neq.__friendcards__&select=username,data`);
+  if(!r.ok||!r.data)return;
+  const users=r.data.filter(u=>!u.username.startsWith('__'));
+  for(const u of users){
+    if(u.username===currentUser) continue; // already updated in memory + scheduled
+    const ustate=u.data||{know:[],learn:[],nights:{},favorites:[]};
+    let dirty=false;
+    ustate.know&&ustate.know.forEach(d=>{if(d.name===oldName){d.name=newName;dirty=true;}});
+    ustate.learn&&ustate.learn.forEach(d=>{if(d.name===oldName){d.name=newName;dirty=true;}});
+    if(dirty){
+      await sbFetch(`/rest/v1/dances?username=eq.${enc(u.username)}`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:ustate,updated_at:new Date().toISOString()})});
+    }
+  }
+}
+
+// ---- Edit People (admin) ----
+let epTargetUsername=null;
+let epTargetState=null;
+
+async function epRefreshUsers(){
+  const sel=document.getElementById('ep-user-select');
+  if(!sel)return;
+  const r=await sbFetch(`/rest/v1/dances?username=neq.__bank__&username=neq.__picks__&username=neq.__submissions__&username=neq.__friendcards__&select=username&order=username.asc`);
+  if(!r.ok||!r.data)return;
+  const users=r.data.filter(u=>!u.username.startsWith('__'));
+  const prev=sel.value;
+  sel.innerHTML=`<option value="">— Select a user —</option>`+users.map(u=>`<option value="${escA(u.username)}">${esc(u.username)}</option>`).join('');
+  if(prev) sel.value=prev;
+}
+
+async function epLoadUser(){
+  const sel=document.getElementById('ep-user-select');
+  const username=sel.value;
+  if(!username){document.getElementById('ep-content').style.display='none';epTargetUsername=null;epTargetState=null;return;}
+  epTargetUsername=username;
+  const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(username)}&select=data`);
+  if(!r.ok||!r.data||!r.data.length){alert('Could not load user data.');return;}
+  epTargetState=r.data[0].data||{know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
+  if(!epTargetState.know) epTargetState.know=[];
+  if(!epTargetState.learn) epTargetState.learn=[];
+  if(!epTargetState.nights) epTargetState.nights={};
+  if(!epTargetState.favorites) epTargetState.favorites=[];
+  document.getElementById('ep-content').style.display='block';
+  epRenderKnow();epRenderLearn();epRenderNights();epRenderCard();
+}
+
+async function epSaveUserState(){
+  if(!epTargetUsername||!epTargetState)return;
+  await sbFetch(`/rest/v1/dances?username=eq.${enc(epTargetUsername)}`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:epTargetState,updated_at:new Date().toISOString()})});
+  // Update friend card for this user
+  const idx=friendCards.findIndex(c=>c.username===epTargetUsername);
+  if(idx>=0){
+    friendCards[idx].know=epTargetState.know.map(d=>d.name);
+    friendCards[idx].learn=epTargetState.learn.map(d=>d.name);
+    // sync favNames
+    const knowMap=Object.fromEntries(epTargetState.know.map(d=>[d.id,d.name]));
+    friendCards[idx].favs=friendCards[idx].favs.filter(id=>knowMap[id]);
+    friendCards[idx].favNames=friendCards[idx].favs.map(id=>knowMap[id]).filter(Boolean);
+    friendCards[idx].updatedAt=new Date().toISOString();
+    saveFriendCardsToCloud();
+  }
+}
+
+function epRenderKnow(){
+  const el=document.getElementById('ep-know-list');
+  if(!el)return;
+  if(!epTargetState.know.length){el.innerHTML=`<div class="empty">No dances in know list.</div>`;return;}
+  const sorted=[...epTargetState.know].sort((a,b)=>a.name.localeCompare(b.name));
+  el.innerHTML=sorted.map(d=>`
+    <div class="dance-item">
+      <span class="name">${esc(d.name)}</span>
+      <button class="btn sm danger" onclick="epRemoveDance('know','${d.id}')">Remove</button>
+    </div>`).join('');
+}
+function epRenderLearn(){
+  const el=document.getElementById('ep-learn-list');
+  if(!el)return;
+  if(!epTargetState.learn.length){el.innerHTML=`<div class="empty">No dances in learn list.</div>`;return;}
+  const sorted=[...epTargetState.learn].sort((a,b)=>a.name.localeCompare(b.name));
+  el.innerHTML=sorted.map(d=>`
+    <div class="dance-item">
+      <span class="name">${esc(d.name)}</span>
+      <button class="btn sm success" onclick="epMoveToKnow('${d.id}')">I know it!</button>
+      <button class="btn sm danger" onclick="epRemoveDance('learn','${d.id}')">Remove</button>
+    </div>`).join('');
+}
+function epAddDance(type){
+  if(!epTargetState)return;
+  const inp=document.getElementById('ep-'+type+'-input');
+  const name=inp.value.trim();if(!name)return;
+  epTargetState[type].push({id:Date.now()+'',name,added:new Date().toISOString()});
+  inp.value='';
+  if(type==='know') epRenderKnow(); else epRenderLearn();
+  epSaveUserState();
+}
+function epRemoveDance(type,id){
+  if(!epTargetState)return;
+  epTargetState[type]=epTargetState[type].filter(d=>d.id!==id);
+  if(type==='know') epTargetState.favorites=(epTargetState.favorites||[]).filter(f=>f!==id);
+  if(type==='know') epRenderKnow(); else epRenderLearn();
+  epSaveUserState();
+}
+function epMoveToKnow(id){
+  if(!epTargetState)return;
+  const d=epTargetState.learn.find(x=>x.id===id);if(!d)return;
+  epTargetState.learn=epTargetState.learn.filter(x=>x.id!==id);
+  epTargetState.know.push({...d});
+  epRenderKnow();epRenderLearn();epSaveUserState();
+}
+function epRenderNights(){
+  const el=document.getElementById('ep-nights-list');if(!el)return;
+  const nights=Object.entries(epTargetState.nights||{}).sort((a,b)=>b[0].localeCompare(a[0]));
+  if(!nights.length){el.innerHTML=`<div class="empty">No nights logged.</div>`;return;}
+  el.innerHTML=nights.map(([date,val])=>{
+    const nd=Array.isArray(val)?{dances:val,dj:''}:val;
+    const dances=(nd.dances||[]).map(id=>epTargetState.know.find(d=>d.id===id)).filter(Boolean);
+    const pills=dances.map(d=>`<span class="log-pill">${esc(d.name)}</span>`).join('');
+    return `<div class="day-log" onclick="this.classList.toggle('open')">
+      <div class="day-log-head">
+        <span class="date">${formatDate(date)}</span>
+        ${nd.dj?`<span class="dj-name">DJ: ${esc(nd.dj)}</span>`:''}
+        <span class="count">${dances.length} dance${dances.length!==1?'s':''}</span>
+        <button class="btn xs danger" onclick="epDeleteNight('${date}',event)">Delete</button>
+        <span class="caret">&#9660;</span>
+      </div>
+      <div class="day-log-body">${pills||'<span style="font-size:13px;color:var(--t3)">No dances recorded</span>'}</div>
+    </div>`;
+  }).join('');
+}
+function epDeleteNight(date,e){
+  e.stopPropagation();
+  if(!confirm(`Delete night of ${formatDate(date)}?`))return;
+  delete epTargetState.nights[date];
+  epRenderNights();epSaveUserState();
+}
+function epRenderCard(){
+  const el=document.getElementById('ep-card-section');if(!el)return;
+  const card=friendCards.find(c=>c.username===epTargetUsername);
+  if(!card){el.innerHTML=`<div class="empty">No friend card created yet for this user.</div>`;return;}
+  const grad=GRADIENTS[card.grad||0];
+  const favHTML=(card.favNames||[]).map((n,i)=>`<div class="fc-fav-row"><span class="fc-fav-num">${i+1}</span><span>${esc(n)}</span></div>`).join('')||`<div style="font-size:12px;color:var(--t3)">No favorites set</div>`;
+  el.innerHTML=`
+    <div class="friend-card" style="max-width:320px;cursor:default">
+      <div class="fc-header" style="background:${grad}">
+        <div class="fc-name">${esc(card.displayName)}</div>
+        <div class="fc-username">@${esc(card.username)}</div>
+      </div>
+      <div class="fc-body">
+        <div class="fc-section-label">Top favorites</div>
+        <div class="fc-fav-list">${favHTML}</div>
+        ${(card.know||[]).length?`<div class="fc-section-label">Knows (${card.know.length})</div>`:''}
+        ${(card.learn||[]).length?`<div class="fc-section-label">Wants to learn (${card.learn.length})</div>`:''}
+      </div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn sm amber" onclick="epEditCardDisplayName()">Edit Display Name</button>
+      <button class="btn sm danger" onclick="epDeleteCard()">Delete Card</button>
+    </div>`;
+}
+function epEditCardDisplayName(){
+  const card=friendCards.find(c=>c.username===epTargetUsername);if(!card)return;
+  const name=prompt('New display name:',card.displayName);
+  if(!name||!name.trim())return;
+  card.displayName=name.trim();card.updatedAt=new Date().toISOString();
+  saveFriendCardsToCloud();epRenderCard();
+}
+function epDeleteCard(){
+  if(!confirm('Delete this user\'s friend card?'))return;
+  const idx=friendCards.findIndex(c=>c.username===epTargetUsername);
+  if(idx>=0){friendCards.splice(idx,1);saveFriendCardsToCloud();epRenderCard();}
+}
+
+tryAutoLogin();
+</script>
+</body>
+</html>
