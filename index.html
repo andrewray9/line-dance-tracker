@@ -232,16 +232,17 @@
     .top5-rank.gold{color:#BA7517;}.top5-rank.silver{color:#6b6a66;}.top5-rank.bronze{color:#854F0B;}
     .top5-name{flex:1;font-size:14px;font-weight:500;}
     .top5-count{font-size:12px;color:var(--t2);}
-    .day-log{border:0.5px solid var(--b3);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:8px;}
-    .day-log-head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg2);cursor:pointer;user-select:none;}
+    .day-log{border:0.5px solid var(--b3);border-radius:var(--radius-lg);margin-bottom:8px;}
+    .day-log-head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg2);cursor:pointer;user-select:none;border-radius:var(--radius-lg);}
+    .day-log.open .day-log-head{border-radius:var(--radius-lg) var(--radius-lg) 0 0;}
     .day-log-head .date{font-size:14px;font-weight:500;flex:1;}
     .day-log-head .dj-name{font-size:12px;color:var(--t2);}
     .day-log-head .count{font-size:12px;color:var(--t2);}
     .caret{font-size:11px;color:var(--t2);transition:transform 0.2s;}
     .day-log.open .caret{transform:rotate(180deg);}
-    .day-log-body{padding:12px 16px;display:none;flex-wrap:wrap;gap:6px;border-top:0.5px solid var(--b3);background:var(--bg);}
+    .day-log-body{padding:12px 16px;display:none;flex-wrap:wrap;gap:6px;border-top:0.5px solid var(--b3);background:var(--bg);border-radius:0 0 var(--radius-lg) var(--radius-lg);}
     .day-log.open .day-log-body{display:flex;}
-    .log-pill{font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border);}
+    .log-pill{font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border);white-space:nowrap;}
 
     /* ALL DANCES ACCORDION */
     .accordion{border:0.5px solid var(--b3);border-radius:var(--radius-lg);overflow:hidden;margin-top:1rem;}
@@ -255,6 +256,7 @@
     .all-dance-row:nth-child(odd){background:var(--bg2);}
     .all-dance-name{flex:1;font-size:13px;}
     .all-dance-count{font-size:12px;color:var(--t2);white-space:nowrap;}
+    .all-dance-last{font-size:11px;color:var(--t3);white-space:nowrap;margin-right:2px;}
 
     /* DJ TAB - manual entry */
     .dj-entry-card{background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;}
@@ -330,12 +332,12 @@
 
     /* FRIENDS TAB */
     .friends-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:1rem;}
-    .friend-card{border-radius:16px;overflow:hidden;border:0.5px solid var(--b3);cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;}
+    .friend-card{border-radius:16px;overflow:hidden;border:0.5px solid var(--b3);cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;display:flex;flex-direction:column;}
     .friend-card:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,0.13);}
-    .fc-header{padding:1.5rem 1.5rem 1.25rem;position:relative;}
+    .fc-header{padding:1.5rem 1.5rem 1.25rem;position:relative;flex-shrink:0;}
     .fc-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);margin-bottom:2px;}
     .fc-username{font-size:12px;color:rgba(255,255,255,0.75);font-weight:500;}
-    .fc-body{background:var(--bg);padding:1rem 1.25rem;}
+    .fc-body{background:var(--bg);padding:1rem 1.25rem;flex:1;}
     .fc-section-label{font-size:10px;font-weight:500;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
     .fc-fav-list{display:flex;flex-direction:column;gap:4px;margin-bottom:1rem;}
     .fc-fav-row{display:flex;align-items:center;gap:8px;font-size:13px;}
@@ -573,6 +575,12 @@
         <option value="">— Select DJ (optional) —</option>
       </select>
     </div>
+    <div class="night-top" style="margin-bottom:1.25rem;">
+      <label style="white-space:nowrap;">Arrived at Palace:</label>
+      <input type="time" id="night-arrive" style="padding:8px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;" onchange="scheduleNightSave()" title="Optional — time you arrived at Palace">
+      <label style="white-space:nowrap;">Left Palace:</label>
+      <input type="time" id="night-leave" style="padding:8px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;" onchange="scheduleNightSave()" title="Optional — time you left Palace">
+    </div>
     <div class="night-grid">
       <div class="night-panel">
         <div class="night-panel-head">Dances Performed</div>
@@ -741,6 +749,7 @@ const ADMIN_USER='drew';
 
 let currentUser=null,isAdmin=false;
 let state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
+let drewDJFreestyles={}; // Drew's DJ freestyle data, loaded for all users
 let bank=[];
 let drewPicks=[];
 let submissions=[]; // shared list of user-submitted dances not in bank
@@ -771,6 +780,7 @@ async function sbFetch(path, options={}) {
 function setSyncStatus(t,l){document.getElementById('sync-dot').className='sync-dot '+t;document.getElementById('sync-label').textContent=l;}
 async function saveToCloud(){
   setSyncStatus('syncing','Syncing...');
+  if(isAdmin) drewDJFreestyles=state.djFreestyles||{};
   const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(currentUser)}`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:state,updated_at:new Date().toISOString()})});
   setSyncStatus(r.ok?'synced':'error',r.ok?'Synced':'Sync failed');
 }
@@ -832,6 +842,20 @@ async function saveFriendCardsToCloud(){
 async function loadDJList(){
   const r=await sbFetch(`/rest/v1/dances?username=eq.__djlist__&select=data`);
   djList=(r.ok&&r.data&&r.data.length>0)?(r.data[0].data.djs||[]):[];
+}
+async function loadDrewDJFreestyles(){
+  // Load Drew's freestyle data so all users can see the DJ stats on Analytics
+  if(isAdmin){
+    // Already using own state
+    drewDJFreestyles=state.djFreestyles||{};
+    return;
+  }
+  const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(ADMIN_USER)}&select=data`);
+  if(r.ok&&r.data&&r.data.length>0){
+    drewDJFreestyles=(r.data[0].data||{}).djFreestyles||{};
+  } else {
+    drewDJFreestyles={};
+  }
 }
 async function saveDJListToCloud(){
   setSyncStatus('syncing','Syncing...');
@@ -917,9 +941,11 @@ async function authSubmit() {
     if(!isSignUp){
       if(document.getElementById('remember-me').checked){
         localStorage.setItem('ld_remembered_email', email);
+        localStorage.setItem('ld_remembered_password', password);
         localStorage.setItem('ld_remember_me','1');
       } else {
         localStorage.removeItem('ld_remembered_email');
+        localStorage.removeItem('ld_remembered_password');
         localStorage.removeItem('ld_remember_me');
       }
     }
@@ -941,6 +967,7 @@ async function authSubmit() {
     await loadSubmissions();
     await loadFriendCards();
     await loadDJList();
+    await loadDrewDJFreestyles();
     enterApp(finalUsername);
 
   } catch (err) {
@@ -983,9 +1010,12 @@ function logout() {
   
   document.getElementById('app').style.display = 'none';
   document.getElementById('auth-wrap').style.display = 'flex';
-  document.getElementById('auth-email').value = '';
+  // Re-fill remembered credentials if Remember Me is active
+  const remMe = localStorage.getItem('ld_remember_me') === '1';
+  document.getElementById('auth-email').value = remMe ? (localStorage.getItem('ld_remembered_email') || '') : '';
+  document.getElementById('auth-password').value = remMe ? (localStorage.getItem('ld_remembered_password') || '') : '';
+  document.getElementById('remember-me').checked = remMe;
   document.getElementById('auth-username').value = '';
-  document.getElementById('auth-password').value = '';
   document.getElementById('auth-btn').disabled = false;
   document.getElementById('auth-btn').textContent = 'Sign in';
 }
@@ -996,12 +1026,16 @@ function hideSplash(){
 }
 
 async function tryAutoLogin() {
-  // Pre-fill remembered email
+  // Pre-fill remembered email and password
   const rememberedEmail = localStorage.getItem('ld_remembered_email');
+  const rememberedPassword = localStorage.getItem('ld_remembered_password');
   const rememberMe = localStorage.getItem('ld_remember_me') === '1';
   if(rememberedEmail && rememberMe){
     document.getElementById('auth-email').value = rememberedEmail;
     document.getElementById('remember-me').checked = true;
+  }
+  if(rememberedPassword && rememberMe){
+    document.getElementById('auth-password').value = rememberedPassword;
   }
 
   const savedUser = localStorage.getItem('ld_user');
@@ -1024,6 +1058,7 @@ async function tryAutoLogin() {
       await loadSubmissions();
       await loadFriendCards();
       await loadDJList();
+      await loadDrewDJFreestyles();
       enterApp(savedUser);
     } else {
       logout();
@@ -1041,7 +1076,7 @@ function switchTab(tab){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('visible'));
   document.getElementById('tab-'+tab).classList.add('visible');
   if(tab==='night') renderNight();
-  if(tab==='log'){renderHistoryStats();renderTop5();renderLog();if(isAdmin)renderDJAnalytics();}
+  if(tab==='log'){renderHistoryStats();renderTop5();renderLog();renderDJAnalytics();}
   if(tab==='admin'){renderAdminBank();renderAdminDJList();loadAdminUsers();}
   if(tab==='bank') renderBank();
   if(tab==='dj') renderDJRecords();
@@ -1357,9 +1392,9 @@ function renderList(type){
 // ---- Night (auto-save) ----
 function getNightData(date){
   const n=state.nights[date];
-  if(!n) return{dances:[],dj:'',highlights:null};
-  if(Array.isArray(n)) return{dances:n,dj:'',highlights:null};
-  return{highlights:null,...n};
+  if(!n) return{dances:[],dj:'',highlights:null,arriveTime:'',leaveTime:''};
+  if(Array.isArray(n)) return{dances:n,dj:'',highlights:null,arriveTime:'',leaveTime:''};
+  return{highlights:null,arriveTime:'',leaveTime:'',...n};
 }
 function localDateStr(){
   // Roll the "day" over at 4am — before 4am counts as the previous day
@@ -1377,7 +1412,7 @@ function initNightDate(){
 function loadNightSelections(){
   nightSelections={};const nd=getNightData(selectedDate);nd.dances.forEach(id=>nightSelections[id]=true);
 }
-function loadNightDJ(){document.getElementById('night-dj').value=getNightData(selectedDate).dj||'';}
+function loadNightDJ(){const nd=getNightData(selectedDate);document.getElementById('night-dj').value=nd.dj||'';document.getElementById('night-arrive').value=nd.arriveTime||'';document.getElementById('night-leave').value=nd.leaveTime||'';}
 function renderNight(){
   if(!selectedDate)initNightDate();
   selectedDate=document.getElementById('night-date').value||localDateStr();
@@ -1426,14 +1461,22 @@ function togglePick(id){
   }
   renderPickList();renderDidList();scheduleNightSave();
 }
-// Auto-save night on any change
 function scheduleNightSave(){
   clearTimeout(nightSaveTimeout);
   nightSaveTimeout=setTimeout(()=>{
     if(!selectedDate)return;
     const dj=document.getElementById('night-dj').value.trim();
+    const arriveTime=document.getElementById('night-arrive').value||'';
+    const leaveTime=document.getElementById('night-leave').value||'';
     const existing=getNightData(selectedDate);
-    state.nights[selectedDate]={...existing,dances:Object.keys(nightSelections),dj};
+    state.nights[selectedDate]={...existing,dances:Object.keys(nightSelections),dj,arriveTime,leaveTime};
+    // Also store palace times in danceLog for the selected date
+    if(state.danceLog){
+      state.danceLog=state.danceLog.filter(e=>e.date!==selectedDate||e.type!=='palace_times');
+    } else { state.danceLog=[]; }
+    if(arriveTime||leaveTime){
+      state.danceLog.push({type:'palace_times',date:selectedDate,arriveTime,leaveTime});
+    }
     const msg=document.getElementById('save-msg');
     msg.textContent='Saved';
     setTimeout(()=>msg.textContent='',2000);
@@ -1557,15 +1600,28 @@ function renderLog(){
   const nights=Object.entries(state.nights).sort((a,b)=>b[0].localeCompare(a[0]));
   if(!nights.length){el.innerHTML=`<div class="empty">No nights logged yet. Go dance!</div>`;return;}
 
-  // Build all-time dance totals
+  // Build all-time dance totals + last danced date
   const allCounts=getAllDanceCounts();
+  const lastDanced={};
+  Object.entries(state.nights).forEach(([date,val])=>{
+    const nd=Array.isArray(val)?{dances:val}:val;
+    (nd.dances||[]).forEach(id=>{
+      if(!lastDanced[id]||date>lastDanced[id]) lastDanced[id]=date;
+    });
+  });
+  function fmtLastDanced(dateStr){
+    if(!dateStr)return'';
+    const parts=dateStr.split('-');
+    return parts[1]+'/'+parts[2]+'/'+parts[0];
+  }
   const totalsRows=Object.entries(allCounts)
-    .map(([id,count])=>({dance:state.know.find(d=>d.id===id),count}))
+    .map(([id,count])=>({dance:state.know.find(d=>d.id===id),count,last:lastDanced[id]||''}))
     .filter(x=>x.dance)
     .sort((a,b)=>a.dance.name.localeCompare(b.dance.name))
     .map(x=>`
       <div class="all-dance-row">
         <span class="all-dance-name">${esc(x.dance.name)}</span>
+        ${x.last?`<span class="all-dance-last">Last Danced on ${fmtLastDanced(x.last)}</span>`:''}
         <span class="all-dance-count">${x.count} time${x.count!==1?'s':''}</span>
       </div>`).join('');
 
@@ -1575,17 +1631,19 @@ function renderLog(){
     const dances=(nd.dances||[]).map(id=>state.know.find(d=>d.id===id)).filter(Boolean);
     const pills=dances.map(d=>`<span class="log-pill">${esc(d.name)}</span>`).join('');
     const djLabel=nd.dj?`<span class="dj-name">DJ: ${esc(nd.dj)}</span>`:'';
+    const palaceLabel=(nd.arriveTime||nd.leaveTime)?`<span class="dj-name" style="color:var(--purple-text)">&#127968; ${nd.arriveTime?nd.arriveTime:'?'} – ${nd.leaveTime?nd.leaveTime:'?'}</span>`:'';
     return `
       <div class="day-log" onclick="this.classList.toggle('open')">
         <div class="day-log-head">
           <span class="date">${formatDate(date)}</span>
           ${djLabel}
+          ${palaceLabel}
           <span class="count">${dances.length} dance${dances.length!==1?'s':''}</span>
           <span class="caret">&#9660;</span>
         </div>
         <div class="day-log-body">
-          <div>${pills||'<span style="font-size:13px;color:var(--t3)">No dances recorded</span>'}</div>
-          <div style="border-top:0.5px solid var(--b3);padding-top:10px;margin-top:10px;display:flex;justify-content:flex-end">
+          ${pills||'<span style="font-size:13px;color:var(--t3)">No dances recorded</span>'}
+          <div style="width:100%;border-top:0.5px solid var(--b3);padding-top:10px;margin-top:4px;display:flex;justify-content:flex-end">
             <button class="btn xs danger" onclick="deleteNight('${date}',event)" title="Delete this night">Delete night</button>
           </div>
         </div>
@@ -1719,22 +1777,25 @@ function renderDJRecords(){
   }).join('');
 }
 
-// ---- DJ Analytics (shown on Analytics tab for admin) ----
+// ---- DJ Analytics (shown on Analytics tab for all users, using Drew's data) ----
 function renderDJAnalytics(){
   const titleEl=document.getElementById('dj-analytics-title');
   const listEl=document.getElementById('dj-analytics-list');
   if(!titleEl||!listEl)return;
-  if(!isAdmin){titleEl.style.display='none';listEl.style.display='none';return;}
+  // Keep drewDJFreestyles in sync if admin (they edit their own state)
+  if(isAdmin) drewDJFreestyles=state.djFreestyles||{};
   titleEl.style.display='';listEl.style.display='';
-  if(!state.djFreestyles||!Object.keys(state.djFreestyles).length){
+  if(!drewDJFreestyles||!Object.keys(drewDJFreestyles).length){
     listEl.innerHTML=`<div class="empty">No freestyle sessions logged yet.</div>`;return;
   }
+  // Use Drew's nights for DJ night counts
   const djNights={};
-  Object.values(state.nights).forEach(val=>{
+  const drewNightsSource=isAdmin?state.nights:(drewDJFreestyles._nights||{});
+  Object.values(drewNightsSource).forEach(val=>{
     const nd=Array.isArray(val)?{dances:val,dj:''}:val;
     if(nd.dj) djNights[nd.dj]=(djNights[nd.dj]||0)+1;
   });
-  const djs=Object.entries(state.djFreestyles).filter(([,arr])=>arr&&arr.length>0);
+  const djs=Object.entries(drewDJFreestyles).filter(([k,arr])=>k!=='_nights'&&arr&&arr.length>0);
   if(!djs.length){listEl.innerHTML=`<div class="empty">No freestyle sessions logged yet.</div>`;return;}
   listEl.innerHTML=djs.map(([name,sessions])=>{
     const totalSecs=sessions.reduce((a,s)=>a+(s.secs||s),0);
