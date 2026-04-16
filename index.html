@@ -372,9 +372,29 @@
     .fadm-num{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--t3);min-width:18px;}
     .fadm-name{flex:1;font-size:13px;font-weight:500;}
     .fadm-handle{cursor:grab;color:var(--t3);font-size:14px;flex-shrink:0;}
+
+    /* SPLASH SCREEN */
+    #splash-screen{
+      position:fixed;inset:0;z-index:9999;
+      background:var(--bg);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+      transition:opacity 0.4s ease, visibility 0.4s ease;
+    }
+    #splash-screen.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+    .splash-logo{width:72px;height:72px;border-radius:20px;object-fit:cover;box-shadow:0 4px 20px rgba(0,0,0,0.12);}
+    .splash-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--t1);letter-spacing:-0.5px;}
+    .splash-spinner{width:28px;height:28px;border:2.5px solid var(--b3);border-top-color:var(--t1);border-radius:50%;animation:spin 0.75s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
+
+<!-- SPLASH SCREEN (shown during auto-login check) -->
+<div id="splash-screen">
+  <img src="https://i.imgur.com/WDByZ1N.png" alt="Line Dance Tracker" class="splash-logo">
+  <div class="splash-title">Line Dance Tracker</div>
+  <div class="splash-spinner"></div>
+</div>
 
 <!-- HIGHLIGHTS MODAL -->
 <div class="modal-overlay" id="highlights-modal" style="display:none">
@@ -450,8 +470,22 @@
     <h1>Line Dance Tracker</h1>
     <p class="sub" id="auth-sub">Sign in to sync your dances across devices</p>
     <div class="auth-error" id="auth-error"></div>
-    <div class="field"><label>Username</label><input type="text" id="auth-username" placeholder="e.g. mama_jones" autocomplete="username"></div>
-    <div class="field"><label>Password</label><input type="password" id="auth-password" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')authSubmit()"></div>
+    
+    <div class="field" id="field-email">
+      <label>Email</label>
+      <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="email">
+    </div>
+    
+    <div class="field" id="field-username" style="display:none;">
+      <label>Username</label>
+      <input type="text" id="auth-username" placeholder="e.g. mama_jones" autocomplete="username">
+    </div>
+    
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="auth-password" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')authSubmit()">
+    </div>
+    
     <button class="auth-btn" id="auth-btn" onclick="authSubmit()">Sign in</button>
     <div class="auth-toggle" id="auth-toggle">No account? <span onclick="toggleAuthMode()">Create one</span></div>
   </div>
@@ -694,8 +728,8 @@
 </div>
 
 <script>
-const SUPABASE_URL='https://stzfjzylemnnvtafojfh.supabase.co';
-const SUPABASE_KEY='sb_publishable_mkiBIeGKW-g7bphzIYkAOg_qzKxy5ZW';
+const SUPABASE_URL='https://chuvnwaqtgyqrwdpzpfx.supabase.co';
+const SUPABASE_KEY='sb_publishable_1k44O83Uhj5OABd-VB_wLQ_fFJb1woU';
 const ADMIN_USER='drew';
 
 let currentUser=null,isAdmin=false;
@@ -711,13 +745,21 @@ let sortState={bank:true,know:true,learn:true,pick:true};
 let favFilterActive=false;
 
 // ---- Supabase ----
-async function sbFetch(path,options={}){
-  const headers={'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
-  if(options.prefer) headers['Prefer']=options.prefer;
-  const res=await fetch(SUPABASE_URL+path,{method:options.method||'GET',headers,body:options.body||undefined});
-  const text=await res.text();
-  return{ok:res.ok,status:res.status,data:text?JSON.parse(text):null};
+// ---- Supabase ----
+async function sbFetch(path, options={}) {
+  // Use the authenticated user's JWT token if available, otherwise fallback to the anon key
+  const token = localStorage.getItem('sb_access_token') || SUPABASE_KEY;
+  const headers = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + token,
+    'Content-Type': 'application/json'
+  };
+  if(options.prefer) headers['Prefer'] = options.prefer;
+  const res = await fetch(SUPABASE_URL + path, { method: options.method || 'GET', headers, body: options.body || undefined });
+  const text = await res.text();
+  return { ok: res.ok, status: res.status, data: text ? JSON.parse(text) : null };
 }
+
 function setSyncStatus(t,l){document.getElementById('sync-dot').className='sync-dot '+t;document.getElementById('sync-label').textContent=l;}
 async function saveToCloud(){
   setSyncStatus('syncing','Syncing...');
@@ -779,43 +821,104 @@ async function saveFriendCardsToCloud(){
     await sbFetch('/rest/v1/dances',{method:'POST',prefer:'return=minimal',body:JSON.stringify({username:'__friendcards__',password:'__friendcards__',data:{cards:friendCards}})});
   }
 }
-function toggleAuthMode(){
-  isSignUp=!isSignUp;
-  document.getElementById('auth-sub').textContent=isSignUp?'Create an account to get started':'Sign in to sync your dances across devices';
-  document.getElementById('auth-btn').textContent=isSignUp?'Create account':'Sign in';
-  document.getElementById('auth-toggle').innerHTML=isSignUp?'Already have an account? <span onclick="toggleAuthMode()">Sign in</span>':'No account? <span onclick="toggleAuthMode()">Create one</span>';
-  document.getElementById('auth-error').style.display='none';
-}
-function showAuthError(msg){const el=document.getElementById('auth-error');el.textContent=msg;el.style.display='block';}
 
-async function authSubmit(){
-  const username=document.getElementById('auth-username').value.trim().toLowerCase();
-  const password=document.getElementById('auth-password').value;
-  if(!username||!password){showAuthError('Please enter a username and password.');return;}
-  const btn=document.getElementById('auth-btn');
-  btn.disabled=true;btn.textContent=isSignUp?'Creating...':'Signing in...';
-  document.getElementById('auth-error').style.display='none';
-  if(isSignUp){
-    const check=await sbFetch(`/rest/v1/dances?username=eq.${enc(username)}&select=username`);
-    if(check.ok&&check.data&&check.data.length>0){showAuthError('That username is already taken.');btn.disabled=false;btn.textContent='Create account';return;}
-    const create=await sbFetch('/rest/v1/dances',{method:'POST',prefer:'return=minimal',body:JSON.stringify({username,password,data:{know:[],learn:[],nights:{},djFreestyles:{},favorites:[]}})});
-    if(!create.ok){showAuthError('Could not create account. Please try again.');btn.disabled=false;btn.textContent='Create account';return;}
-    state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
-    await loadBank();await loadPicks();await loadSubmissions();await loadFriendCards();enterApp(username);
-  } else {
-    const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(username)}&select=password,data`);
-    if(!r.ok||!r.data||r.data.length===0){showAuthError('Username not found.');btn.disabled=false;btn.textContent='Sign in';return;}
-    if(r.data[0].password!==password){showAuthError('Incorrect password.');btn.disabled=false;btn.textContent='Sign in';return;}
-    state=r.data[0].data||{know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
-    if(!state.djFreestyles) state.djFreestyles={};
-    if(!state.favorites) state.favorites=[];
-    await loadBank();await loadPicks();await loadSubmissions();await loadFriendCards();enterApp(username);
+function toggleAuthMode() {
+  isSignUp = !isSignUp;
+  document.getElementById('auth-sub').textContent = isSignUp ? 'Create an account to get started' : 'Sign in to sync your dances across devices';
+  document.getElementById('auth-btn').textContent = isSignUp ? 'Create account' : 'Sign in';
+  document.getElementById('auth-toggle').innerHTML = isSignUp ? 'Already have an account? <span onclick="toggleAuthMode()">Sign in</span>' : 'No account? <span onclick="toggleAuthMode()">Create one</span>';
+  document.getElementById('auth-error').style.display = 'none';
+  
+  // Show username field only during sign up
+  document.getElementById('field-username').style.display = isSignUp ? 'block' : 'none';
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+async function authSubmit() {
+  const email = document.getElementById('auth-email').value.trim();
+  const username = document.getElementById('auth-username').value.trim().toLowerCase();
+  const password = document.getElementById('auth-password').value;
+
+  if (isSignUp && (!email || !username || !password)) {
+    showAuthError('Please enter an email, username, and password.');
+    return;
+  }
+  if (!isSignUp && (!email || !password)) {
+    showAuthError('Please enter your email and password.');
+    return;
+  }
+
+  const btn = document.getElementById('auth-btn');
+  btn.disabled = true;
+  btn.textContent = isSignUp ? 'Creating...' : 'Signing in...';
+  document.getElementById('auth-error').style.display = 'none';
+
+  try {
+    let authResult;
+    
+    if (isSignUp) {
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, password: password, data: { username: username } })
+      });
+      authResult = await res.json();
+      if (!res.ok) throw new Error(authResult.error_description || authResult.msg || authResult.message || 'Signup failed');
+      
+      if (!authResult.access_token) {
+        showAuthError('Account created! Please check your email to verify your account.');
+        btn.disabled = false;
+        btn.textContent = 'Create account';
+        return;
+      }
+    } else {
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, password: password })
+      });
+      authResult = await res.json();
+      if (!res.ok) throw new Error(authResult.error_description || authResult.msg || authResult.message || 'Invalid login credentials');
+    }
+
+    const token = authResult.access_token;
+    const finalUsername = authResult.user.user_metadata?.username || username;
+    
+    localStorage.setItem('sb_access_token', token);
+
+    const r = await sbFetch(`/rest/v1/dances?username=eq.${enc(finalUsername)}&select=data`);
+    
+    if (r.ok && r.data && r.data.length > 0) {
+      state = r.data[0].data || {know:[], learn:[], nights:{}, djFreestyles:{}, favorites:[]};
+    } else {
+      state = {know:[], learn:[], nights:{}, djFreestyles:{}, favorites:[]};
+    }
+    
+    if (!state.djFreestyles) state.djFreestyles = {};
+    if (!state.favorites) state.favorites = [];
+
+    await loadBank();
+    await loadPicks();
+    await loadSubmissions();
+    await loadFriendCards();
+    enterApp(finalUsername);
+
+  } catch (err) {
+    showAuthError(err.message);
+    btn.disabled = false;
+    btn.textContent = isSignUp ? 'Create account' : 'Sign in';
   }
 }
 
 function enterApp(username){
   currentUser=username;isAdmin=username===ADMIN_USER;
   localStorage.setItem('ld_user',username);
+  hideSplash();
   document.getElementById('auth-wrap').style.display='none';
   document.getElementById('app').style.display='block';
   document.getElementById('user-label').textContent=username;
@@ -823,34 +926,63 @@ function enterApp(username){
   document.getElementById('admin-tab').style.display=isAdmin?'inline-block':'none';
   document.getElementById('submissions-tab').style.display=isAdmin?'inline-block':'none';
   document.getElementById('editpeople-tab').style.display=isAdmin?'inline-block':'none';
-  // Only show picks admin panel for drew
   document.getElementById('picks-admin-panel').style.display=isAdmin?'block':'none';
   setSyncStatus('synced','Synced');
   updateSubmissionsBadge();
   renderBank();renderList('know');renderList('learn');initNightDate();renderDJRecords();renderPicks();
 }
 
-function logout(){
-  currentUser=null;isAdmin=false;
+function logout() {
+  currentUser = null;
+  isAdmin = false;
   localStorage.removeItem('ld_user');
-  state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};bank=[];drewPicks=[];submissions=[];friendCards=[];
-  document.getElementById('app').style.display='none';
-  document.getElementById('auth-wrap').style.display='flex';
-  document.getElementById('auth-username').value='';document.getElementById('auth-password').value='';
-  document.getElementById('auth-btn').disabled=false;document.getElementById('auth-btn').textContent='Sign in';
+  localStorage.removeItem('sb_access_token');
+  state = {know:[], learn:[], nights:{}, djFreestyles:{}, favorites:[]};
+  bank = []; drewPicks = []; submissions = []; friendCards = [];
+  
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('auth-wrap').style.display = 'flex';
+  document.getElementById('auth-email').value = '';
+  document.getElementById('auth-username').value = '';
+  document.getElementById('auth-password').value = '';
+  document.getElementById('auth-btn').disabled = false;
+  document.getElementById('auth-btn').textContent = 'Sign in';
 }
 
-async function tryAutoLogin(){
-  const saved=localStorage.getItem('ld_user');if(!saved)return;
-  const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(saved)}&select=data`);
-  if(r.ok&&r.data&&r.data.length>0){
-    state=r.data[0].data||{know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
-    if(!state.djFreestyles) state.djFreestyles={};
-    if(!state.favorites) state.favorites=[];
-    await loadBank();await loadPicks();await loadSubmissions();await loadFriendCards();enterApp(saved);
+function hideSplash(){
+  const splash=document.getElementById('splash-screen');
+  if(splash) splash.classList.add('hidden');
+}
+
+async function tryAutoLogin() {
+  const savedUser = localStorage.getItem('ld_user');
+  const token = localStorage.getItem('sb_access_token');
+  
+  if (!savedUser || !token) {
+    hideSplash();
+    return;
+  }
+  
+  try {
+    const r = await sbFetch(`/rest/v1/dances?username=eq.${enc(savedUser)}&select=data`);
+    if (r.ok && r.data && r.data.length > 0) {
+      state = r.data[0].data || {know:[], learn:[], nights:{}, djFreestyles:{}, favorites:[]};
+      if (!state.djFreestyles) state.djFreestyles = {};
+      if (!state.favorites) state.favorites = [];
+      await loadBank();
+      await loadPicks();
+      await loadSubmissions();
+      await loadFriendCards();
+      enterApp(savedUser);
+    } else {
+      logout();
+      hideSplash();
+    }
+  } catch(e) {
+    logout();
+    hideSplash();
   }
 }
-
 // ---- Tabs ----
 function switchTab(tab){
   const tabs=['bank','know','learn','night','log','dj','picks','friends','submissions','admin','editpeople'];
