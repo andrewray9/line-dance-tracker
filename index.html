@@ -143,6 +143,16 @@
     .link-btn.tutorial{background:var(--green-bg);color:var(--green-text);border-color:var(--green-border);}
     .in-bank-badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border);white-space:nowrap;}
 
+    /* BOOTSTEPPER RESULTS */
+    .bs-result-card{border:0.5px solid var(--blue-border);border-radius:var(--radius-lg);background:var(--bg);overflow:hidden;}
+    .bs-result-head{display:flex;align-items:center;gap:10px;padding:11px 14px;flex-wrap:wrap;}
+    .bs-result-name{font-size:14px;font-weight:500;flex:1;min-width:140px;}
+    .bs-result-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+    .bs-result-body{padding:10px 14px;border-top:0.5px solid var(--b3);display:flex;flex-direction:column;gap:6px;}
+    .bs-result-links{display:flex;gap:6px;flex-wrap:wrap;}
+    .bs-spin{display:inline-block;width:14px;height:14px;border:2px solid var(--blue-border);border-top-color:var(--blue-text);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
     /* ADMIN FORM */
     .admin-form{background:var(--amber-bg);border:0.5px solid var(--amber-border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.5rem;}
     .admin-form-title{font-size:13px;font-weight:500;color:var(--amber-text);margin-bottom:1rem;}
@@ -708,6 +718,37 @@
 
   <!-- ADMIN -->
   <div id="tab-admin" class="section">
+
+    <!-- BOOTSTEPPER IMPORT -->
+    <div class="admin-form" id="bootstepper-form" style="background:var(--blue-bg);border-color:var(--blue-border);">
+      <div class="admin-form-title" style="color:var(--blue-text);">&#128279; Import from Bootstepper</div>
+
+      <!-- API Key row -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+        <input type="password" id="bs-api-key" placeholder="Bootstepper API key" style="flex:1;min-width:180px;padding:8px 12px;border:0.5px solid var(--blue-border);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;" autocomplete="off">
+        <button class="btn sm" style="color:var(--blue-text);border-color:var(--blue-border);" onclick="bsSaveKey()" title="Save key for this session">Save Key</button>
+        <span id="bs-key-status" style="font-size:12px;color:var(--t3);"></span>
+      </div>
+
+      <!-- Search by title -->
+      <div style="font-size:12px;font-weight:500;color:var(--blue-text);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">Search by dance title</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+        <input type="text" id="bs-search-input" placeholder="e.g. Watermelon Crawl" style="flex:1;min-width:160px;padding:8px 12px;border:0.5px solid var(--blue-border);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;" onkeydown="if(event.key==='Enter')bsSearch()">
+        <button class="btn info sm" onclick="bsSearch()">Search</button>
+      </div>
+
+      <!-- Search by dance ID -->
+      <div style="font-size:12px;font-weight:500;color:var(--blue-text);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">Import by Bootstepper Dance ID</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+        <input type="text" id="bs-id-input" placeholder="e.g. D3CN4M2M4KMCD22" style="flex:1;min-width:160px;padding:8px 12px;border:0.5px solid var(--blue-border);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;" onkeydown="if(event.key==='Enter')bsImportById()">
+        <button class="btn info sm" onclick="bsImportById()">Import by ID</button>
+      </div>
+
+      <!-- Status / results -->
+      <div id="bs-status" style="font-size:13px;margin-bottom:8px;display:none;"></div>
+      <div id="bs-results" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+
     <div class="admin-form" id="admin-dj-form">
       <div class="admin-form-title">&#9835; Manage DJ List</div>
       <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
@@ -715,15 +756,6 @@
         <button class="btn amber" onclick="adminAddDJ()">Add DJ</button>
       </div>
       <div id="admin-dj-list" style="display:flex;flex-direction:column;gap:6px;"></div>
-    </div>
-    <div class="admin-form" id="admin-bs-form" style="background:var(--blue-bg);border-color:var(--blue-border);">
-      <div class="admin-form-title" style="color:var(--blue-text);">&#128279; Import from Bootstepper</div>
-      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
-        <input type="text" id="bs-search-query" placeholder="Search dance title…" style="flex:1;min-width:160px;padding:8px 12px;border:0.5px solid var(--blue-border);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;" onkeydown="if(event.key==='Enter')bsSearch()">
-        <button class="btn info" onclick="bsSearch()">Search</button>
-      </div>
-      <div id="bs-status" style="font-size:12px;min-height:16px;margin-bottom:8px;"></div>
-      <div id="bs-results" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
     <div class="admin-form">
       <div class="admin-form-title">&#9733; Add a new dance to the bank</div>
@@ -2489,123 +2521,170 @@ function epDeleteCard(){
   if(idx>=0){friendCards.splice(idx,1);saveFriendCardsToCloud();epRenderCard();}
 }
 
-// ---- Bootstepper Import ----
-const BS_WORKER = 'https://api.bootstepper.com';
+// ---- Bootstepper API Integration ----
+const BS_API_BASE = 'https://api.bootstepper.com';
+let bsApiKey = '';
 
-function bsStatus(msg, isError) {
+function bsSaveKey() {
+  const val = document.getElementById('bs-api-key').value.trim();
+  if (!val) { bsSetStatus('Please enter an API key.', 'error'); return; }
+  bsApiKey = val;
+  sessionStorage.setItem('bs_api_key', val);
+  document.getElementById('bs-api-key').value = '';
+  document.getElementById('bs-key-status').textContent = '✓ Key saved for session';
+  document.getElementById('bs-key-status').style.color = 'var(--green-dark)';
+}
+
+function bsGetKey() {
+  if (bsApiKey) return bsApiKey;
+  const stored = sessionStorage.getItem('bs_api_key');
+  if (stored) { bsApiKey = stored; return stored; }
+  return null;
+}
+
+function bsSetStatus(msg, type) {
   const el = document.getElementById('bs-status');
-  if (!el) return;
-  el.textContent = msg;
-  el.style.color = isError ? 'var(--red-text)' : 'var(--blue-text)';
+  el.style.display = '';
+  el.style.color = type === 'error' ? 'var(--red-text)' : type === 'success' ? 'var(--green-dark)' : 'var(--t2)';
+  el.innerHTML = msg;
+}
+
+async function bsApiFetch(path) {
+  const key = bsGetKey();
+  if (!key) throw new Error('No API key — enter your Bootstepper API key above and click Save Key.');
+  const res = await fetch(BS_API_BASE + path, {
+    headers: { 'X-BootStepper-API-Key': key }
+  });
+  if (!res.ok) {
+    const txt = await res.text().catch(() => '');
+    throw new Error(`Bootstepper API error ${res.status}${txt ? ': ' + txt.slice(0, 120) : ''}`);
+  }
+  return res.json();
 }
 
 async function bsSearch() {
-  const q = (document.getElementById('bs-search-query')?.value || '').trim();
-  if (!q) { bsStatus('Please enter a search term.', true); return; }
-
-  bsStatus('Searching…');
-  document.getElementById('bs-results').innerHTML = '';
-
-  let data;
+  const q = document.getElementById('bs-search-input').value.trim();
+  if (!q) { bsSetStatus('Enter a dance title to search.', 'error'); return; }
+  const resultsEl = document.getElementById('bs-results');
+  resultsEl.innerHTML = '';
+  bsSetStatus('<span class="bs-spin"></span>Searching Bootstepper…', 'info');
   try {
-    const res = await fetch(BS_WORKER + '/dances/search?query=' + encodeURIComponent(q) + '&limit=10', {headers:{'X-BootStepper-API-Key':'AT6MMN6K2H6R74SQKNB56B8','Accept':'application/json'}});
-    if (!res.ok) { bsStatus('API error ' + res.status, true); return; }
-    data = await res.json();
+    const data = await bsApiFetch(`/dances/search?query=${encodeURIComponent(q)}&limit=10`);
+    const dances = data.dances || data.results || data.data || data || [];
+    if (!Array.isArray(dances) || !dances.length) {
+      bsSetStatus('No dances found for that search.', 'error');
+      return;
+    }
+    bsSetStatus(`Found ${dances.length} result${dances.length !== 1 ? 's' : ''}.`, 'success');
+    resultsEl.innerHTML = dances.map(d => bsRenderResult(d)).join('');
   } catch (e) {
-    bsStatus('Network error: ' + e.message, true);
-    return;
+    bsSetStatus('Error: ' + e.message, 'error');
   }
-
-  const dances = Array.isArray(data) ? data : (data.dances || data.results || data.data || []);
-  bsStatus(dances.length + ' result' + (dances.length !== 1 ? 's' : '') + ' found');
-  bsRenderResults(dances);
 }
 
-function bsRenderResults(dances) {
-  const el = document.getElementById('bs-results');
-  el._bsData = dances;
-
-  if (!dances.length) {
-    el.innerHTML = '<div class="empty" style="padding:.75rem 0;font-size:13px;">No results found.</div>';
-    return;
+async function bsImportById() {
+  const id = document.getElementById('bs-id-input').value.trim();
+  if (!id) { bsSetStatus('Enter a Bootstepper dance ID.', 'error'); return; }
+  const resultsEl = document.getElementById('bs-results');
+  resultsEl.innerHTML = '';
+  bsSetStatus('<span class="bs-spin"></span>Fetching dance…', 'info');
+  try {
+    const data = await bsApiFetch(`/dances/getById?id=${encodeURIComponent(id)}`);
+    const dance = data.dance || data.data || data;
+    if (!dance || !dance.id) { bsSetStatus('Dance not found.', 'error'); return; }
+    bsSetStatus('Dance found!', 'success');
+    resultsEl.innerHTML = bsRenderResult(dance);
+  } catch (e) {
+    bsSetStatus('Error: ' + e.message, 'error');
   }
+}
 
-  el.innerHTML = dances.map((d, i) => {
-    const name = d.name || d.title || d.danceName || '';
-    const counts = d.counts != null ? Number(d.counts) : null;
-    const walls = d.walls != null ? Number(d.walls) : null;
-    const difficulty = d.difficulty || d.difficultyLevel || '';
-    const alreadyInBank = bank.some(b => b.name.toLowerCase() === name.toLowerCase());
+function bsRenderResult(d) {
+  // Normalise fields — Bootstepper may use different key names
+  const name = d.name || d.title || d.danceName || '(unnamed)';
+  const counts = d.counts ?? d.count ?? d.stepCount ?? null;
+  const walls = d.walls ?? d.wallCount ?? null;
+  const tags = d.tags ?? d.restarts ?? d.tagCount ?? null;
+  const difficulty = d.difficulty || d.level || '';
+  const demoUrl = d.demoUrl || d.demo || d.videoUrl || '';
+  const danceUrl = d.danceUrl || d.url || (d.id ? `https://bootstepper.com/dances/${d.id}` : '');
+  const id = d.id || '';
 
-    const pills = [
-      counts != null ? `<span class="bank-detail-stat"><strong>${counts}</strong> counts</span>` : '',
-      walls != null ? `<span class="bank-detail-stat"><strong>${walls}</strong> walls</span>` : '',
-      difficulty ? `<span class="diff-badge diff-${difficulty}">${difficulty}</span>` : '',
-    ].filter(Boolean).join('');
+  const diffBadge = difficulty ? `<span class="diff-badge diff-${difficulty}">${difficulty}</span>` : '';
+  const alreadyIn = bank.some(b => b.name.toLowerCase() === name.toLowerCase());
 
-    return `<div style="padding:10px 14px;border:0.5px solid var(--blue-border);border-radius:var(--radius-md);background:var(--bg);display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-      <div style="flex:1;min-width:120px;">
-        <div style="font-size:14px;font-weight:500;margin-bottom:4px;">${esc(name)}</div>
-        <div style="display:flex;gap:5px;flex-wrap:wrap;">${pills}</div>
+  const pills = [
+    counts != null ? `<span class="bank-detail-stat"><strong>${counts}</strong> counts</span>` : '',
+    walls != null ? `<span class="bank-detail-stat"><strong>${walls}</strong> walls</span>` : '',
+    tags != null ? `<span class="bank-detail-stat"><strong>${tags}</strong> tags</span>` : '',
+  ].filter(Boolean).join('');
+
+  const demoBtn = demoUrl ? `<a class="link-btn demo" href="${escA(demoUrl)}" target="_blank" rel="noopener">&#9654; Demo</a>` : '';
+  const danceBtn = danceUrl ? `<a class="link-btn tutorial" href="${escA(danceUrl)}" target="_blank" rel="noopener">&#128279; Bootstepper</a>` : '';
+
+  const addBtn = alreadyIn
+    ? `<span style="font-size:12px;color:var(--green-dark);font-weight:500;">&#10003; Already in bank</span>`
+    : `<button class="btn sm success" onclick="bsAddToBank('${escA(JSON.stringify({id,name,counts,walls,tags,difficulty,demoUrl,danceUrl}))}')">&#43; Add to bank</button>`;
+
+  return `
+    <div class="bs-result-card">
+      <div class="bs-result-head">
+        <span class="bs-result-name">${esc(name)}</span>
+        <div class="bs-result-meta">${diffBadge}${pills}</div>
       </div>
-      ${alreadyInBank
-        ? `<span style="font-size:12px;color:var(--t3);white-space:nowrap;">Already in bank</span>`
-        : `<button class="btn sm info" onclick="bsImportDance(${i})">+ Add to bank</button>`}
+      <div class="bs-result-body">
+        ${(demoBtn || danceBtn) ? `<div class="bs-result-links">${demoBtn}${danceBtn}</div>` : ''}
+        <div>${addBtn}</div>
+      </div>
     </div>`;
-  }).join('');
 }
 
-async function bsImportDance(idx) {
-  const el = document.getElementById('bs-results');
-  const dances = el._bsData;
-  if (!dances || !dances[idx]) return;
-
-  const d = dances[idx];
-  const name = d.name || d.title || d.danceName || '';
-  const bsId = d.id || d.danceId || '';
-
-  if (!name) { bsStatus('Dance has no name — cannot import.', true); return; }
+function bsAddToBank(jsonStr) {
+  if (!isAdmin) return;
+  let d;
+  try { d = JSON.parse(jsonStr); } catch { alert('Could not parse dance data.'); return; }
+  const { id, name, counts, walls, tags, difficulty, demoUrl, danceUrl } = d;
+  if (!name) { alert('No dance name found.'); return; }
   if (bank.some(b => b.name.toLowerCase() === name.toLowerCase())) {
-    bsStatus('"' + name + '" is already in the bank.', true); return;
+    alert('That dance is already in the bank.');
+    return;
   }
-
-  // Fetch videos
-  let demo = '', tutorial = '';
-  if (bsId) {
-    bsStatus('Fetching videos…');
-    try {
-      const res = await fetch(BS_WORKER + '/videos/getByDanceId?danceId=' + encodeURIComponent(bsId), {headers:{'X-BootStepper-API-Key':'AT6MMN6K2H6R74SQKNB56B8','Accept':'application/json'}});
-      if (res.ok) {
-        const vdata = await res.json();
-        const videos = Array.isArray(vdata) ? vdata : (vdata.videos || vdata.data || []);
-        for (const v of videos) {
-          const url = v.url || v.youtubeUrl || v.link || '';
-          const type = (v.type || v.videoType || '').toLowerCase();
-          if (!demo && type.includes('demo')) demo = url;
-          else if (!tutorial && (type.includes('tutorial') || type.includes('teach'))) tutorial = url;
-          else if (!demo && url) demo = url;
-        }
-      }
-    } catch (e) { /* videos optional, continue */ }
-  }
-
   bank.push({
     id: Date.now() + '',
     name,
-    demo,
-    tutorial,
-    difficulty: d.difficulty || d.difficultyLevel || '',
-    counts: d.counts != null ? Number(d.counts) : null,
-    walls: d.walls != null ? Number(d.walls) : null,
-    tags: d.tags != null ? Number(d.tags) : null,
-    added: new Date().toISOString()
+    demo: demoUrl || '',
+    tutorial: danceUrl || '',
+    difficulty: difficulty || '',
+    counts: counts != null ? Number(counts) : null,
+    walls: walls != null ? Number(walls) : null,
+    tags: tags != null ? Number(tags) : null,
+    added: new Date().toISOString(),
+    source: 'bootstepper',
+    bootstepperId: id || ''
   });
-
-  await saveBankToCloud();
-  renderAdminBank(); renderBank();
-  bsStatus('"' + name + '" added to the dance bank! ✓');
-  bsRenderResults(dances);
+  saveBankToCloud();
+  renderAdminBank();
+  renderBank();
+  bsSetStatus(`✓ "${esc(name)}" added to the dance bank!`, 'success');
+  // Re-render results so the button updates
+  document.querySelectorAll('.bs-result-card').forEach(card => {
+    const nameEl = card.querySelector('.bs-result-name');
+    if (nameEl && nameEl.textContent === name) {
+      const addDiv = card.querySelector('.bs-result-body > div:last-child');
+      if (addDiv) addDiv.innerHTML = `<span style="font-size:12px;color:var(--green-dark);font-weight:500;">&#10003; Added to bank</span>`;
+    }
+  });
 }
+
+// Restore session key on load
+(function() {
+  const k = sessionStorage.getItem('bs_api_key');
+  if (k) {
+    bsApiKey = k;
+    const statusEl = document.getElementById('bs-key-status');
+    if (statusEl) { statusEl.textContent = '✓ Key loaded'; statusEl.style.color = 'var(--green-dark)'; }
+  }
+})();
 
 // Flush any pending saves immediately when user leaves/backgrounds the app (critical for iOS)
 function flushPendingSaves(){
