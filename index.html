@@ -718,23 +718,11 @@
     </div>
     <div class="admin-form" id="admin-bs-form" style="background:var(--blue-bg);border-color:var(--blue-border);">
       <div class="admin-form-title" style="color:var(--blue-text);">&#128279; Import from Bootstepper</div>
-      <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
-        <button class="sort-btn" id="bs-mode-id" onclick="bsSwitchMode('id')" style="font-size:12px;">By Dance ID</button>
-        <button class="sort-btn active" id="bs-mode-search" onclick="bsSwitchMode('search')" style="font-size:12px;">By Title Search</button>
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        <input type="text" id="bs-search-query" placeholder="Search dance title…" style="flex:1;min-width:160px;padding:8px 12px;border:0.5px solid var(--blue-border);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;" onkeydown="if(event.key==='Enter')bsSearch()">
+        <button class="btn info" onclick="bsSearch()">Search</button>
       </div>
-      <div id="bs-panel-id" style="display:none;margin-bottom:10px;">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <input type="text" id="bs-dance-id" placeholder="Bootstepper dance ID" style="flex:1;padding:8px 12px;border:0.5px solid var(--blue-border);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;">
-          <button class="btn info" onclick="bsFetchById()">Fetch</button>
-        </div>
-      </div>
-      <div id="bs-panel-search" style="margin-bottom:10px;">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <input type="text" id="bs-search-query" placeholder="Search dance title..." style="flex:1;padding:8px 12px;border:0.5px solid var(--blue-border);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;" onkeydown="if(event.key==='Enter')bsSearch()">
-          <button class="btn info" onclick="bsSearch()">Search</button>
-        </div>
-      </div>
-      <div id="bs-status" style="font-size:12px;color:var(--blue-text);margin-bottom:8px;min-height:16px;"></div>
+      <div id="bs-status" style="font-size:12px;min-height:16px;margin-bottom:8px;"></div>
       <div id="bs-results" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
     <div class="admin-form">
@@ -2502,124 +2490,120 @@ function epDeleteCard(){
 }
 
 // ---- Bootstepper Import ----
-const BS_BASE='https://corsproxy.io/?url=https://api.bootstepper.com';
-function bsKey(){return'AT6MMN6K2H6R74SQKNB56B8';}
-function bsStatus(msg,err){const el=document.getElementById('bs-status');if(el){el.textContent=msg;el.style.color=err?'var(--red-text)':'var(--blue-text)';}}
-function bsSwitchMode(mode){
-  document.getElementById('bs-panel-id').style.display=mode==='id'?'block':'none';
-  document.getElementById('bs-panel-search').style.display=mode==='search'?'block':'none';
-  document.getElementById('bs-mode-id').classList.toggle('active',mode==='id');
-  document.getElementById('bs-mode-search').classList.toggle('active',mode==='search');
-  document.getElementById('bs-results').innerHTML='';
-  bsStatus('');
-}
-async function bsApiFetch(path){
-  const key=bsKey();
+const BS_WORKER = 'https://api.bootstepper.com';
 
-  try{
-    const r=await fetch(BS_BASE+path,{headers:{'X-BootStepper-API-Key':key,'Accept':'application/json'}});
-    if(!r.ok){const t=await r.text();bsStatus('API error '+r.status+': '+(JSON.parse(t)?.message||t),true);return null;}
-    return await r.json();
-  }catch(e){bsStatus('Network error: '+e.message,true);return null;}
+function bsStatus(msg, isError) {
+  const el = document.getElementById('bs-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = isError ? 'var(--red-text)' : 'var(--blue-text)';
 }
-async function bsGetVideos(danceId){
-  const data=await bsApiFetch('/videos/getByDanceId?danceId='+encodeURIComponent(danceId));
-  if(!data) return{demo:'',tutorial:''};
-  const videos=Array.isArray(data)?data:(data.videos||data.data||[]);
-  let demo='',tutorial='';
-  for(const v of videos){
-    const url=v.url||v.youtubeUrl||v.link||'';
-    const type=(v.type||v.videoType||'').toLowerCase();
-    if(!demo&&type.includes('demo')) demo=url;
-    else if(!tutorial&&(type.includes('tutorial')||type.includes('instruction')||type.includes('teach'))) tutorial=url;
-    else if(!demo&&url) demo=url;
+
+async function bsSearch() {
+  const q = (document.getElementById('bs-search-query')?.value || '').trim();
+  if (!q) { bsStatus('Please enter a search term.', true); return; }
+
+  bsStatus('Searching…');
+  document.getElementById('bs-results').innerHTML = '';
+
+  let data;
+  try {
+    const res = await fetch(BS_WORKER + '/dances/search?query=' + encodeURIComponent(q) + '&limit=10', {headers:{'X-BootStepper-API-Key':'AT6MMN6K2H6R74SQKNB56B8','Accept':'application/json'}});
+    if (!res.ok) { bsStatus('API error ' + res.status, true); return; }
+    data = await res.json();
+  } catch (e) {
+    bsStatus('Network error: ' + e.message, true);
+    return;
   }
-  return{demo,tutorial};
+
+  const dances = Array.isArray(data) ? data : (data.dances || data.results || data.data || []);
+  bsStatus(dances.length + ' result' + (dances.length !== 1 ? 's' : '') + ' found');
+  bsRenderResults(dances);
 }
-function bsMapDance(d){
-  return{
-    name: d.name||d.title||d.danceName||'',
-    counts: d.counts!=null?Number(d.counts):null,
-    walls: d.walls!=null?Number(d.walls):null,
-    tags: d.tags!=null?Number(d.tags):null,
-    difficulty: d.difficulty||d.difficultyLevel||'',
-    bsId: d.id||d.danceId||''
-  };
-}
-function bsRenderResults(dances){
-  const el=document.getElementById('bs-results');
-  if(!dances.length){el.innerHTML='<div class="empty" style="padding:.75rem 0;font-size:13px;">No results found.</div>';return;}
-  el.innerHTML=dances.map((d,i)=>{
-    const m=bsMapDance(d);
-    const alreadyInBank=bank.some(b=>b.name.toLowerCase()===m.name.toLowerCase());
-    const pills=[
-      m.counts!=null?`<span class="bank-detail-stat"><strong>${m.counts}</strong> counts</span>`:'',
-      m.walls!=null?`<span class="bank-detail-stat"><strong>${m.walls}</strong> walls</span>`:'',
-      m.tags!=null?`<span class="bank-detail-stat"><strong>${m.tags}</strong> tags</span>`:'',
-      m.difficulty?`<span class="diff-badge diff-${m.difficulty}">${m.difficulty}</span>`:'',
+
+function bsRenderResults(dances) {
+  const el = document.getElementById('bs-results');
+  el._bsData = dances;
+
+  if (!dances.length) {
+    el.innerHTML = '<div class="empty" style="padding:.75rem 0;font-size:13px;">No results found.</div>';
+    return;
+  }
+
+  el.innerHTML = dances.map((d, i) => {
+    const name = d.name || d.title || d.danceName || '';
+    const counts = d.counts != null ? Number(d.counts) : null;
+    const walls = d.walls != null ? Number(d.walls) : null;
+    const difficulty = d.difficulty || d.difficultyLevel || '';
+    const alreadyInBank = bank.some(b => b.name.toLowerCase() === name.toLowerCase());
+
+    const pills = [
+      counts != null ? `<span class="bank-detail-stat"><strong>${counts}</strong> counts</span>` : '',
+      walls != null ? `<span class="bank-detail-stat"><strong>${walls}</strong> walls</span>` : '',
+      difficulty ? `<span class="diff-badge diff-${difficulty}">${difficulty}</span>` : '',
     ].filter(Boolean).join('');
+
     return `<div style="padding:10px 14px;border:0.5px solid var(--blue-border);border-radius:var(--radius-md);background:var(--bg);display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <div style="flex:1;min-width:120px;">
-        <div style="font-size:14px;font-weight:500;margin-bottom:4px;">${esc(m.name)}</div>
+        <div style="font-size:14px;font-weight:500;margin-bottom:4px;">${esc(name)}</div>
         <div style="display:flex;gap:5px;flex-wrap:wrap;">${pills}</div>
       </div>
       ${alreadyInBank
-        ?`<span style="font-size:12px;color:var(--t3);white-space:nowrap;">Already in bank</span>`
-        :`<button class="btn sm info" onclick="bsImportDance(${i})">&#43; Add to bank</button>`}
+        ? `<span style="font-size:12px;color:var(--t3);white-space:nowrap;">Already in bank</span>`
+        : `<button class="btn sm info" onclick="bsImportDance(${i})">+ Add to bank</button>`}
     </div>`;
   }).join('');
-  // stash for import
-  el._bsData=dances;
 }
-async function bsFetchById(){
-  const id=(document.getElementById('bs-dance-id')?.value||'').trim();
-  if(!id){bsStatus('Please enter a dance ID.',true);return;}
-  bsStatus('Fetching…');
-  document.getElementById('bs-results').innerHTML='';
-  const data=await bsApiFetch('/dances/getById?id='+encodeURIComponent(id));
-  if(!data) return;
-  const dance=data.dance||data.data||data;
-  bsStatus('');
-  bsRenderResults([dance]);
-}
-async function bsSearch(){
-  const q=(document.getElementById('bs-search-query')?.value||'').trim();
-  if(!q){bsStatus('Please enter a search term.',true);return;}
-  bsStatus('Searching…');
-  document.getElementById('bs-results').innerHTML='';
-  const data=await bsApiFetch('/dances/search?query='+encodeURIComponent(q)+'&limit=10');
-  if(!data) return;
-  const dances=Array.isArray(data)?data:(data.dances||data.results||data.data||[]);
-  bsStatus(dances.length+' result'+(dances.length!==1?'s':'')+ ' found');
-  bsRenderResults(dances);
-}
-async function bsImportDance(idx){
-  const el=document.getElementById('bs-results');
-  const dances=el._bsData;
-  if(!dances||!dances[idx]) return;
-  const raw=dances[idx];
-  const m=bsMapDance(raw);
-  if(!m.name){bsStatus('Dance has no name — cannot import.',true);return;}
-  if(bank.some(b=>b.name.toLowerCase()===m.name.toLowerCase())){
-    bsStatus('"'+m.name+'" is already in the bank.',true);return;
+
+async function bsImportDance(idx) {
+  const el = document.getElementById('bs-results');
+  const dances = el._bsData;
+  if (!dances || !dances[idx]) return;
+
+  const d = dances[idx];
+  const name = d.name || d.title || d.danceName || '';
+  const bsId = d.id || d.danceId || '';
+
+  if (!name) { bsStatus('Dance has no name — cannot import.', true); return; }
+  if (bank.some(b => b.name.toLowerCase() === name.toLowerCase())) {
+    bsStatus('"' + name + '" is already in the bank.', true); return;
   }
-  bsStatus('Fetching videos…');
-  const {demo,tutorial}=m.bsId?await bsGetVideos(m.bsId):{demo:'',tutorial:''};
+
+  // Fetch videos
+  let demo = '', tutorial = '';
+  if (bsId) {
+    bsStatus('Fetching videos…');
+    try {
+      const res = await fetch(BS_WORKER + '/videos/getByDanceId?danceId=' + encodeURIComponent(bsId), {headers:{'X-BootStepper-API-Key':'AT6MMN6K2H6R74SQKNB56B8','Accept':'application/json'}});
+      if (res.ok) {
+        const vdata = await res.json();
+        const videos = Array.isArray(vdata) ? vdata : (vdata.videos || vdata.data || []);
+        for (const v of videos) {
+          const url = v.url || v.youtubeUrl || v.link || '';
+          const type = (v.type || v.videoType || '').toLowerCase();
+          if (!demo && type.includes('demo')) demo = url;
+          else if (!tutorial && (type.includes('tutorial') || type.includes('teach'))) tutorial = url;
+          else if (!demo && url) demo = url;
+        }
+      }
+    } catch (e) { /* videos optional, continue */ }
+  }
+
   bank.push({
-    id:Date.now()+'',
-    name:m.name,
-    demo:demo||'',
-    tutorial:tutorial||'',
-    difficulty:m.difficulty||'',
-    counts:m.counts,
-    walls:m.walls,
-    tags:m.tags,
-    added:new Date().toISOString()
+    id: Date.now() + '',
+    name,
+    demo,
+    tutorial,
+    difficulty: d.difficulty || d.difficultyLevel || '',
+    counts: d.counts != null ? Number(d.counts) : null,
+    walls: d.walls != null ? Number(d.walls) : null,
+    tags: d.tags != null ? Number(d.tags) : null,
+    added: new Date().toISOString()
   });
+
   await saveBankToCloud();
-  renderAdminBank();renderBank();
-  bsStatus('"'+m.name+'" added to the dance bank! ✓');
-  // Re-render results to show "already in bank"
+  renderAdminBank(); renderBank();
+  bsStatus('"' + name + '" added to the dance bank! ✓');
   bsRenderResults(dances);
 }
 
