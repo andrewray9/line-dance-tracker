@@ -996,7 +996,7 @@
         <span class="filter-pill" onclick="setBankFilter('Intermediate',this)">Intermediate</span>
         <span class="filter-pill" onclick="setBankFilter('Advanced',this)">Advanced</span>
         <button class="sort-btn active" id="bank-sort-btn" onclick="toggleSort('bank')">A–Z</button>
-        <button class="sort-btn" id="bank-fav-btn" onclick="toggleBankFavFilter()">&#9829; Favorites</button>
+        <button class="sort-btn" id="bank-fav-btn" onclick="toggleBankFavFilter()">&#10084; Favorites</button>
       </div>
       <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center;">
         <span style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;padding:4px 2px;white-space:nowrap;">My Lists:</span>
@@ -1013,7 +1013,7 @@
     <div class="search-sort-row">
       <input type="text" id="know-search" placeholder="Search..." oninput="renderList('know')">
       <button class="sort-btn active" id="know-sort-btn" onclick="toggleSort('know')">A–Z</button>
-      <button class="sort-btn" id="know-fav-btn" onclick="toggleFavFilter()">&#9829; Favorites</button>
+      <button class="sort-btn" id="know-fav-btn" onclick="toggleFavFilter()">&#10084; Favorites</button>
     </div>
     <div class="bank-filter-row" id="know-diff-filters" style="margin-bottom:1rem;">
       <span class="filter-pill active" onclick="setListFilter('know','all',this)">All</span>
@@ -1218,7 +1218,7 @@
     <div id="tf-trending"></div>
 
     <!-- FAVORITES VS REALITY -->
-    <div class="section-title" style="margin-top:1.5rem">&#10084;&#65039; Favorites vs. Reality</div>
+    <div class="section-title" style="margin-top:1.5rem">&#10084; Favorites vs. Reality</div>
     <p class="section-note">How often do your hearted favorites actually make it onto a night?</p>
     <div id="tf-favs-reality"></div>
 
@@ -2411,7 +2411,7 @@ function renderBank(){
       // Remove button + promote button
       const removeBtn=`<button class="btn sm danger" onclick="removeFromList('${bankView}','${esc(d.name)}')">&#10005; Remove</button>`;
       const promoteBtn=bankView==='learn'?`<button class="btn sm success" onclick="addFromBank('know','${esc(d.name)}')">&#43; I Know It</button>`:'';
-      const favBtn=bankView==='know'?`<button class="fav-btn ${isFav(d.id)?'active':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" title="${isFav(d.id)?'Unfavorite':'Favorite'}" style="font-size:16px;margin-right:2px;">&#9829;</button>`:'';
+      const favBtn=bankView==='know'?`<button class="fav-btn ${isFav(d.id)?'active':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" title="${isFav(d.id)?'Unfavorite':'Favorite'}" style="font-size:16px;margin-right:2px;">&#10084;</button>`:'';
       const hasBody=demoBtn||tutBtn||spotifyBtn||statPills||removeBtn;
       const itemId='bview-'+d.id;
       return `<div class="bank-item" id="${itemId}">
@@ -2437,16 +2437,17 @@ function renderBank(){
   if(bankFavFilterActive){
     items=items.filter(d=>{
       const knowEntry=state.know.find(k=>k.name.toLowerCase()===d.name.toLowerCase());
-      return knowEntry&&isFav(knowEntry.id);
+      return isFav(knowEntry?knowEntry.id:d.id);
     });
   }
   if(sortState.bank) items.sort((a,b)=>a.name.localeCompare(b.name));
-  if(!items.length){el.innerHTML=`<div class="empty">${bankFavFilterActive?'No favorite dances in the bank yet — heart some dances on the Dances I Know tab!':bank.length===0?'No dances in the bank yet.':'No dances match your search.'}</div>`;return;}
+  if(!items.length){el.innerHTML=`<div class="empty">${bankFavFilterActive?'No favorite dances yet — heart any dance in the bank!':bank.length===0?'No dances in the bank yet.':'No dances match your search.'}</div>`;return;}
   el.innerHTML=items.map(d=>{
     const inKnow=isInList(d.name,'know'),inLearn=isInList(d.name,'learn');
     const knowEntry=state.know.find(k=>k.name.toLowerCase()===d.name.toLowerCase());
     const knowId=knowEntry?knowEntry.id:null;
-    const favBtn=inKnow&&knowId?`<button class="fav-btn ${isFav(knowId)?'active':''}" onclick="event.stopPropagation();toggleFav('${knowId}')" title="${isFav(knowId)?'Unfavorite':'Favorite'}" style="font-size:16px;margin-right:2px;">&#9829;</button>`:'';
+    const favId=knowId||d.id;
+    const favBtn=`<button class="fav-btn ${isFav(favId)?'active':''}" onclick="event.stopPropagation();toggleFav('${favId}')" title="${isFav(favId)?'Unfavorite':'Favorite'}" style="font-size:16px;margin-right:2px;">&#10084;</button>`;
     const diffBadge=d.difficulty?`<span class="diff-badge diff-${d.difficulty}">${d.difficulty}</span>`:'';
     const statusPill=inKnow?`<span class="diff-badge" style="background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border)">&#10003; I Know It</span>`:inLearn?`<span class="diff-badge" style="background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border)">&#9733; Learning</span>`:'';
     const demoBtn=d.demo?`<a class="link-btn demo" href="${escA(d.demo)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#9654; Demo</a>`:'';
@@ -2748,7 +2749,7 @@ function toggleFav(id){
   if(!state.favorites) state.favorites=[];
   if(isFav(id)) state.favorites=state.favorites.filter(f=>f!==id);
   else state.favorites.push(id);
-  renderList('know');renderBank();scheduleSave();
+  renderList('know');renderList('learn');renderBank();scheduleSave();
 }
 function toggleBankFavFilter(){
   bankFavFilterActive=!bankFavFilterActive;
@@ -2761,10 +2762,11 @@ function syncMyCard(){
   if(idx<0) return;
   friendCards[idx].know=state.know.map(d=>d.name);
   friendCards[idx].learn=state.learn.map(d=>d.name);
-  // Remove favs that no longer exist in know, keep favNames in sync
+  // Keep favs that exist in know OR bank, and resolve names from both
   const knowIds=new Set(state.know.map(d=>d.id));
-  friendCards[idx].favs=friendCards[idx].favs.filter(id=>knowIds.has(id));
-  friendCards[idx].favNames=friendCards[idx].favs.map(id=>state.know.find(d=>d.id===id)?.name||'').filter(Boolean);
+  const bankIds=new Set(bank.map(d=>d.id));
+  friendCards[idx].favs=friendCards[idx].favs.filter(id=>knowIds.has(id)||bankIds.has(id));
+  friendCards[idx].favNames=friendCards[idx].favs.map(id=>state.know.find(d=>d.id===id)?.name||bank.find(d=>d.id===id)?.name||'').filter(Boolean);
   friendCards[idx].updatedAt=new Date().toISOString();
   saveFriendCardsToCloud();
 }
@@ -2828,7 +2830,7 @@ function renderList(type){
       <button class="btn sm danger" onclick="removeDance('${type}','${d.id}')">Remove</button>`;
     return `<div class="bank-item" id="list-item-${d.id}">
       <div class="bank-item-head" onclick="this.parentElement.classList.toggle('open')">
-        ${type==='know'?`<button class="fav-btn ${isFav(d.id)?'active':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" title="${isFav(d.id)?'Unfavorite':'Favorite'}" style="font-size:16px;margin-right:2px;">&#9829;</button>`:''}
+        ${type==='know'?`<button class="fav-btn ${isFav(d.id)?'active':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" title="${isFav(d.id)?'Unfavorite':'Favorite'}" style="font-size:16px;margin-right:2px;">&#10084;</button>`:''}
         <span class="bank-item-name">${esc(d.name)}</span>
         <div class="bank-item-meta">${diffBadge}</div>
         <span class="bank-item-caret">&#9660;</span>
@@ -4987,7 +4989,7 @@ function renderTFFavsReality(){
   if(!el) return;
 
   const favIds=state.favorites||[];
-  if(!favIds.length){el.innerHTML=`<div class="empty">You haven't hearted any dances yet — tap ♥ on the Dances I Know tab!</div>`;return;}
+  if(!favIds.length){el.innerHTML=`<div class="empty">You haven't hearted any dances yet — tap &#10084; on any dance in the bank or your lists!</div>`;return;}
 
   const nights=tfAllNightEntries().filter(n=>(n.dances||[]).length>0);
   if(!nights.length){el.innerHTML=`<div class="empty">No nights logged yet.</div>`;return;}
@@ -4996,7 +4998,7 @@ function renderTFFavsReality(){
   nights.forEach(n=>(n.dances||[]).forEach(id=>{nightCount[id]=(nightCount[id]||0)+1;}));
 
   const favDances=favIds.map(id=>{
-    const d=state.know.find(x=>x.id===id);if(!d)return null;
+    const d=state.know.find(x=>x.id===id)||bank.find(x=>x.id===id);if(!d)return null;
     const count=nightCount[id]||0;
     const pct=Math.round((count/nights.length)*100);
     return{...d,count,pct};
