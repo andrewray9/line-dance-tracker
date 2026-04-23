@@ -1440,6 +1440,24 @@
 
 </div>
 
+<!-- CHANGELOG POPUP MODAL -->
+<div class="modal-overlay" id="cl-modal" style="display:none;z-index:1100;" onclick="if(event.target===this)clDismissModal()">
+  <div class="modal-card" style="max-width:500px;position:relative;">
+    <button onclick="clDismissModal()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:22px;line-height:1;cursor:pointer;color:var(--t3);padding:0;" aria-label="Close">&times;</button>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+      <span id="cl-modal-version" style="font-size:12px;font-weight:600;background:var(--purple-bg);color:var(--purple-text);border:0.5px solid var(--purple-border);border-radius:20px;padding:3px 11px;"></span>
+      <span style="font-size:11px;font-weight:500;background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border);border-radius:20px;padding:3px 9px;">New Update</span>
+    </div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:6px;" id="cl-modal-title"></h2>
+    <div class="modal-date" id="cl-modal-date"></div>
+    <div style="font-size:14px;color:var(--t1);line-height:1.7;white-space:pre-wrap;margin-bottom:1.5rem;" id="cl-modal-notes"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn" onclick="switchTab('changelog');clDismissModal()">See full changelog</button>
+      <button class="btn primary" onclick="clDismissModal()">Got it</button>
+    </div>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <footer class="app-footer" id="app-footer" style="display:none;">
   <span class="footer-brand">Line Dance Tracker</span>
@@ -1962,6 +1980,7 @@ async function authSubmit() {
     await loadDJList();
     await loadHomeConfig();
     await loadDrewDJFreestyles();
+    await clLoad();
     enterApp(finalUsername);
 
   } catch (err) {
@@ -1979,7 +1998,7 @@ function enterApp(username){
   document.getElementById('auth-wrap').style.display='none';
   document.getElementById('app').style.display='block';
   showAppFooter();
-  clLoad();
+  clMaybeShowModal();
   document.getElementById('user-label').textContent=username;
   document.getElementById('admin-badge').style.display=isAdmin?'inline':'none';
   document.getElementById('admin-tab').style.display=isAdmin?'inline-block':'none';
@@ -2140,6 +2159,7 @@ async function tryAutoLogin() {
       await loadDJList();
       await loadHomeConfig();
       await loadDrewDJFreestyles();
+      await clLoad();
       enterApp(user);
       return true;
     }
@@ -6176,23 +6196,39 @@ setInterval(async()=>{
 let changelog = [];
 
 async function clLoad() {
-  try {
-    const r = await sbFetch('/rest/v1/dances?username=eq.__changelog__&select=data');
-    const d = await r.json();
-    if (d && d[0] && d[0].data && d[0].data.entries) {
-      changelog = d[0].data.entries;
-    } else {
-      changelog = [];
-    }
-  } catch(e) { changelog = []; }
+  const r = await sbFetch(`/rest/v1/dances?username=eq.__changelog__&select=data`);
+  changelog = (r.ok && r.data && r.data.length > 0) ? (r.data[0].data.entries || []) : [];
   clUpdateVersionUI();
+  renderChangelog();
+}
+
+function clMaybeShowModal() {
+  if (!changelog.length) return;
+  // Sort to find latest entry by version number
+  const latest = changelog.slice().sort((a,b) => (parseFloat(b.version)||0) - (parseFloat(a.version)||0))[0];
+  if (!latest) return;
+  const seenKey = 'cl_seen_' + currentUser;
+  const lastSeenId = localStorage.getItem(seenKey);
+  if (lastSeenId === latest.id) return; // already seen this version
+  // Show the modal
+  document.getElementById('cl-modal-version').textContent = 'v' + latest.version;
+  document.getElementById('cl-modal-title').textContent = latest.title;
+  document.getElementById('cl-modal-date').textContent = latest.date || '';
+  document.getElementById('cl-modal-notes').textContent = latest.notes || '';
+  document.getElementById('cl-modal').style.display = 'flex';
+}
+
+function clDismissModal() {
+  document.getElementById('cl-modal').style.display = 'none';
+  if (!changelog.length) return;
+  const latest = changelog.slice().sort((a,b) => (parseFloat(b.version)||0) - (parseFloat(a.version)||0))[0];
+  if (latest) localStorage.setItem('cl_seen_' + currentUser, latest.id);
 }
 
 async function clSave() {
-  const check = await sbFetch('/rest/v1/dances?username=eq.__changelog__&select=username');
-  const existing = await check.json();
-  if (existing && existing.length) {
-    await sbFetch('/rest/v1/dances?username=eq.__changelog__', {method:'PATCH', prefer:'return=minimal', body:JSON.stringify({data:{entries:changelog}, updated_at:new Date().toISOString()})});
+  const check = await sbFetch(`/rest/v1/dances?username=eq.__changelog__&select=username`);
+  if (check.ok && check.data && check.data.length > 0) {
+    await sbFetch(`/rest/v1/dances?username=eq.__changelog__`, {method:'PATCH', prefer:'return=minimal', body:JSON.stringify({data:{entries:changelog}, updated_at:new Date().toISOString()})});
   } else {
     await sbFetch('/rest/v1/dances', {method:'POST', prefer:'return=minimal', body:JSON.stringify({username:'__changelog__', password:'__changelog__', data:{entries:changelog}})});
   }
@@ -6212,7 +6248,7 @@ function clUpdateVersionUI() {
   if (footerBtn) footerBtn.textContent = label;
 }
 
-function clAddEntry() {
+async function clAddEntry() {
   const version = document.getElementById('cl-input-version').value.trim();
   const title = document.getElementById('cl-input-title').value.trim();
   const date = document.getElementById('cl-input-date').value;
@@ -6223,27 +6259,27 @@ function clAddEntry() {
   document.getElementById('cl-input-title').value = '';
   document.getElementById('cl-input-date').value = '';
   document.getElementById('cl-input-notes').value = '';
-  clSave();
+  await clSave();
   clUpdateVersionUI();
   renderChangelog();
 }
 
-function clDeleteEntry(id) {
+async function clDeleteEntry(id) {
   if (!confirm('Delete this changelog entry?')) return;
   changelog = changelog.filter(e => e.id !== id);
-  clSave();
+  await clSave();
   clUpdateVersionUI();
   renderChangelog();
 }
 
-function clSaveEdit(id) {
+async function clSaveEdit(id) {
   const entry = changelog.find(e => e.id === id);
   if (!entry) return;
   entry.version = document.getElementById('cl-edit-version-' + id).value.trim() || entry.version;
   entry.title = document.getElementById('cl-edit-title-' + id).value.trim() || entry.title;
   entry.date = document.getElementById('cl-edit-date-' + id).value || entry.date;
   entry.notes = document.getElementById('cl-edit-notes-' + id).value;
-  clSave();
+  await clSave();
   clUpdateVersionUI();
   renderChangelog();
 }
