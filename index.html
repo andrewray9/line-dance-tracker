@@ -2028,18 +2028,31 @@ function enterApp(username){
   const greet=document.getElementById('home-greeting');
   recRefresh();
   if(greet){greet.textContent='Where would you like to go?';}
-  // Check if there's a more recent locally-cached state (from a failed sync last session)
+  // Retrieve and remove the cloud timestamp stashed during login
+  const cloudUpdatedAt = state.__cloudUpdatedAt || null;
+  delete state.__cloudUpdatedAt;
+
+  // Check if there's a more recent locally-cached state (from a failed sync last session).
+  // Only use local if it is provably NEWER than the cloud — never blindly override cloud data,
+  // which would cause changes made on another device to be wiped out.
   const cached=loadLocalCache();
   if(cached && cached.state && cached.savedAt){
-    state=cached.state;
-    if(!state.djFreestyles) state.djFreestyles={};
-    if(!state.favorites) state.favorites=[];
-    if(!state.danceLog) state.danceLog=[];
-    if(!state.favoriteFriends) state.favoriteFriends=[];
-    if(!state.drewsNights) state.drewsNights={};
-    syncPending=true;
-    setSyncStatus('error','Unsynced changes found — syncing now...');
-    saveToCloud();
+    const localIsNewer = !cloudUpdatedAt || new Date(cached.savedAt) > new Date(cloudUpdatedAt);
+    if(localIsNewer){
+      state=cached.state;
+      if(!state.djFreestyles) state.djFreestyles={};
+      if(!state.favorites) state.favorites=[];
+      if(!state.danceLog) state.danceLog=[];
+      if(!state.favoriteFriends) state.favoriteFriends=[];
+      if(!state.drewsNights) state.drewsNights={};
+      syncPending=true;
+      setSyncStatus('error','Unsynced changes found — syncing now...');
+      saveToCloud();
+    } else {
+      // Cloud data is same age or newer — discard the stale local cache and trust the cloud
+      clearLocalCache();
+      setSyncStatus('synced','Synced');
+    }
   } else {
     setSyncStatus('synced','Synced');
   }
@@ -2146,7 +2159,7 @@ async function tryAutoLogin() {
   }
 
   async function finishLogin(user) {
-    const r = await sbFetch(`/rest/v1/dances?username=eq.${enc(user)}&select=data`);
+    const r = await sbFetch(`/rest/v1/dances?username=eq.${enc(user)}&select=data,updated_at`);
     if (r.ok && r.data && r.data.length > 0) {
       state = r.data[0].data || {know:[], learn:[], nights:{}, djFreestyles:{}, favorites:[], favoriteFriends:[]};
       if (!state.djFreestyles) state.djFreestyles = {};
@@ -2154,6 +2167,7 @@ async function tryAutoLogin() {
       if (!state.danceLog) state.danceLog = [];
       if (!state.favoriteFriends) state.favoriteFriends = [];
       if (!state.drewsNights) state.drewsNights = {};
+      state.__cloudUpdatedAt = r.data[0].updated_at || null;
       await loadBank();
       await loadPicks();
       await loadSubmissions();
