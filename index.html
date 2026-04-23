@@ -1441,16 +1441,16 @@
 </div>
 
 <!-- CHANGELOG POPUP MODAL -->
-<div class="modal-overlay" id="cl-modal" style="display:none;z-index:1100;" onclick="if(event.target===this)clDismissModal()">
-  <div class="modal-card" style="max-width:500px;position:relative;">
+<div class="modal-overlay" id="cl-modal" style="display:none;z-index:1100;align-items:flex-end;" onclick="if(event.target===this)clDismissModal()">
+  <div class="modal-card" style="max-width:500px;position:relative;width:100%;margin:0 auto;max-height:80vh;overflow-y:auto;border-bottom-left-radius:0;border-bottom-right-radius:0;">
     <button onclick="clDismissModal()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:22px;line-height:1;cursor:pointer;color:var(--t3);padding:0;" aria-label="Close">&times;</button>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
       <span id="cl-modal-version" style="font-size:12px;font-weight:600;background:var(--purple-bg);color:var(--purple-text);border:0.5px solid var(--purple-border);border-radius:20px;padding:3px 11px;"></span>
       <span style="font-size:11px;font-weight:500;background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border);border-radius:20px;padding:3px 9px;">New Update</span>
     </div>
-    <h2 style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:6px;" id="cl-modal-title"></h2>
+    <h2 style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:6px;" id="cl-modal-title"></h2>
     <div class="modal-date" id="cl-modal-date"></div>
-    <div style="font-size:14px;color:var(--t1);line-height:1.7;white-space:pre-wrap;margin-bottom:1.5rem;" id="cl-modal-notes"></div>
+    <div style="font-size:13px;color:var(--t1);line-height:1.7;white-space:pre-wrap;margin-bottom:1.25rem;" id="cl-modal-notes"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;">
       <button class="btn" onclick="switchTab('changelog');clDismissModal()">See full changelog</button>
       <button class="btn primary" onclick="clDismissModal()">Got it</button>
@@ -6204,25 +6204,29 @@ async function clLoad() {
 
 function clMaybeShowModal() {
   if (!changelog.length) return;
-  // Sort to find latest entry by version number
   const latest = changelog.slice().sort((a,b) => (parseFloat(b.version)||0) - (parseFloat(a.version)||0))[0];
   if (!latest) return;
-  const seenKey = 'cl_seen_' + currentUser;
-  const lastSeenId = localStorage.getItem(seenKey);
-  if (lastSeenId === latest.id) return; // already seen this version
-  // Show the modal
+  // Check cloud state first, fall back to localStorage
+  const seenId = (state.clSeenId) || localStorage.getItem('cl_seen_' + currentUser);
+  if (seenId === latest.id) return;
   document.getElementById('cl-modal-version').textContent = 'v' + latest.version;
   document.getElementById('cl-modal-title').textContent = latest.title;
   document.getElementById('cl-modal-date').textContent = latest.date || '';
   document.getElementById('cl-modal-notes').textContent = latest.notes || '';
   document.getElementById('cl-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
 
 function clDismissModal() {
   document.getElementById('cl-modal').style.display = 'none';
+  document.body.style.overflow = '';
   if (!changelog.length) return;
   const latest = changelog.slice().sort((a,b) => (parseFloat(b.version)||0) - (parseFloat(a.version)||0))[0];
-  if (latest) localStorage.setItem('cl_seen_' + currentUser, latest.id);
+  if (!latest) return;
+  // Save to both cloud state and localStorage
+  state.clSeenId = latest.id;
+  localStorage.setItem('cl_seen_' + currentUser, latest.id);
+  scheduleSave();
 }
 
 async function clSave() {
