@@ -6001,6 +6001,10 @@ async function recRefresh() {
   const knownNames = new Set((state.know || []).map(d => d.name.toLowerCase().trim()));
   const learnNames = new Set((state.learn || []).map(d => d.name.toLowerCase().trim()));
 
+  // HOT_LEARN_THRESHOLD: if a dance is on the learn list but has a high recency score
+  // (i.e. it's being played a lot), still allow it as a recommendation candidate.
+  const HOT_LEARN_THRESHOLD = 3; // matches the "hot" label threshold (score >= 3)
+
   // If the dancer knows more than 60 dances, shift priority to hot Intermediate/Advanced songs
   const totalKnown = (state.know || []).length;
   const expertMode = totalKnown > 60;
@@ -6023,7 +6027,10 @@ async function recRefresh() {
   const allCandidates = bank
     .filter(b => {
       const n = b.name.toLowerCase().trim();
-      return !knownNames.has(n) && !learnNames.has(n) && !recSkipped.has(n);
+      if (knownNames.has(n) || recSkipped.has(n)) return false;
+      // Allow learn-list dances only if they're "hot" (played a lot recently)
+      if (learnNames.has(n) && (scores[n] || 0) < HOT_LEARN_THRESHOLD) return false;
+      return true;
     })
     .map(b => {
       const n = b.name.toLowerCase().trim();
@@ -6058,7 +6065,9 @@ async function recRefresh() {
     const widenCandidates = bank
       .filter(b => {
         const n = b.name.toLowerCase().trim();
-        return !knownNames.has(n) && !learnNames.has(n) && !recSkipped.has(n);
+        if (knownNames.has(n) || recSkipped.has(n)) return false;
+        if (learnNames.has(n) && (scores[n] || 0) < HOT_LEARN_THRESHOLD) return false;
+        return true;
       })
       .map(b => {
         const n = b.name.toLowerCase().trim();
@@ -6139,6 +6148,11 @@ function recShowResult(pick, profile, targetDiffs) {
   pillsHTML += `<span class="rec-pill ${hotLabel}">${hotText}</span>`;
   if (b.counts) pillsHTML += `<span class="rec-pill cool">${b.counts} counts</span>`;
   if (b.walls) pillsHTML += `<span class="rec-pill cool">${b.walls} walls</span>`;
+  // Flag if the dance is already on the user's learn list (recommended because it's hot)
+  const learnNamesCheck = new Set((state.learn || []).map(d => d.name.toLowerCase().trim()));
+  if (learnNamesCheck.has(b.name.toLowerCase().trim())) {
+    pillsHTML += `<span class="rec-pill" style="background:var(--purple-bg);color:var(--purple-text);border-color:var(--purple-border);">📌 On your learn list</span>`;
+  }
   pillsEl.innerHTML = pillsHTML;
 
   // Links
