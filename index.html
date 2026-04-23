@@ -87,6 +87,39 @@
     .tab.admin-tab{color:var(--amber-text);}
     .tab[data-tab="submissions"].active,.tab[data-tab="admin"].active,.tab[data-tab="editpeople"].active{background:#FAEEDA;color:#633806;border-color:#FAC775;}
     .tab[data-tab="feedback"].active{background:#F0FDF4;color:#166534;border-color:#86efac;}
+    .tab[data-tab="changelog"].active{background:#F5F0FF;color:#5B21B6;border-color:#C4B5FD;}
+
+    /* FOOTER */
+    .app-footer{max-width:880px;margin:0 auto;padding:1.5rem 1.25rem 2.5rem;border-top:0.5px solid var(--b3);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+    .app-footer .footer-brand{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--t2);}
+    .app-footer .footer-version{font-size:12px;color:var(--t3);cursor:pointer;transition:color 0.15s;}
+    .app-footer .footer-version:hover{color:var(--t1);}
+    .app-footer .footer-links{display:flex;gap:14px;}
+    .app-footer .footer-link{font-size:12px;color:var(--t3);cursor:pointer;transition:color 0.15s;background:none;border:none;font-family:'DM Sans',sans-serif;padding:0;}
+    .app-footer .footer-link:hover{color:var(--t1);}
+
+    /* CHANGELOG */
+    .changelog-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.5rem;}
+    .changelog-version-badge{font-size:13px;font-weight:600;background:var(--purple-bg);color:var(--purple-text);border:0.5px solid var(--purple-border);border-radius:20px;padding:4px 14px;}
+    .changelog-entry{border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);margin-bottom:12px;overflow:hidden;}
+    .changelog-entry-head{display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;user-select:none;transition:background 0.1s;}
+    .changelog-entry-head:hover{background:var(--bg2);}
+    .changelog-entry.open .changelog-entry-head{background:var(--bg2);border-bottom:0.5px solid var(--b3);}
+    .changelog-entry-version{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--t1);min-width:60px;}
+    .changelog-entry-title{font-size:14px;font-weight:500;flex:1;color:var(--t1);}
+    .changelog-entry-date{font-size:12px;color:var(--t3);white-space:nowrap;}
+    .changelog-entry-caret{font-size:11px;color:var(--t3);transition:transform 0.2s;}
+    .changelog-entry.open .changelog-entry-caret{transform:rotate(180deg);}
+    .changelog-entry-body{display:none;padding:14px 18px;}
+    .changelog-entry.open .changelog-entry-body{display:block;}
+    .changelog-entry-body textarea{width:100%;min-height:100px;padding:10px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;resize:vertical;line-height:1.6;}
+    .changelog-entry-body textarea:focus{outline:none;border-color:var(--b1);}
+    .changelog-entry-body .cl-notes{font-size:14px;color:var(--t1);line-height:1.7;white-space:pre-wrap;}
+    .changelog-entry-body .cl-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;}
+    .changelog-add-row{display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap;align-items:flex-end;}
+    .changelog-add-row input{padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;}
+    .changelog-add-row input:focus{outline:none;border-color:var(--b1);}
+    .changelog-add-row input::placeholder{color:var(--t3);}
     @media(prefers-color-scheme:dark){
       .tab[data-tab="home"].active{background:#2d1f3d;color:#c084fc;border-color:#7e22ce;}
       .tab[data-tab="bank"].active{background:#0e1e2e;color:#6ab4f5;border-color:#1a5a9e;}
@@ -99,6 +132,7 @@
       .tab[data-tab="drewsnight"].active{background:#2e1800;color:#ffaa66;border-color:#8B3A00;}
       .tab[data-tab="submissions"].active,.tab[data-tab="admin"].active,.tab[data-tab="editpeople"].active{background:#2a1d08;color:#f0a840;border-color:#7a4a0a;}
       .tab[data-tab="feedback"].active{background:#052e16;color:#4ade80;border-color:#16a34a;}
+      .tab[data-tab="changelog"].active{background:#1e1430;color:#a78bfa;border-color:#5B21B6;}
     }
     @keyframes tabIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
     .section{display:none;opacity:0;}
@@ -815,6 +849,7 @@
     <button class="mobile-tab" data-tab="log" onclick="mobileSwitch('log')"><span class="mtab-dot"></span>Analytics</button>
     <button class="mobile-tab" data-tab="friends" onclick="mobileSwitch('friends')"><span class="mtab-dot"></span>Friends</button>
     <button class="mobile-tab" data-tab="feedback" onclick="mobileSwitch('feedback')"><span class="mtab-dot"></span>Suggestions &amp; Bugs</button>
+    <button class="mobile-tab" data-tab="changelog" onclick="mobileSwitch('changelog')"><span class="mtab-dot" style="background:#8b5cf6;"></span>Changelog</button>
     <button class="mobile-tab" data-tab="drewsnight" id="mobile-tab-drewsnight" style="display:none" onclick="mobileSwitch('drewsnight')"><span class="mtab-dot" style="background:#ff8c42;"></span>Drew's Night</button>
     <div class="mobile-menu-section" id="mobile-admin-section" style="display:none">Admin</div>
     <button class="mobile-tab" data-tab="dj" id="mobile-tab-dj" style="display:none" onclick="mobileSwitch('dj')"><span class="mtab-dot"></span>Test Features</button>
@@ -835,6 +870,7 @@
     <button class="tab" data-tab="dj" id="dj-tab-btn" style="display:none" onclick="switchTab('dj')">Test Features</button>
     <button class="tab" data-tab="friends" onclick="switchTab('friends')">Friends</button>
     <button class="tab" data-tab="feedback" onclick="switchTab('feedback')">Suggestions &amp; Bugs</button>
+    <button class="tab" data-tab="changelog" onclick="switchTab('changelog')">Changelog</button>
     <button class="tab admin-tab" data-tab="submissions" id="submissions-tab" style="display:none" onclick="switchTab('submissions')">&#9888; Submissions <span id="submissions-badge" style="display:none;background:var(--red-text);color:#fff;font-size:10px;padding:1px 6px;border-radius:20px;margin-left:4px;"></span></button>
     <button class="tab admin-tab" data-tab="admin" id="admin-tab" style="display:none" onclick="switchTab('admin')">&#9733; Admin</button>
     <button class="tab admin-tab" data-tab="editpeople" id="editpeople-tab" style="display:none" onclick="switchTab('editpeople')">&#9998; Edit People</button>
@@ -885,6 +921,12 @@
         <span class="home-card-icon">💬</span>
         <span class="home-card-title">Suggestions &amp; Bugs</span>
         <span class="home-card-desc">Suggest a dance, app idea, or report a bug</span>
+        <span class="home-card-arrow">→</span>
+      </button>
+      <button class="home-card" id="home-card-changelog" onclick="switchTab('changelog')" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">
+        <span class="home-card-icon">📋</span>
+        <span class="home-card-title">Changelog</span>
+        <span class="home-card-desc">App updates & version history</span>
         <span class="home-card-arrow">→</span>
       </button>
       <button class="home-card hc-rose" id="home-card-drewsnight" style="display:none" onclick="switchTab('drewsnight')">
@@ -1368,7 +1410,45 @@
     <div id="debug-status" style="font-size:13px;color:var(--t2);margin-bottom:1rem;"></div>
     <div id="debug-night-output"></div>
   </div>
+
+  <!-- CHANGELOG SECTION -->
+  <div id="tab-changelog" class="section">
+    <div class="changelog-header">
+      <div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:4px;">Changelog</h2>
+        <p class="section-note" style="margin:0">App updates, fixes &amp; new features</p>
+      </div>
+      <span class="changelog-version-badge" id="changelog-current-version">v1.0</span>
+    </div>
+
+    <!-- Admin-only: add new entry -->
+    <div id="changelog-admin-panel" style="display:none;background:var(--bg2);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.5rem;">
+      <div style="font-size:12px;font-weight:500;color:var(--t2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px;">Add New Entry</div>
+      <div class="changelog-add-row">
+        <input type="text" id="cl-input-version" placeholder="Version (e.g. 1.2)" style="width:130px;flex:none;">
+        <input type="text" id="cl-input-title" placeholder="Title (e.g. Night Improvements)" style="flex:1;min-width:180px;">
+        <input type="date" id="cl-input-date" style="padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;">
+      </div>
+      <textarea id="cl-input-notes" placeholder="Describe the changes in this version..." style="width:100%;min-height:90px;padding:10px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;resize:vertical;line-height:1.6;margin-bottom:10px;" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+      <div style="display:flex;justify-content:flex-end;">
+        <button class="btn primary" onclick="clAddEntry()">+ Add Entry</button>
+      </div>
+    </div>
+
+    <div id="changelog-list"><div class="empty">No changelog entries yet.</div></div>
+  </div>
+
 </div>
+
+<!-- FOOTER -->
+<footer class="app-footer" id="app-footer" style="display:none;">
+  <span class="footer-brand">Line Dance Tracker</span>
+  <div class="footer-links">
+    <button class="footer-link" onclick="switchTab('feedback')">Suggestions &amp; Bugs</button>
+    <button class="footer-link" onclick="switchTab('changelog')" id="footer-version-btn">v1.0</button>
+  </div>
+</footer>
+
 <div class="sp-modal-overlay" id="sp-playlist-modal" style="display:none" onclick="if(event.target===this)closeSpotifyModal()">
   <div class="sp-modal">
     <div class="sp-modal-header">
@@ -1898,6 +1978,8 @@ function enterApp(username){
   hideSplash();
   document.getElementById('auth-wrap').style.display='none';
   document.getElementById('app').style.display='block';
+  showAppFooter();
+  clLoad();
   document.getElementById('user-label').textContent=username;
   document.getElementById('admin-badge').style.display=isAdmin?'inline':'none';
   document.getElementById('admin-tab').style.display=isAdmin?'inline-block':'none';
@@ -2186,6 +2268,7 @@ function switchTab(tab,_fromSwipe=false){
   if(tab==='feedback') renderFeedbackTab();
   if(tab==='editpeople') epRefreshUsers();
   if(tab==='debug') renderDebugTab();
+  if(tab==='changelog') renderChangelog();
 }
 
 // ---- Sort helpers ----
@@ -3090,6 +3173,7 @@ function renderHistoryStats(){
     if(!entry.timestamp||entry.type==='palace_times'||entry.type==='not_performed') return;
     const t=new Date(entry.timestamp);
     if(t<oneMonthAgo) return;
+    if(t<new Date('2026-04-22T00:00:00')) return;
     const h=t.getHours();
     const m=t.getMinutes();
     // Only allow 7:00 PM (19:00) through 1:30 AM
@@ -3183,7 +3267,8 @@ function renderLog(){
     const dances=(nd.dances||[]).map(id=>state.know.find(d=>d.id===id)).filter(Boolean);
     const pills=dances.map(d=>`<span class="log-pill">${esc(d.name)}</span>`).join('');
     const djLabel=nd.dj?`<span class="dj-name">DJ: ${esc(nd.dj)}</span>`:'';
-    const palaceLabel=(nd.arriveTime||nd.leaveTime)?`<span class="dj-name" style="color:var(--purple-text)">&#127968; ${nd.arriveTime?nd.arriveTime:'?'} – ${nd.leaveTime?nd.leaveTime:'?'}</span>`:'';
+    function fmt12(t){if(!t)return'?';const[hh,mm]=t.split(':').map(Number);const ampm=hh<12?'AM':'PM';const h=hh%12||12;return`${h}:${String(mm).padStart(2,'0')} ${ampm}`;}
+    const palaceLabel=(nd.arriveTime||nd.leaveTime)?`<span class="dj-name" style="color:var(--purple-text)">${fmt12(nd.arriveTime)} – ${fmt12(nd.leaveTime)}</span>`:'';
     return `
       <div class="day-log" onclick="this.classList.toggle('open')">
         <div class="day-log-head">
@@ -3210,12 +3295,12 @@ function renderLog(){
       </div>
       <div class="accordion-body">
         <div style="margin-bottom:1rem">
-          <div style="font-size:11px;font-weight:500;color:var(--t2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px">All-time dance totals</div>
-          <div class="all-dances-list">${totalsRows||'<div class="empty">No dances recorded yet.</div>'}</div>
-        </div>
-        <div style="border-top:0.5px solid var(--b3);padding-top:1rem">
           <div style="font-size:11px;font-weight:500;color:var(--t2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px">Individual nights</div>
           ${nightRows}
+        </div>
+        <div style="border-top:0.5px solid var(--b3);padding-top:1rem">
+          <div style="font-size:11px;font-weight:500;color:var(--t2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px">All-time dance totals</div>
+          <div class="all-dances-list">${totalsRows||'<div class="empty">No dances recorded yet.</div>'}</div>
         </div>
       </div>
     </div>`;
@@ -6086,6 +6171,137 @@ setInterval(async()=>{
   if(!currentUser) return;
   await tryRefreshToken();
 }, 45 * 60 * 1000);
+
+// ---- CHANGELOG ----
+let changelog = [];
+
+async function clLoad() {
+  try {
+    const r = await sbFetch('/rest/v1/dances?username=eq.__changelog__&select=data');
+    const d = await r.json();
+    if (d && d[0] && d[0].data && d[0].data.entries) {
+      changelog = d[0].data.entries;
+    } else {
+      changelog = [];
+    }
+  } catch(e) { changelog = []; }
+  clUpdateVersionUI();
+}
+
+async function clSave() {
+  const check = await sbFetch('/rest/v1/dances?username=eq.__changelog__&select=username');
+  const existing = await check.json();
+  if (existing && existing.length) {
+    await sbFetch('/rest/v1/dances?username=eq.__changelog__', {method:'PATCH', prefer:'return=minimal', body:JSON.stringify({data:{entries:changelog}, updated_at:new Date().toISOString()})});
+  } else {
+    await sbFetch('/rest/v1/dances', {method:'POST', prefer:'return=minimal', body:JSON.stringify({username:'__changelog__', password:'__changelog__', data:{entries:changelog}})});
+  }
+}
+
+function clUpdateVersionUI() {
+  // Find the latest version (first entry after sorting by version desc)
+  const latest = changelog.slice().sort((a,b) => {
+    const av = parseFloat(a.version) || 0;
+    const bv = parseFloat(b.version) || 0;
+    return bv - av;
+  })[0];
+  const label = latest ? 'v' + latest.version : 'v1.0';
+  const badge = document.getElementById('changelog-current-version');
+  const footerBtn = document.getElementById('footer-version-btn');
+  if (badge) badge.textContent = label;
+  if (footerBtn) footerBtn.textContent = label;
+}
+
+function clAddEntry() {
+  const version = document.getElementById('cl-input-version').value.trim();
+  const title = document.getElementById('cl-input-title').value.trim();
+  const date = document.getElementById('cl-input-date').value;
+  const notes = document.getElementById('cl-input-notes').value.trim();
+  if (!version || !title) { alert('Please fill in at least a version and title.'); return; }
+  changelog.unshift({ id: Date.now() + '', version, title, date: date || new Date().toISOString().slice(0,10), notes });
+  document.getElementById('cl-input-version').value = '';
+  document.getElementById('cl-input-title').value = '';
+  document.getElementById('cl-input-date').value = '';
+  document.getElementById('cl-input-notes').value = '';
+  clSave();
+  clUpdateVersionUI();
+  renderChangelog();
+}
+
+function clDeleteEntry(id) {
+  if (!confirm('Delete this changelog entry?')) return;
+  changelog = changelog.filter(e => e.id !== id);
+  clSave();
+  clUpdateVersionUI();
+  renderChangelog();
+}
+
+function clSaveEdit(id) {
+  const entry = changelog.find(e => e.id === id);
+  if (!entry) return;
+  entry.version = document.getElementById('cl-edit-version-' + id).value.trim() || entry.version;
+  entry.title = document.getElementById('cl-edit-title-' + id).value.trim() || entry.title;
+  entry.date = document.getElementById('cl-edit-date-' + id).value || entry.date;
+  entry.notes = document.getElementById('cl-edit-notes-' + id).value;
+  clSave();
+  clUpdateVersionUI();
+  renderChangelog();
+}
+
+function renderChangelog() {
+  const adminPanel = document.getElementById('changelog-admin-panel');
+  if (adminPanel) adminPanel.style.display = isAdmin ? '' : 'none';
+
+  const el = document.getElementById('changelog-list');
+  if (!el) return;
+  if (!changelog.length) {
+    el.innerHTML = '<div class="empty">No changelog entries yet.</div>';
+    return;
+  }
+
+  const sorted = changelog.slice().sort((a,b) => {
+    const av = parseFloat(a.version) || 0;
+    const bv = parseFloat(b.version) || 0;
+    return bv - av;
+  });
+
+  el.innerHTML = sorted.map((entry, i) => {
+    const isFirst = i === 0;
+    return `
+    <div class="changelog-entry${isFirst ? ' open' : ''}" id="cl-entry-${entry.id}">
+      <div class="changelog-entry-head" onclick="this.closest('.changelog-entry').classList.toggle('open')">
+        <span class="changelog-entry-version">v${esc(entry.version)}</span>
+        <span class="changelog-entry-title">${esc(entry.title)}</span>
+        ${isFirst ? '<span style="font-size:11px;font-weight:600;background:var(--purple-bg);color:var(--purple-text);border:0.5px solid var(--purple-border);border-radius:20px;padding:2px 9px;white-space:nowrap;">Latest</span>' : ''}
+        <span class="changelog-entry-date">${entry.date || ''}</span>
+        <span class="changelog-entry-caret">&#9660;</span>
+      </div>
+      <div class="changelog-entry-body">
+        ${isAdmin ? `
+          <div style="display:grid;grid-template-columns:100px 1fr auto;gap:8px;margin-bottom:10px;align-items:center;">
+            <input id="cl-edit-version-${entry.id}" value="${esc(entry.version)}" placeholder="Version" style="padding:7px 10px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;">
+            <input id="cl-edit-title-${entry.id}" value="${esc(entry.title)}" placeholder="Title" style="padding:7px 10px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;">
+            <input type="date" id="cl-edit-date-${entry.id}" value="${entry.date||''}" style="padding:7px 10px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;">
+          </div>
+          <textarea id="cl-edit-notes-${entry.id}" style="width:100%;min-height:90px;padding:10px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;resize:vertical;line-height:1.6;margin-bottom:10px;">${esc(entry.notes||'')}</textarea>
+          <div class="cl-actions">
+            <button class="btn xs danger" onclick="clDeleteEntry('${entry.id}')">Delete</button>
+            <button class="btn xs primary" onclick="clSaveEdit('${entry.id}')">Save Changes</button>
+          </div>
+        ` : `
+          <div class="cl-notes">${esc(entry.notes || 'No notes for this version.')}</div>
+        `}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Show footer once logged in
+function showAppFooter() {
+  const footer = document.getElementById('app-footer');
+  if (footer) footer.style.display = '';
+}
+
 </script>
 </body>
 </html>
