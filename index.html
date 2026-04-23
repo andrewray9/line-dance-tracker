@@ -996,6 +996,7 @@
         <span class="filter-pill" onclick="setBankFilter('Intermediate',this)">Intermediate</span>
         <span class="filter-pill" onclick="setBankFilter('Advanced',this)">Advanced</span>
         <button class="sort-btn active" id="bank-sort-btn" onclick="toggleSort('bank')">A–Z</button>
+        <button class="sort-btn" id="bank-fav-btn" onclick="toggleBankFavFilter()">&#9829; Favorites</button>
       </div>
       <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center;">
         <span style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;padding:4px 2px;white-space:nowrap;">My Lists:</span>
@@ -1532,6 +1533,7 @@ let listFilter={know:'all',learn:'all'};
 let bankView='all'; // 'all' | 'know' | 'learn'
 let sortState={bank:true,know:true,learn:true,pick:true};
 let favFilterActive=false;
+let bankFavFilterActive=false;
 
 // ---- Supabase ----
 async function sbFetch(path, options={}) {
@@ -2332,6 +2334,12 @@ function setListFilter(type,diff,el){
 }
 function setBankView(view,el){
   bankView=view;
+  // Reset fav filter when switching to learn view (favs are only for know list)
+  if(view==='learn'&&bankFavFilterActive){
+    bankFavFilterActive=false;
+    const favBtn=document.getElementById('bank-fav-btn');
+    if(favBtn) favBtn.classList.remove('active');
+  }
   // Update pill styles for view row
   ['bank-view-all-pill','bank-view-know-pill','bank-view-learn-pill'].forEach(id=>{
     const p=document.getElementById(id);
@@ -2362,10 +2370,13 @@ function renderBank(){
         return be?.difficulty===bankFilter;
       });
     }
+    if(bankView==='know'&&bankFavFilterActive){
+      filtered=filtered.filter(d=>isFav(d.id));
+    }
     if(sortState.bank) filtered.sort((a,b)=>a.name.localeCompare(b.name));
     if(!filtered.length){
       const label=bankView==='know'?'Dances I Know':'Want to Learn';
-      el.innerHTML=`<div class="empty">No dances in your "${label}" list yet${q?' matching your search.':'.'}</div>`;
+      el.innerHTML=`<div class="empty">No dances in your "${label}" list yet${q?' matching your search':bankView==='know'&&bankFavFilterActive?' — heart some dances to see them here':'.'}</div>`;
       return;
     }
     const headerColor=bankView==='know'?'var(--green-text)':'var(--blue-text)';
@@ -2386,10 +2397,12 @@ function renderBank(){
       // Remove button + promote button
       const removeBtn=`<button class="btn sm danger" onclick="removeFromList('${bankView}','${esc(d.name)}')">&#10005; Remove</button>`;
       const promoteBtn=bankView==='learn'?`<button class="btn sm success" onclick="addFromBank('know','${esc(d.name)}')">&#43; I Know It</button>`:'';
+      const favBtn=bankView==='know'?`<button class="fav-btn ${isFav(d.id)?'active':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" title="${isFav(d.id)?'Unfavorite':'Favorite'}" style="font-size:16px;margin-right:2px;">&#9829;</button>`:'';
       const hasBody=demoBtn||tutBtn||spotifyBtn||statPills||removeBtn;
       const itemId='bview-'+d.id;
       return `<div class="bank-item" id="${itemId}">
         <div class="bank-item-head" onclick="this.parentElement.classList.toggle('open')">
+          ${favBtn}
           <span class="bank-item-name">${esc(d.name)}</span>
           <div class="bank-item-meta">${diffBadge}</div>
           <span class="bank-item-caret">&#9660;</span>
@@ -2407,10 +2420,19 @@ function renderBank(){
   // --- Default: all-dances view ---
   let items=bank.filter(d=>!q||d.name.toLowerCase().includes(q.toLowerCase()));
   if(bankFilter!=='all') items=items.filter(d=>d.difficulty===bankFilter);
+  if(bankFavFilterActive){
+    items=items.filter(d=>{
+      const knowEntry=state.know.find(k=>k.name.toLowerCase()===d.name.toLowerCase());
+      return knowEntry&&isFav(knowEntry.id);
+    });
+  }
   if(sortState.bank) items.sort((a,b)=>a.name.localeCompare(b.name));
-  if(!items.length){el.innerHTML=`<div class="empty">${bank.length===0?'No dances in the bank yet.':'No dances match your search.'}</div>`;return;}
+  if(!items.length){el.innerHTML=`<div class="empty">${bankFavFilterActive?'No favorite dances in the bank yet — heart some dances on the Dances I Know tab!':bank.length===0?'No dances in the bank yet.':'No dances match your search.'}</div>`;return;}
   el.innerHTML=items.map(d=>{
     const inKnow=isInList(d.name,'know'),inLearn=isInList(d.name,'learn');
+    const knowEntry=state.know.find(k=>k.name.toLowerCase()===d.name.toLowerCase());
+    const knowId=knowEntry?knowEntry.id:null;
+    const favBtn=inKnow&&knowId?`<button class="fav-btn ${isFav(knowId)?'active':''}" onclick="event.stopPropagation();toggleFav('${knowId}')" title="${isFav(knowId)?'Unfavorite':'Favorite'}" style="font-size:16px;margin-right:2px;">&#9829;</button>`:'';
     const diffBadge=d.difficulty?`<span class="diff-badge diff-${d.difficulty}">${d.difficulty}</span>`:'';
     const statusPill=inKnow?`<span class="diff-badge" style="background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border)">&#10003; I Know It</span>`:inLearn?`<span class="diff-badge" style="background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border)">&#9733; Learning</span>`:'';
     const demoBtn=d.demo?`<a class="link-btn demo" href="${escA(d.demo)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#9654; Demo</a>`:'';
@@ -2427,6 +2449,7 @@ function renderBank(){
     const hasBody=demoBtn||tutBtn||spotifyBtn||statPills||addBtns;
     return `<div class="bank-item" id="bitem-${d.id}">
       <div class="bank-item-head" onclick="toggleBankItem('${d.id}')">
+        ${favBtn}
         <span class="bank-item-name">${esc(d.name)}</span>
         <div class="bank-item-meta">${diffBadge}${statusPill}</div>
         <span class="bank-item-caret">&#9660;</span>
@@ -2450,6 +2473,8 @@ function addFromBankById(type,bankId){
   state[other]=state[other].filter(x=>x.name.toLowerCase()!==name.toLowerCase());
   if(!isInList(name,type)) state[type].push({id:Date.now()+'',name,added:new Date().toISOString()});
   renderBank();renderList('know');renderList('learn');scheduleSave();syncMyCard();
+  // If fav filter is active and a dance was just added to know, keep filter consistent
+  if(bankFavFilterActive) renderBank();
 }
 function addFromBank(type,name){
   const other=type==='know'?'learn':'know';
@@ -2709,7 +2734,13 @@ function toggleFav(id){
   if(!state.favorites) state.favorites=[];
   if(isFav(id)) state.favorites=state.favorites.filter(f=>f!==id);
   else state.favorites.push(id);
-  renderList('know');scheduleSave();
+  renderList('know');renderBank();scheduleSave();
+}
+function toggleBankFavFilter(){
+  bankFavFilterActive=!bankFavFilterActive;
+  const btn=document.getElementById('bank-fav-btn');
+  if(btn) btn.classList.toggle('active',bankFavFilterActive);
+  renderBank();
 }
 function syncMyCard(){
   const idx=friendCards.findIndex(c=>c.username===currentUser);
