@@ -234,9 +234,11 @@
     .search-sort-row input{flex:1;min-width:160px;padding:8px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;}
     .search-sort-row input:focus{outline:none;border-color:var(--b1);}
     .search-sort-row input::placeholder{color:var(--t3);}
-    .sort-btn{padding:7px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t2);font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:background 0.1s;}
+    .sort-btn{padding:7px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t2);font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:background 0.1s;display:inline-flex;align-items:center;gap:5px;}
     .sort-btn.active{background:var(--t1);color:var(--bg);border-color:var(--t1);}
     .sort-btn:hover:not(.active){background:var(--bg2);}
+    .sort-btn .fav-icon{width:13px;height:13px;fill:#D4537E;flex-shrink:0;}
+    .sort-btn.active .fav-icon{fill:#fff;}
     .empty{text-align:center;padding:3rem 1rem;color:var(--t3);font-size:14px;}
     .section-note{font-size:13px;color:var(--t2);margin-bottom:1rem;}
     .section-title{font-size:12px;font-weight:500;color:var(--t2);letter-spacing:.05em;text-transform:uppercase;margin:1.5rem 0 .75rem;}
@@ -998,7 +1000,7 @@
         <span class="filter-pill" onclick="setBankFilter('Intermediate',this)">Intermediate</span>
         <span class="filter-pill" onclick="setBankFilter('Advanced',this)">Advanced</span>
         <button class="sort-btn active" id="bank-sort-btn" onclick="toggleSort('bank')">A–Z</button>
-        <button class="sort-btn" id="bank-fav-btn" onclick="toggleBankFavFilter()">&#10084; Favorites</button>
+        <button class="sort-btn" id="bank-fav-btn" onclick="toggleBankFavFilter()"><svg class="fav-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg> Favorites</button>
       </div>
       <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center;">
         <span style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;padding:4px 2px;white-space:nowrap;">My Lists:</span>
@@ -1015,7 +1017,7 @@
     <div class="search-sort-row">
       <input type="text" id="know-search" placeholder="Search..." oninput="renderList('know')">
       <button class="sort-btn active" id="know-sort-btn" onclick="toggleSort('know')">A–Z</button>
-      <button class="sort-btn" id="know-fav-btn" onclick="toggleFavFilter()">&#10084; Favorites</button>
+      <button class="sort-btn" id="know-fav-btn" onclick="toggleFavFilter()"><svg class="fav-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg> Favorites</button>
     </div>
     <div class="bank-filter-row" id="know-diff-filters" style="margin-bottom:1rem;">
       <span class="filter-pill active" onclick="setListFilter('know','all',this)">All</span>
