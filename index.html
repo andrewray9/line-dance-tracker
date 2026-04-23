@@ -245,8 +245,10 @@
     .dance-list{display:flex;flex-direction:column;gap:6px;}
     .dance-item{display:flex;align-items:center;gap:10px;padding:11px 15px;border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);}
     .dance-item .name{flex:1;font-size:14px;font-weight:500;}
-    .fav-btn{background:none;border:none;cursor:pointer;font-size:18px;line-height:1;padding:0 2px;color:var(--t3);transition:color 0.15s;}
-    .fav-btn.active{color:#D4537E;}.fav-btn:hover{color:#D4537E;}
+    .fav-btn{background:none;border:none;cursor:pointer;font-size:18px;line-height:1;padding:0 2px;color:var(--t3);transition:color 0.15s;display:inline-flex;align-items:center;}
+    .fav-btn svg{width:16px;height:16px;fill:#b0afab;transition:fill 0.15s;}
+    .fav-btn.active svg{fill:#D4537E;}
+    .fav-btn:hover svg{fill:#D4537E;}
 
     /* DANCE BANK */
     .bank-controls{margin-bottom:1.25rem;}
@@ -2411,7 +2413,7 @@ function renderBank(){
       // Remove button + promote button
       const removeBtn=`<button class="btn sm danger" onclick="removeFromList('${bankView}','${esc(d.name)}')">&#10005; Remove</button>`;
       const promoteBtn=bankView==='learn'?`<button class="btn sm success" onclick="addFromBank('know','${esc(d.name)}')">&#43; I Know It</button>`:'';
-      const favBtn=bankView==='know'?`<button class="fav-btn ${isFav(d.id)?'active':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" title="${isFav(d.id)?'Unfavorite':'Favorite'}" style="font-size:16px;margin-right:2px;">&#10084;</button>`:'';
+      const favBtn=bankView==='know'?`<button class="fav-btn ${isFav(d.id)?'active':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" title="${isFav(d.id)?'Unfavorite':'Favorite'}" style="margin-right:2px;"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg></button>`:'';
       const hasBody=demoBtn||tutBtn||spotifyBtn||statPills||removeBtn;
       const itemId='bview-'+d.id;
       return `<div class="bank-item" id="${itemId}">
@@ -2447,7 +2449,7 @@ function renderBank(){
     const knowEntry=state.know.find(k=>k.name.toLowerCase()===d.name.toLowerCase());
     const knowId=knowEntry?knowEntry.id:null;
     const favId=knowId||d.id;
-    const favBtn=`<button class="fav-btn ${isFav(favId)?'active':''}" onclick="event.stopPropagation();toggleFav('${favId}')" title="${isFav(favId)?'Unfavorite':'Favorite'}" style="font-size:16px;margin-right:2px;">&#10084;</button>`;
+    const favBtn=`<button class="fav-btn ${isFav(favId)?'active':''}" onclick="event.stopPropagation();toggleFav('${favId}')" title="${isFav(favId)?'Unfavorite':'Favorite'}" style="margin-right:2px;"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg></button>`;
     const diffBadge=d.difficulty?`<span class="diff-badge diff-${d.difficulty}">${d.difficulty}</span>`:'';
     const statusPill=inKnow?`<span class="diff-badge" style="background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border)">&#10003; I Know It</span>`:inLearn?`<span class="diff-badge" style="background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border)">&#9733; Learning</span>`:'';
     const demoBtn=d.demo?`<a class="link-btn demo" href="${escA(d.demo)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#9654; Demo</a>`:'';
@@ -2830,7 +2832,7 @@ function renderList(type){
       <button class="btn sm danger" onclick="removeDance('${type}','${d.id}')">Remove</button>`;
     return `<div class="bank-item" id="list-item-${d.id}">
       <div class="bank-item-head" onclick="this.parentElement.classList.toggle('open')">
-        ${type==='know'?`<button class="fav-btn ${isFav(d.id)?'active':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" title="${isFav(d.id)?'Unfavorite':'Favorite'}" style="font-size:16px;margin-right:2px;">&#10084;</button>`:''}
+        ${type==='know'?`<button class="fav-btn ${isFav(d.id)?'active':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" title="${isFav(d.id)?'Unfavorite':'Favorite'}" style="margin-right:2px;"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg></button>`:''}
         <span class="bank-item-name">${esc(d.name)}</span>
         <div class="bank-item-meta">${diffBadge}</div>
         <span class="bank-item-caret">&#9660;</span>
