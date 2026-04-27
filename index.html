@@ -1629,6 +1629,17 @@ window.addEventListener('online', async ()=>{
   if(!currentUser) return;
   if(retryQueued){
     await flushRetryQueue();
+    // Block UI during the pause so no edits can be made before we read back
+    let blocker = document.getElementById('sync-blocker');
+    if(!blocker){
+      blocker = document.createElement('div');
+      blocker.id = 'sync-blocker';
+      blocker.style.cssText = 'position:fixed;inset:0;z-index:9999;cursor:wait;';
+      document.body.appendChild(blocker);
+    }
+    // Wait briefly so the DB write has time to propagate before we read back
+    await new Promise(res => setTimeout(res, 500));
+    blocker.remove();
   }
   // Always refresh from cloud after reconnecting
   if(!retryQueued) await refreshFromCloud();
