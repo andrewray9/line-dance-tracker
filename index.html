@@ -1553,10 +1553,10 @@ async function sbFetch(path, options={}) {
   return { ok: res.ok, status: res.status, data: text ? JSON.parse(text) : null };
 }
 
-// ---- Cloud-only save ----
-// All changes are saved directly to the cloud. If the save fails the caller
-// is responsible for reverting the change and showing an error to the user.
-// No local cache is used — the cloud is always the source of truth.
+// ---- Cloud-only save with retry queue ----
+// All changes are saved directly to the cloud. If a save fails, the current
+// state snapshot is queued and retried automatically when the connection
+// is restored. The cloud is always the source of truth.
 
 function setSyncStatus(t,l){
   const dot=document.getElementById('sync-dot');
@@ -1565,7 +1565,39 @@ function setSyncStatus(t,l){
   if(lbl) lbl.textContent=l;
 }
 
-// Returns true on success, false on failure.
+// Retry queue — holds the most recent failed state snapshot.
+// We only ever need the latest snapshot since each save sends the full state.
+let retryQueued = false;
+let retryInProgress = false;
+
+async function flushRetryQueue(){
+  if(!retryQueued || retryInProgress || !currentUser) return;
+  retryInProgress = true;
+  setSyncStatus('syncing','Reconnected — syncing...');
+  try{
+    const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(currentUser)}`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:state,updated_at:new Date().toISOString()})});
+    if(r.ok){
+      retryQueued = false;
+      setSyncStatus('synced','Synced');
+      // Notify any open Night page that the pending save went through
+      const msg=document.getElementById('save-msg');
+      if(msg && msg.dataset.pending==='1'){
+        msg.textContent='Saved';msg.style.color='';msg.dataset.pending='';
+        setTimeout(()=>{ if(msg.textContent==='Saved') msg.textContent=''; },1500);
+      }
+    } else {
+      setSyncStatus('error','Changes pending — waiting for connection');
+    }
+  }catch(e){
+    setSyncStatus('error','Changes pending — waiting for connection');
+  }
+  retryInProgress = false;
+}
+
+// Fire the retry queue as soon as the device comes back online.
+window.addEventListener('online', ()=>{ if(retryQueued && currentUser) flushRetryQueue(); });
+
+// Returns true on success, false on failure (change is queued for retry).
 async function saveToCloud(){
   if(!currentUser) return false;
   setSyncStatus('syncing','Syncing...');
@@ -1573,14 +1605,17 @@ async function saveToCloud(){
   try{
     const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(currentUser)}`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:state,updated_at:new Date().toISOString()})});
     if(r.ok){
+      retryQueued = false;
       setSyncStatus('synced','Synced');
       return true;
     } else {
-      setSyncStatus('error','Not saved — check your connection');
+      retryQueued = true;
+      setSyncStatus('error','Changes pending — waiting for connection');
       return false;
     }
   }catch(e){
-    setSyncStatus('error','Not saved — check your connection');
+    retryQueued = true;
+    setSyncStatus('error','Changes pending — waiting for connection');
     return false;
   }
 }
@@ -1592,19 +1627,21 @@ function scheduleSave(){
   saveTimeout=setTimeout(saveToCloud,300);
 }
 
-// Show a temporary error banner on the My Night page when a save fails.
+// Show a temporary status message on the My Night page.
 function showNightSaveError(){
   const msg=document.getElementById('save-msg');
   if(!msg) return;
-  msg.textContent='⚠️ No connection — change not saved';
+  msg.textContent='⚠️ No connection — will retry when reconnected';
   msg.style.color='var(--red-text)';
-  setTimeout(()=>{ msg.textContent=''; msg.style.color=''; },3000);
+  msg.dataset.pending='1';
+  // Don't auto-clear — leave it visible until the retry succeeds
 }
 function showNightSaveSuccess(){
   const msg=document.getElementById('save-msg');
   if(!msg) return;
   msg.textContent='Saved';
   msg.style.color='';
+  msg.dataset.pending='';
   setTimeout(()=>{ if(msg.textContent==='Saved') msg.textContent=''; },1500);
 }
 
@@ -2697,65 +2734,42 @@ async function addDance(type){
   inp.value='';renderList(type);
   const ok=await saveToCloud();
   if(!ok){
-    state[type]=state[type].filter(d=>d.id!==newDance.id);
-    inp.value=name;renderList(type);
-    alert('Could not save — check your connection and try again.');
-    return;
+    // State keeps the change — it will sync when reconnected.
+    // If the user navigates away and comes back, the pending indicator stays visible.
+  } else {
+    syncMyCard();
   }
-  syncMyCard();
-  // If not in bank, queue as a submission for admin review
-  const inBank=bank.some(d=>d.name.toLowerCase()===name.toLowerCase());
-  const alreadyQueued=submissions.some(s=>s.name.toLowerCase()===name.toLowerCase());
-  if(!inBank&&!alreadyQueued){
-    submissions.push({id:Date.now()+'_sub',name,addedBy:currentUser,list:type,addedAt:new Date().toISOString()});
-    saveSubmissionsToCloud();
-    if(isAdmin) updateSubmissionsBadge();
+  // If not in bank, queue as a submission for admin review (only on successful save)
+  if(ok){
+    const inBank=bank.some(d=>d.name.toLowerCase()===name.toLowerCase());
+    const alreadyQueued=submissions.some(s=>s.name.toLowerCase()===name.toLowerCase());
+    if(!inBank&&!alreadyQueued){
+      submissions.push({id:Date.now()+'_sub',name,addedBy:currentUser,list:type,addedAt:new Date().toISOString()});
+      saveSubmissionsToCloud();
+      if(isAdmin) updateSubmissionsBadge();
+    }
   }
 }
 async function removeDance(type,id){
-  const prev=JSON.parse(JSON.stringify(state[type]));
-  const prevFavs=JSON.parse(JSON.stringify(state.favorites||[]));
   state[type]=state[type].filter(d=>d.id!==id);
   if(type==='know') state.favorites=(state.favorites||[]).filter(f=>f!==id);
   renderList(type);renderBank();
   const ok=await saveToCloud();
-  if(!ok){
-    state[type]=prev;
-    state.favorites=prevFavs;
-    renderList(type);renderBank();
-    alert('Could not save — check your connection and try again.');
-    return;
-  }
-  syncMyCard();
+  if(ok) syncMyCard();
 }
 async function moveToKnow(id){
   const d=state.learn.find(x=>x.id===id);if(!d)return;
-  const prevLearn=JSON.parse(JSON.stringify(state.learn));
-  const prevKnow=JSON.parse(JSON.stringify(state.know));
   state.learn=state.learn.filter(x=>x.id!==id);state.know.push({...d});
   renderList('learn');renderList('know');renderBank();
   const ok=await saveToCloud();
-  if(!ok){
-    state.learn=prevLearn;state.know=prevKnow;
-    renderList('learn');renderList('know');renderBank();
-    alert('Could not save — check your connection and try again.');
-    return;
-  }
-  syncMyCard();
+  if(ok) syncMyCard();
 }
 async function toggleFav(id){
   if(!state.favorites) state.favorites=[];
-  const wasFav=isFav(id);
-  if(wasFav) state.favorites=state.favorites.filter(f=>f!==id);
+  if(isFav(id)) state.favorites=state.favorites.filter(f=>f!==id);
   else state.favorites.push(id);
   renderList('know');renderList('learn');renderBank();
-  const ok=await saveToCloud();
-  if(!ok){
-    // Revert
-    if(wasFav) state.favorites.push(id);
-    else state.favorites=state.favorites.filter(f=>f!==id);
-    renderList('know');renderList('learn');renderBank();
-  }
+  saveToCloud();
 }
 function renderList(type){
   const el=document.getElementById(type+'-list');
@@ -2854,14 +2868,7 @@ function renderDidList(){
   el.innerHTML=dances.map(d=>`<div class="did-item">${esc(d.name)}<button class="remove" onclick="togglePick('${d.id}')" title="Remove">&#215;</button></div>`).join('');
 }
 async function togglePick(id){
-  const wasSelected = !!nightSelections[id];
-
-  // Snapshot state for revert
-  const prevNightSelections = {...nightSelections};
-  const prevDanceLog = state.danceLog ? [...state.danceLog] : [];
-  const prevNight = state.nights[selectedDate] ? JSON.parse(JSON.stringify(state.nights[selectedDate])) : undefined;
-
-  if(wasSelected){
+  if(nightSelections[id]){
     delete nightSelections[id];
     if(state.danceLog){
       state.danceLog=state.danceLog.filter(e=>!(e.danceId===id && e.date===selectedDate));
@@ -2893,28 +2900,14 @@ async function togglePick(id){
   renderPickList();renderDidList();
 
   const ok = await saveToCloud();
-  if(!ok){
-    // Revert the change
-    nightSelections = prevNightSelections;
-    state.danceLog = prevDanceLog;
-    if(prevNight !== undefined) state.nights[selectedDate] = prevNight;
-    else delete state.nights[selectedDate];
-    renderPickList();renderDidList();
-    showNightSaveError();
-  } else {
-    showNightSaveSuccess();
-  }
+  if(!ok) showNightSaveError();
+  else showNightSaveSuccess();
 }
 async function commitNightSave(){
   if(!selectedDate) return;
   const dj=document.getElementById('night-dj').value.trim();
   const arriveTime=document.getElementById('night-arrive').value||'';
   const leaveTime=document.getElementById('night-leave').value||'';
-
-  // Snapshot for revert
-  const prevNight = state.nights[selectedDate] ? JSON.parse(JSON.stringify(state.nights[selectedDate])) : undefined;
-  const prevDanceLog = state.danceLog ? [...state.danceLog] : [];
-
   const existing=getNightData(selectedDate);
   state.nights[selectedDate]={...existing,dances:Object.keys(nightSelections),dj,arriveTime,leaveTime};
   if(state.danceLog){
@@ -2923,16 +2916,9 @@ async function commitNightSave(){
   if(arriveTime||leaveTime){
     state.danceLog.push({type:'palace_times',date:selectedDate,arriveTime,leaveTime});
   }
-
   const ok = await saveToCloud();
-  if(!ok){
-    if(prevNight !== undefined) state.nights[selectedDate] = prevNight;
-    else delete state.nights[selectedDate];
-    state.danceLog = prevDanceLog;
-    showNightSaveError();
-  } else {
-    showNightSaveSuccess();
-  }
+  if(!ok) showNightSaveError();
+  else showNightSaveSuccess();
 }
 function scheduleNightSave(){
   clearTimeout(nightSaveTimeout);
@@ -3144,15 +3130,13 @@ async function commitDrewsNightSave(){
   const arriveTime=document.getElementById('drewsnight-arrive')?.value||'';
   const leaveTime=document.getElementById('drewsnight-leave')?.value||'';
   const existing=getDrewsNightData(drewsSelectedDate);
-  const prevNight=state.nights[drewsSelectedDate]?JSON.parse(JSON.stringify(state.nights[drewsSelectedDate])):undefined;
   state.nights[drewsSelectedDate]={...existing,dances:Object.keys(drewsNightSelections),notPerformed:Object.keys(drewsNotPerfSelections),dj,arriveTime,leaveTime};
   const ok=await saveToCloud();
   const msg=document.getElementById('drewsnight-save-msg');
   if(!ok){
-    if(prevNight!==undefined) state.nights[drewsSelectedDate]=prevNight; else delete state.nights[drewsSelectedDate];
-    if(msg){msg.textContent='⚠️ Not saved — check connection';msg.style.color='var(--red-text)';setTimeout(()=>{msg.textContent='';msg.style.color='';},3000);}
+    if(msg){msg.textContent='⚠️ No connection — will retry when reconnected';msg.style.color='var(--red-text)';msg.dataset.pending='1';}
   } else {
-    if(msg){msg.textContent='Saved';msg.style.color='';setTimeout(()=>{if(msg.textContent==='Saved')msg.textContent='';},1500);}
+    if(msg){msg.textContent='Saved';msg.style.color='';msg.dataset.pending='';setTimeout(()=>{if(msg.textContent==='Saved')msg.textContent='';},1500);}
   }
 }
 function scheduleDrewsNightSave(){
