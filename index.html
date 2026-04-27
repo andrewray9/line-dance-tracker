@@ -1641,8 +1641,8 @@ window.addEventListener('online', async ()=>{
     await new Promise(res => setTimeout(res, 500));
     blocker.remove();
   }
-  // Always refresh from cloud after reconnecting
-  if(!retryQueued) await refreshFromCloud();
+  // Always refresh from cloud after reconnecting (retryQueued is now false after a successful flush)
+  await refreshFromCloud();
 });
 
 // Returns true on success, false on failure (change is queued for retry).
