@@ -1553,23 +1553,10 @@ async function sbFetch(path, options={}) {
   return { ok: res.ok, status: res.status, data: text ? JSON.parse(text) : null };
 }
 
-// ---- Offline-first local cache ----
-let syncPending = false;       // true when local has unsaved changes
-let syncRetryTimer = null;     // setInterval handle for retry loop
-const LOCAL_CACHE_KEY = ()=> currentUser ? 'ld_cache_' + currentUser : null;
-
-function saveLocalCache(){
-  const key = LOCAL_CACHE_KEY(); if(!key) return;
-  try{ localStorage.setItem(key, JSON.stringify({state, savedAt: new Date().toISOString()})); }catch(e){}
-}
-function loadLocalCache(){
-  const key = LOCAL_CACHE_KEY(); if(!key) return null;
-  try{ const raw=localStorage.getItem(key); return raw?JSON.parse(raw):null; }catch(e){return null;}
-}
-function clearLocalCache(){
-  const key = LOCAL_CACHE_KEY(); if(!key) return;
-  try{ localStorage.removeItem(key); }catch(e){}
-}
+// ---- Cloud-only save ----
+// All changes are saved directly to the cloud. If the save fails the caller
+// is responsible for reverting the change and showing an error to the user.
+// No local cache is used — the cloud is always the source of truth.
 
 function setSyncStatus(t,l){
   const dot=document.getElementById('sync-dot');
@@ -1578,75 +1565,47 @@ function setSyncStatus(t,l){
   if(lbl) lbl.textContent=l;
 }
 
+// Returns true on success, false on failure.
 async function saveToCloud(){
-  if(!currentUser) return;
-  // Always write to local cache first — data is never lost
-  saveLocalCache();
+  if(!currentUser) return false;
   setSyncStatus('syncing','Syncing...');
   if(isAdmin) drewDJFreestyles=state.djFreestyles||{};
   try{
     const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(currentUser)}`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:state,updated_at:new Date().toISOString()})});
     if(r.ok){
-      syncPending=false;
-      clearLocalCache();
       setSyncStatus('synced','Synced');
-      stopSyncRetry();
+      return true;
     } else {
-      syncPending=true;
-      setSyncStatus('error','Saved locally — will sync when reconnected');
-      startSyncRetry();
+      setSyncStatus('error','Not saved — check your connection');
+      return false;
     }
   }catch(e){
-    syncPending=true;
-    setSyncStatus('error','Saved locally — will sync when reconnected');
-    startSyncRetry();
+    setSyncStatus('error','Not saved — check your connection');
+    return false;
   }
 }
 
-function startSyncRetry(){
-  if(syncRetryTimer) return; // already running
-  syncRetryTimer=setInterval(async()=>{
-    if(!syncPending||!currentUser) return;
-    if(!navigator.onLine) return;
-    setSyncStatus('syncing','Retrying sync...');
-    try{
-      const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(currentUser)}`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:state,updated_at:new Date().toISOString()})});
-      if(r.ok){
-        syncPending=false;
-        clearLocalCache();
-        setSyncStatus('synced','Synced');
-        stopSyncRetry();
-      }
-    }catch(e){}
-  }, 20000); // retry every 20 seconds
-}
-
-function stopSyncRetry(){
-  if(syncRetryTimer){ clearInterval(syncRetryTimer); syncRetryTimer=null; }
-}
-
-// Fire immediately when the device comes back online
-window.addEventListener('online', ()=>{
-  if(syncPending && currentUser){
-    setSyncStatus('syncing','Back online — syncing...');
-    saveToCloud();
-  }
-  if(friendCardSyncPending && currentUser){
-    pushFriendCardsToCloud();
-  }
-});
-
-window.addEventListener('offline', ()=>{
-  if(currentUser && (syncPending || friendCardSyncPending)){
-    setSyncStatus('error','Offline — saved locally');
-  }
-});
-
+// scheduleSave is kept for compatibility with non-critical saves (DJ records,
+// freestyle timers, etc.) that don't need revert logic.
 function scheduleSave(){
-  // Write to local cache immediately, then debounce cloud push
-  if(currentUser){ saveLocalCache(); syncPending=true; }
   clearTimeout(saveTimeout);
   saveTimeout=setTimeout(saveToCloud,300);
+}
+
+// Show a temporary error banner on the My Night page when a save fails.
+function showNightSaveError(){
+  const msg=document.getElementById('save-msg');
+  if(!msg) return;
+  msg.textContent='⚠️ No connection — change not saved';
+  msg.style.color='var(--red-text)';
+  setTimeout(()=>{ msg.textContent=''; msg.style.color=''; },3000);
+}
+function showNightSaveSuccess(){
+  const msg=document.getElementById('save-msg');
+  if(!msg) return;
+  msg.textContent='Saved';
+  msg.style.color='';
+  setTimeout(()=>{ if(msg.textContent==='Saved') msg.textContent=''; },1500);
 }
 
 async function loadBank(){
@@ -2033,33 +1992,9 @@ function enterApp(username){
   recRefresh();
   if(greet){greet.textContent='Where would you like to go?';}
   // Retrieve and remove the cloud timestamp stashed during login
-  const cloudUpdatedAt = state.__cloudUpdatedAt || null;
   delete state.__cloudUpdatedAt;
-
-  // Check if there's a more recent locally-cached state (from a failed sync last session).
-  // Only use local if it is provably NEWER than the cloud — never blindly override cloud data,
-  // which would cause changes made on another device to be wiped out.
-  const cached=loadLocalCache();
-  if(cached && cached.state && cached.savedAt){
-    const localIsNewer = !cloudUpdatedAt || new Date(cached.savedAt) > new Date(cloudUpdatedAt);
-    if(localIsNewer){
-      state=cached.state;
-      if(!state.djFreestyles) state.djFreestyles={};
-      if(!state.favorites) state.favorites=[];
-      if(!state.danceLog) state.danceLog=[];
-      if(!state.favoriteFriends) state.favoriteFriends=[];
-      if(!state.drewsNights) state.drewsNights={};
-      syncPending=true;
-      setSyncStatus('error','Unsynced changes found — syncing now...');
-      saveToCloud();
-    } else {
-      // Cloud data is same age or newer — discard the stale local cache and trust the cloud
-      clearLocalCache();
-      setSyncStatus('synced','Synced');
-    }
-  } else {
-    setSyncStatus('synced','Synced');
-  }
+  // Cloud is always the source of truth — no local cache to merge.
+  setSyncStatus('synced','Synced');
   // Check if there's a pending friend card save from a previous session
   const cachedCard=loadFriendCardCache();
   if(cachedCard){
@@ -2087,9 +2022,7 @@ function enterApp(username){
 }
 
 function logout() {
-  stopSyncRetry();
   stopFriendCardRetry();
-  syncPending=false;
   friendCardSyncPending=false;
   currentUser = null;
   isAdmin = false;
@@ -2219,21 +2152,9 @@ async function tryAutoLogin() {
     logout();
     hideSplash();
   } catch(e) {
-    // On network error, try to load from local cache so the app still works offline
-    const cached = loadLocalCache();
-    if (cached && cached.state && savedUser) {
-      state = cached.state;
-      if (!state.djFreestyles) state.djFreestyles = {};
-      if (!state.favorites) state.favorites = [];
-      if (!state.danceLog) state.danceLog = [];
-      if (!state.favoriteFriends) state.favoriteFriends = [];
-      if (!state.drewsNights) state.drewsNights = {};
-      enterApp(savedUser);
-      setSyncStatus('error', 'Offline — using cached data');
-    } else {
-      logout();
-      hideSplash();
-    }
+    // Network error during login — cannot load data without cloud connection
+    logout();
+    hideSplash();
   }
 }
 // ---- Tabs ----
@@ -2749,12 +2670,6 @@ function adminEditUser(username){
 
 // ---- My lists ----
 function isFav(id){return(state.favorites||[]).includes(id);}
-function toggleFav(id){
-  if(!state.favorites) state.favorites=[];
-  if(isFav(id)) state.favorites=state.favorites.filter(f=>f!==id);
-  else state.favorites.push(id);
-  renderList('know');renderList('learn');renderBank();scheduleSave();
-}
 function toggleBankFavFilter(){
   bankFavFilterActive=!bankFavFilterActive;
   const btn=document.getElementById('bank-fav-btn');
@@ -2774,11 +2689,20 @@ function syncMyCard(){
   friendCards[idx].updatedAt=new Date().toISOString();
   saveFriendCardsToCloud();
 }
-function addDance(type){
+async function addDance(type){
   const inp=document.getElementById(type+'-input');
   const name=inp.value.trim();if(!name)return;
-  state[type].push({id:Date.now()+'',name,added:new Date().toISOString()});
-  inp.value='';renderList(type);scheduleSave();syncMyCard();
+  const newDance={id:Date.now()+'',name,added:new Date().toISOString()};
+  state[type].push(newDance);
+  inp.value='';renderList(type);
+  const ok=await saveToCloud();
+  if(!ok){
+    state[type]=state[type].filter(d=>d.id!==newDance.id);
+    inp.value=name;renderList(type);
+    alert('Could not save — check your connection and try again.');
+    return;
+  }
+  syncMyCard();
   // If not in bank, queue as a submission for admin review
   const inBank=bank.some(d=>d.name.toLowerCase()===name.toLowerCase());
   const alreadyQueued=submissions.some(s=>s.name.toLowerCase()===name.toLowerCase());
@@ -2788,15 +2712,50 @@ function addDance(type){
     if(isAdmin) updateSubmissionsBadge();
   }
 }
-function removeDance(type,id){
+async function removeDance(type,id){
+  const prev=JSON.parse(JSON.stringify(state[type]));
+  const prevFavs=JSON.parse(JSON.stringify(state.favorites||[]));
   state[type]=state[type].filter(d=>d.id!==id);
   if(type==='know') state.favorites=(state.favorites||[]).filter(f=>f!==id);
-  renderList(type);renderBank();scheduleSave();syncMyCard();
+  renderList(type);renderBank();
+  const ok=await saveToCloud();
+  if(!ok){
+    state[type]=prev;
+    state.favorites=prevFavs;
+    renderList(type);renderBank();
+    alert('Could not save — check your connection and try again.');
+    return;
+  }
+  syncMyCard();
 }
-function moveToKnow(id){
+async function moveToKnow(id){
   const d=state.learn.find(x=>x.id===id);if(!d)return;
+  const prevLearn=JSON.parse(JSON.stringify(state.learn));
+  const prevKnow=JSON.parse(JSON.stringify(state.know));
   state.learn=state.learn.filter(x=>x.id!==id);state.know.push({...d});
-  renderList('learn');renderList('know');renderBank();scheduleSave();syncMyCard();
+  renderList('learn');renderList('know');renderBank();
+  const ok=await saveToCloud();
+  if(!ok){
+    state.learn=prevLearn;state.know=prevKnow;
+    renderList('learn');renderList('know');renderBank();
+    alert('Could not save — check your connection and try again.');
+    return;
+  }
+  syncMyCard();
+}
+async function toggleFav(id){
+  if(!state.favorites) state.favorites=[];
+  const wasFav=isFav(id);
+  if(wasFav) state.favorites=state.favorites.filter(f=>f!==id);
+  else state.favorites.push(id);
+  renderList('know');renderList('learn');renderBank();
+  const ok=await saveToCloud();
+  if(!ok){
+    // Revert
+    if(wasFav) state.favorites.push(id);
+    else state.favorites=state.favorites.filter(f=>f!==id);
+    renderList('know');renderList('learn');renderBank();
+  }
 }
 function renderList(type){
   const el=document.getElementById(type+'-list');
@@ -2894,16 +2853,21 @@ function renderDidList(){
   if(!dances.length){el.innerHTML=`<div class="empty" style="padding:1.5rem .5rem">Nothing selected yet</div>`;return;}
   el.innerHTML=dances.map(d=>`<div class="did-item">${esc(d.name)}<button class="remove" onclick="togglePick('${d.id}')" title="Remove">&#215;</button></div>`).join('');
 }
-function togglePick(id){
-  if(nightSelections[id]){
+async function togglePick(id){
+  const wasSelected = !!nightSelections[id];
+
+  // Snapshot state for revert
+  const prevNightSelections = {...nightSelections};
+  const prevDanceLog = state.danceLog ? [...state.danceLog] : [];
+  const prevNight = state.nights[selectedDate] ? JSON.parse(JSON.stringify(state.nights[selectedDate])) : undefined;
+
+  if(wasSelected){
     delete nightSelections[id];
-    // Remove log entries for this dance on the current date
     if(state.danceLog){
       state.danceLog=state.danceLog.filter(e=>!(e.danceId===id && e.date===selectedDate));
     }
   } else {
     nightSelections[id]=true;
-    // Record exact local timestamp + DJ when a dance is selected
     const dance=state.know.find(d=>d.id===id);
     const dj=document.getElementById('night-dj').value.trim();
     const now=new Date();
@@ -2918,13 +2882,39 @@ function togglePick(id){
     if(!state.danceLog) state.danceLog=[];
     state.danceLog.push(entry);
   }
-  renderPickList();renderDidList();scheduleNightSave();
-}
-function commitNightSave(){
-  if(!selectedDate)return;
+
+  // Commit night to state immediately so the save includes this change
   const dj=document.getElementById('night-dj').value.trim();
   const arriveTime=document.getElementById('night-arrive').value||'';
   const leaveTime=document.getElementById('night-leave').value||'';
+  const existing=getNightData(selectedDate);
+  state.nights[selectedDate]={...existing,dances:Object.keys(nightSelections),dj,arriveTime,leaveTime};
+
+  renderPickList();renderDidList();
+
+  const ok = await saveToCloud();
+  if(!ok){
+    // Revert the change
+    nightSelections = prevNightSelections;
+    state.danceLog = prevDanceLog;
+    if(prevNight !== undefined) state.nights[selectedDate] = prevNight;
+    else delete state.nights[selectedDate];
+    renderPickList();renderDidList();
+    showNightSaveError();
+  } else {
+    showNightSaveSuccess();
+  }
+}
+async function commitNightSave(){
+  if(!selectedDate) return;
+  const dj=document.getElementById('night-dj').value.trim();
+  const arriveTime=document.getElementById('night-arrive').value||'';
+  const leaveTime=document.getElementById('night-leave').value||'';
+
+  // Snapshot for revert
+  const prevNight = state.nights[selectedDate] ? JSON.parse(JSON.stringify(state.nights[selectedDate])) : undefined;
+  const prevDanceLog = state.danceLog ? [...state.danceLog] : [];
+
   const existing=getNightData(selectedDate);
   state.nights[selectedDate]={...existing,dances:Object.keys(nightSelections),dj,arriveTime,leaveTime};
   if(state.danceLog){
@@ -2933,13 +2923,16 @@ function commitNightSave(){
   if(arriveTime||leaveTime){
     state.danceLog.push({type:'palace_times',date:selectedDate,arriveTime,leaveTime});
   }
-  // Write to local cache immediately so data is safe regardless of connectivity
-  saveLocalCache();
-  syncPending=true;
-  const msg=document.getElementById('save-msg');
-  if(msg){msg.textContent='Saved locally';setTimeout(()=>{if(msg.textContent==='Saved locally')msg.textContent='';},2000);}
-  clearTimeout(saveTimeout);
-  saveToCloud();
+
+  const ok = await saveToCloud();
+  if(!ok){
+    if(prevNight !== undefined) state.nights[selectedDate] = prevNight;
+    else delete state.nights[selectedDate];
+    state.danceLog = prevDanceLog;
+    showNightSaveError();
+  } else {
+    showNightSaveSuccess();
+  }
 }
 function scheduleNightSave(){
   clearTimeout(nightSaveTimeout);
@@ -3145,20 +3138,22 @@ function toggleDrewsNotPerf(id){
   }
   renderDrewsNotPerfList();renderDrewsDidList();scheduleDrewsNightSave();
 }
-function commitDrewsNightSave(){
+async function commitDrewsNightSave(){
   if(!drewsSelectedDate) return;
   const dj=document.getElementById('drewsnight-dj')?.value.trim()||'';
   const arriveTime=document.getElementById('drewsnight-arrive')?.value||'';
   const leaveTime=document.getElementById('drewsnight-leave')?.value||'';
   const existing=getDrewsNightData(drewsSelectedDate);
-  // Save performed dances to state.nights so analytics picks them up
+  const prevNight=state.nights[drewsSelectedDate]?JSON.parse(JSON.stringify(state.nights[drewsSelectedDate])):undefined;
   state.nights[drewsSelectedDate]={...existing,dances:Object.keys(drewsNightSelections),notPerformed:Object.keys(drewsNotPerfSelections),dj,arriveTime,leaveTime};
-  saveLocalCache();
-  syncPending=true;
+  const ok=await saveToCloud();
   const msg=document.getElementById('drewsnight-save-msg');
-  if(msg){msg.textContent='Saved locally';setTimeout(()=>{if(msg.textContent==='Saved locally')msg.textContent='';},2000);}
-  clearTimeout(saveTimeout);
-  saveToCloud();
+  if(!ok){
+    if(prevNight!==undefined) state.nights[drewsSelectedDate]=prevNight; else delete state.nights[drewsSelectedDate];
+    if(msg){msg.textContent='⚠️ Not saved — check connection';msg.style.color='var(--red-text)';setTimeout(()=>{msg.textContent='';msg.style.color='';},3000);}
+  } else {
+    if(msg){msg.textContent='Saved';msg.style.color='';setTimeout(()=>{if(msg.textContent==='Saved')msg.textContent='';},1500);}
+  }
 }
 function scheduleDrewsNightSave(){
   clearTimeout(drewsNightSaveTimeout);
@@ -5282,8 +5277,6 @@ function flushPendingSaves(){
   if(!currentUser) return;
   const nightPending = nightSaveTimeout != null;
   const savePending  = saveTimeout != null;
-  // Always write to local cache so nothing is lost if the network call doesn't complete
-  saveLocalCache();
   if(nightPending){ clearTimeout(nightSaveTimeout); nightSaveTimeout=null; commitNightSave(); return; }
   if(savePending){  clearTimeout(saveTimeout);  saveTimeout=null;  saveToCloud(); }
 }
