@@ -1594,8 +1594,45 @@ async function flushRetryQueue(){
   retryInProgress = false;
 }
 
-// Fire the retry queue as soon as the device comes back online.
-window.addEventListener('online', ()=>{ if(retryQueued && currentUser) flushRetryQueue(); });
+// Re-fetch state from the cloud and re-render the current tab.
+// Called when the connection is restored and there are no pending local changes.
+async function refreshFromCloud(){
+  if(!currentUser) return;
+  setSyncStatus('syncing','Refreshing...');
+  try{
+    const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(currentUser)}&select=data`);
+    if(r.ok && r.data && r.data.length>0){
+      state = r.data[0].data || {know:[],learn:[],nights:{},djFreestyles:{},favorites:[],favoriteFriends:[]};
+      if(!state.djFreestyles) state.djFreestyles={};
+      if(!state.favorites) state.favorites=[];
+      if(!state.danceLog) state.danceLog=[];
+      if(!state.favoriteFriends) state.favoriteFriends=[];
+      if(!state.drewsNights) state.drewsNights={};
+      if(isAdmin) drewDJFreestyles=state.djFreestyles||{};
+      // Re-render everything that could have changed on another device
+      renderBank();renderList('know');renderList('learn');renderDJRecords();renderPicks();
+      // Re-render the active tab so its content is up to date
+      if(currentTabName) switchTab(currentTabName);
+      setSyncStatus('synced','Synced');
+    } else {
+      setSyncStatus('synced','Synced');
+    }
+  }catch(e){
+    setSyncStatus('synced','Synced');
+  }
+}
+
+// When the connection comes back:
+// — if we have pending changes, flush them to the cloud first then refresh
+// — otherwise just refresh so the page shows the latest data from any device
+window.addEventListener('online', async ()=>{
+  if(!currentUser) return;
+  if(retryQueued){
+    await flushRetryQueue();
+  }
+  // Always refresh from cloud after reconnecting
+  if(!retryQueued) await refreshFromCloud();
+});
 
 // Returns true on success, false on failure (change is queued for retry).
 async function saveToCloud(){
