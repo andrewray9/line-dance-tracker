@@ -123,6 +123,37 @@
     .changelog-add-row input{padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;}
     .changelog-add-row input:focus{outline:none;border-color:var(--b1);}
     .changelog-add-row input::placeholder{color:var(--t3);}
+
+    /* CUSTOM LISTS */
+    .cl-modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;padding:1rem;}
+    .cl-modal-card{background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);width:100%;max-width:520px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;}
+    .cl-modal-head{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem 1rem;border-bottom:0.5px solid var(--b3);}
+    .cl-modal-head h2{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;}
+    .cl-modal-close{background:none;border:none;font-size:22px;line-height:1;cursor:pointer;color:var(--t3);padding:0;font-family:inherit;}
+    .cl-modal-close:hover{color:var(--t1);}
+    .cl-modal-body{padding:1.25rem 1.5rem;overflow-y:auto;flex:1;}
+    .cl-modal-footer{padding:.75rem 1.5rem 1.25rem;border-top:0.5px solid var(--b3);display:flex;gap:8px;justify-content:flex-end;}
+    .cl-dance-checklist{display:flex;flex-direction:column;gap:4px;max-height:300px;overflow-y:auto;border:0.5px solid var(--b3);border-radius:var(--radius-md);padding:6px;}
+    .cl-dance-check-item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;cursor:pointer;transition:background 0.1s;}
+    .cl-dance-check-item:hover{background:var(--bg2);}
+    .cl-dance-check-item input[type=checkbox]{width:15px;height:15px;accent-color:var(--t1);cursor:pointer;flex-shrink:0;}
+    .cl-dance-check-item label{font-size:13px;color:var(--t1);cursor:pointer;flex:1;}
+    .cl-check-search{width:100%;padding:8px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;margin-bottom:6px;}
+    .cl-check-search:focus{outline:none;border-color:var(--b1);}
+    .custom-list-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 12px 5px 14px;border-radius:999px;border:1.5px solid var(--purple-border);background:var(--bg2);color:var(--purple-text);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all 0.15s;}
+    .custom-list-pill:hover{background:var(--purple-bg);}
+    .custom-list-pill.active{background:var(--purple-bg);border-color:var(--purple-border);}
+    .admin-custom-list-item{border:0.5px solid var(--b3);border-radius:var(--radius-md);background:var(--bg);margin-bottom:8px;overflow:hidden;}
+    .admin-custom-list-head{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;}
+    .admin-custom-list-head:hover{background:var(--bg2);}
+    .admin-custom-list-head .acl-name{font-size:14px;font-weight:500;flex:1;}
+    .admin-custom-list-head .acl-count{font-size:12px;color:var(--t3);}
+    .admin-custom-list-body{display:none;padding:12px 14px;border-top:0.5px solid var(--b3);background:var(--bg2);}
+    .admin-custom-list-item.open .admin-custom-list-body{display:block;}
+    .admin-custom-list-item.open .admin-custom-list-head{background:var(--bg2);}
+    @media(prefers-color-scheme:dark){
+      .custom-list-pill.active{background:var(--purple-bg);}
+    }
     @media(prefers-color-scheme:dark){
       .tab[data-tab="home"].active{background:#2d1f3d;color:#c084fc;border-color:#7e22ce;}
       .tab[data-tab="bank"].active{background:#0e1e2e;color:#6ab4f5;border-color:#1a5a9e;}
@@ -290,6 +321,17 @@
     .link-btn.tutorial{background:var(--green-bg);color:var(--green-text);border-color:var(--green-border);}
     .link-btn.spotify{background:#e8f9ef;color:#1a7a3f;border-color:#5ecb82;}
     @media(prefers-color-scheme:dark){.link-btn.spotify{background:#0a2e18;color:#4ade80;border-color:#16a34a;}}
+    /* Multi-spotify editor */
+    .sp-links-editor{display:flex;flex-direction:column;gap:6px;margin-bottom:6px;}
+    .sp-link-row{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:center;}
+    @media(max-width:540px){.sp-link-row{grid-template-columns:1fr auto;}.sp-link-row .sp-link-url{grid-column:1/-2;}}
+    .sp-link-row input{padding:7px 10px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;width:100%;}
+    .sp-link-row input:focus{outline:none;border-color:var(--b1);}
+    .sp-link-row input::placeholder{color:var(--t3);}
+    .sp-link-remove{background:none;border:0.5px solid var(--red-border);color:var(--red-text);border-radius:var(--radius-md);padding:5px 9px;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;flex-shrink:0;transition:background 0.1s;}
+    .sp-link-remove:hover{background:var(--red-bg);}
+    .sp-add-link-btn{font-size:12px;font-weight:500;padding:5px 12px;border-radius:20px;border:0.5px solid var(--green-border);background:var(--green-bg);color:var(--green-text);cursor:pointer;font-family:'DM Sans',sans-serif;align-self:flex-start;transition:opacity 0.1s;}
+    .sp-add-link-btn:hover{opacity:0.8;}
     .in-bank-badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border);white-space:nowrap;}
 
     /* SPOTIFY PLAYLIST MODAL */
@@ -986,6 +1028,7 @@
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
         <button class="btn sm" id="rec-toggle-btn" onclick="toggleRecWidget()" style="background:var(--amber-bg);color:var(--amber-text);border-color:var(--amber-border);">Need a Suggestion?</button>
         <button class="btn sm info" onclick="openSuggestModal()">&#43; Suggest a Dance</button>
+        <button class="btn sm" id="admin-create-list-btn" onclick="openCustomListModal()" style="display:none;background:var(--purple-bg);color:var(--purple-text);border-color:var(--purple-border);">&#9998; Create List</button>
       </div>
     </div>
     <!-- RECOMMENDATION WIDGET (collapsed by default) -->
@@ -1020,6 +1063,11 @@
         <span class="filter-pill" id="bank-view-all-pill" onclick="setBankView('all',this)" style="background:var(--t1);color:var(--bg);border-color:var(--t1);">All Dances</span>
         <span class="filter-pill" id="bank-view-know-pill" onclick="setBankView('know',this)" style="color:var(--green-text);border-color:var(--green-border);">&#10003; I Know</span>
         <span class="filter-pill" id="bank-view-learn-pill" onclick="setBankView('learn',this)" style="color:var(--blue-text);border-color:var(--blue-border);">&#9733; Want to Learn</span>
+        <span class="filter-pill" id="bank-view-new-pill" onclick="setBankView('new',this)" style="color:var(--amber-text);border-color:var(--amber-border);"> Other</span>
+      </div>
+      <div id="bank-custom-lists-row" style="display:none;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center;">
+        <span style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;padding:4px 2px;white-space:nowrap;">Custom:</span>
+        <div id="bank-custom-list-pills" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
       </div>
     </div>
     <div id="bank-list"></div>
@@ -1366,7 +1414,10 @@
           <input type="text" id="bank-name" placeholder="Dance name" class="full">
           <input type="url" id="bank-demo" placeholder="Demo link (YouTube URL)">
           <input type="url" id="bank-tutorial" placeholder="Tutorial link (YouTube URL)">
-          <input type="url" id="bank-spotify" placeholder="Spotify link (optional)" class="full">
+          <div class="full" style="display:flex;flex-direction:column;gap:6px;">
+            <div id="bank-spotify-editor" class="sp-links-editor"></div>
+            <button type="button" class="sp-add-link-btn" onclick="spEditorAddRow('bank-spotify-editor')">+ Add Spotify link</button>
+          </div>
           <select id="bank-diff" class="full">
             <option value="">Difficulty (optional)</option>
             <option value="Beginner">Beginner</option>
@@ -1419,6 +1470,16 @@
         <div id="admin-tab-visibility-list" style="display:flex;flex-direction:column;gap:6px;"></div>
       </div>
     </div>
+    <div class="admin-section-collapsible collapsed" id="admin-custom-lists-section">
+      <div class="admin-section-header" onclick="toggleAdminSection('admin-custom-lists-section');renderAdminCustomLists()">&#9783; Custom Dance Lists <span class="admin-caret">&#9660;</span></div>
+      <div class="admin-section-body">
+        <p style="font-size:13px;color:var(--t2);margin-bottom:1rem;">Create and manage custom dance lists visible on the Dance Bank page for all users.</p>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:1rem;">
+          <button class="btn amber" onclick="openCustomListModal()">&#43; New List</button>
+        </div>
+        <div id="admin-custom-lists-list"><div class="empty">No custom lists yet.</div></div>
+      </div>
+    </div>
   </div>
 
   <!-- MOD PANEL -->
@@ -1439,7 +1500,10 @@
           <input type="text" id="mod-bank-name" placeholder="Dance name" class="full">
           <input type="url" id="mod-bank-demo" placeholder="Demo link (YouTube URL)">
           <input type="url" id="mod-bank-tutorial" placeholder="Tutorial link (YouTube URL)">
-          <input type="url" id="mod-bank-spotify" placeholder="Spotify link (optional)" class="full">
+          <div class="full" style="display:flex;flex-direction:column;gap:6px;">
+            <div id="mod-bank-spotify-editor" class="sp-links-editor"></div>
+            <button type="button" class="sp-add-link-btn" onclick="spEditorAddRow('mod-bank-spotify-editor')">+ Add Spotify link</button>
+          </div>
           <select id="mod-bank-diff" class="full">
             <option value="">Difficulty (optional)</option>
             <option value="Beginner">Beginner</option>
@@ -1513,6 +1577,32 @@
     <div id="changelog-list"><div class="empty">No changelog entries yet.</div></div>
   </div>
 
+</div>
+
+<!-- CUSTOM LIST MODAL -->
+<div class="cl-modal-overlay" id="custom-list-modal" style="display:none;" onclick="if(event.target===this)closeCustomListModal()">
+  <div class="cl-modal-card">
+    <div class="cl-modal-head">
+      <h2 id="custom-list-modal-title">Create a List</h2>
+      <button class="cl-modal-close" onclick="closeCustomListModal()">&#215;</button>
+    </div>
+    <div class="cl-modal-body">
+      <div style="margin-bottom:1rem;">
+        <label style="display:block;font-size:12px;font-weight:500;color:var(--t2);margin-bottom:5px;">List name <span style="color:var(--red-text)">*</span></label>
+        <input type="text" id="custom-list-name-input" placeholder="e.g. Tonight's Setlist" style="width:100%;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;">
+      </div>
+      <div style="margin-bottom:.5rem;">
+        <label style="display:block;font-size:12px;font-weight:500;color:var(--t2);margin-bottom:5px;">Select dances from the bank</label>
+        <input type="text" class="cl-check-search" id="custom-list-dance-search" placeholder="Search dances..." oninput="renderCustomListDanceChecklist()">
+        <div class="cl-dance-checklist" id="custom-list-dance-checklist"></div>
+      </div>
+      <div style="font-size:12px;color:var(--t3);margin-top:6px;"><span id="custom-list-selected-count">0</span> dances selected</div>
+    </div>
+    <div class="cl-modal-footer">
+      <button class="btn" onclick="closeCustomListModal()">Cancel</button>
+      <button class="btn primary" id="custom-list-save-btn" onclick="saveCustomList()">Create List</button>
+    </div>
+  </div>
 </div>
 
 <!-- CHANGELOG POPUP MODAL -->
@@ -1599,6 +1689,7 @@ let djList=[]; // shared list of DJs managed by admin
 let modList=[]; // shared list of moderator usernames
 let homeConfig={}; // admin-configurable home card gradients
 let tabVisibilityConfig={}; // admin-configurable tab visibility per role
+let customLists=[]; // admin-created custom dance lists
 
 // Tabs that can have their visibility toggled per role by the admin.
 // 'alwaysFor' lists roles that always see it (not toggleable).
@@ -1624,7 +1715,7 @@ let drewsNightSortState={pick:true,notperf:true};
 let isSignUp=false,saveTimeout=null,nightSaveTimeout=null;
 let bankFilter='all';
 let listFilter={know:'all',learn:'all'};
-let bankView='all'; // 'all' | 'know' | 'learn'
+let bankView='all'; // 'all' | 'know' | 'learn' | 'new' | 'custom:{id}'
 let sortState={bank:true,know:true,learn:true,pick:true};
 let favFilterActive=false;
 let bankFavFilterActive=false;
@@ -1800,6 +1891,230 @@ async function saveBankToCloud(){
 async function loadPicks(){
   const r=await sbFetch(`/rest/v1/dances?username=eq.__picks__&select=data`);
   drewPicks=(r.ok&&r.data&&r.data.length>0)?(r.data[0].data.picks||[]):[];
+}
+
+// ---- Custom Lists (admin managed) ----
+async function loadCustomLists(){
+  const r=await sbFetch(`/rest/v1/dances?username=eq.__customlists__&select=data`);
+  customLists=(r.ok&&r.data&&r.data.length>0)?(r.data[0].data.lists||[]):[];
+}
+async function saveCustomListsToCloud(){
+  setSyncStatus('syncing','Syncing...');
+  const check=await sbFetch(`/rest/v1/dances?username=eq.__customlists__&select=username`);
+  if(check.ok&&check.data&&check.data.length>0){
+    await sbFetch(`/rest/v1/dances?username=eq.__customlists__`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:{lists:customLists},updated_at:new Date().toISOString()})});
+  } else {
+    await sbFetch('/rest/v1/dances',{method:'POST',prefer:'return=minimal',body:JSON.stringify({username:'__customlists__',password:'__customlists__',data:{lists:customLists}})});
+  }
+  setSyncStatus('synced','Synced');
+}
+
+// State for the modal (create or edit)
+let customListEditingId=null; // null = create, string = editing existing
+
+function openCustomListModal(editId){
+  if(!isAdmin) return;
+  _customListSelectionCache=null; // always reset on open
+  customListEditingId=editId||null;
+  const modal=document.getElementById('custom-list-modal');
+  const title=document.getElementById('custom-list-modal-title');
+  const saveBtn=document.getElementById('custom-list-save-btn');
+  const nameInput=document.getElementById('custom-list-name-input');
+  // Reset search
+  const search=document.getElementById('custom-list-dance-search');
+  if(search) search.value='';
+  if(editId){
+    const list=customLists.find(l=>l.id===editId);
+    title.textContent='Edit List';
+    saveBtn.textContent='Save Changes';
+    nameInput.value=list?list.name:'';
+  } else {
+    title.textContent='Create a List';
+    saveBtn.textContent='Create List';
+    nameInput.value='';
+  }
+  renderCustomListDanceChecklist();
+  modal.style.display='flex';
+  setTimeout(()=>nameInput.focus(),80);
+}
+function closeCustomListModal(){
+  document.getElementById('custom-list-modal').style.display='none';
+  customListEditingId=null;
+}
+
+function renderCustomListDanceChecklist(){
+  const el=document.getElementById('custom-list-dance-checklist');
+  const countEl=document.getElementById('custom-list-selected-count');
+  if(!el) return;
+  const q=(document.getElementById('custom-list-dance-search')?.value||'').toLowerCase();
+  // Get currently selected IDs
+  const editing=customListEditingId?customLists.find(l=>l.id===customListEditingId):null;
+  // Selected set: use checkboxes already rendered if they exist, otherwise seed from editing
+  const selected=getCustomListModalSelected();
+  const sorted=[...bank].sort((a,b)=>a.name.localeCompare(b.name));
+  const filtered=q?sorted.filter(d=>d.name.toLowerCase().includes(q)):sorted;
+  if(!filtered.length){el.innerHTML=`<div style="font-size:13px;color:var(--t3);padding:8px 4px;">No dances match your search.</div>`;return;}
+  el.innerHTML=filtered.map(d=>{
+    const checked=selected.has(d.id);
+    return `<div class="cl-dance-check-item" onclick="toggleCustomListCheck('${d.id}')">
+      <input type="checkbox" id="cldc-${d.id}" ${checked?'checked':''} onclick="event.stopPropagation();updateCustomListCount()">
+      <label for="cldc-${d.id}" onclick="event.stopPropagation()">${esc(d.name)}${d.difficulty?` <span style="font-size:11px;color:var(--t3);">(${d.difficulty})</span>`:''}</label>
+    </div>`;
+  }).join('');
+  updateCustomListCount();
+}
+
+function getCustomListModalSelected(){
+  // If checkboxes are rendered, read from DOM; else seed from the list being edited
+  const boxes=document.querySelectorAll('#custom-list-dance-checklist input[type=checkbox]');
+  if(boxes.length>0){
+    const s=new Set();
+    boxes.forEach(b=>{ if(b.checked) s.add(b.id.replace('cldc-','')); });
+    return s;
+  }
+  // Seed from editing list
+  if(customListEditingId){
+    const list=customLists.find(l=>l.id===customListEditingId);
+    return new Set(list?list.danceIds:[]);
+  }
+  return new Set();
+}
+
+function toggleCustomListCheck(id){
+  const cb=document.getElementById('cldc-'+id);
+  if(cb){ cb.checked=!cb.checked; updateCustomListCount(); }
+}
+
+function updateCustomListCount(){
+  const boxes=document.querySelectorAll('#custom-list-dance-checklist input[type=checkbox]');
+  const countEl=document.getElementById('custom-list-selected-count');
+  if(!countEl) return;
+  // Count all checked across the full bank, not just what's visible
+  // We track selected in a module-level set so searching doesn't lose selections
+  let n=0;
+  boxes.forEach(b=>{ if(b.checked) n++; });
+  // Also count any already-selected that may be hidden by search
+  const allSelected=getAllCustomListSelected();
+  countEl.textContent=allSelected.size;
+}
+
+// Persist selections across search filtering using a hidden set
+let _customListSelectionCache=null;
+
+function getAllCustomListSelected(){
+  // Merge DOM state into cache
+  if(!_customListSelectionCache){
+    // Seed from editing list on first call
+    if(customListEditingId){
+      const list=customLists.find(l=>l.id===customListEditingId);
+      _customListSelectionCache=new Set(list?list.danceIds:[]);
+    } else {
+      _customListSelectionCache=new Set();
+    }
+  }
+  // Update cache from visible checkboxes
+  document.querySelectorAll('#custom-list-dance-checklist input[type=checkbox]').forEach(b=>{
+    const id=b.id.replace('cldc-','');
+    if(b.checked) _customListSelectionCache.add(id);
+    else _customListSelectionCache.delete(id);
+  });
+  return _customListSelectionCache;
+}
+
+function openCustomListModalWithCache(editId){
+  _customListSelectionCache=null; // reset cache on open
+  openCustomListModal(editId);
+}
+
+async function saveCustomList(){
+  const name=document.getElementById('custom-list-name-input').value.trim();
+  if(!name){alert('Please enter a list name.');return;}
+  const selected=getAllCustomListSelected();
+  const danceIds=Array.from(selected);
+  if(customListEditingId){
+    const list=customLists.find(l=>l.id===customListEditingId);
+    if(list){ list.name=name; list.danceIds=danceIds; list.updated=new Date().toISOString(); }
+  } else {
+    customLists.push({id:Date.now()+'',name,danceIds,created:new Date().toISOString()});
+  }
+  _customListSelectionCache=null;
+  await saveCustomListsToCloud();
+  closeCustomListModal();
+  renderCustomListPills();
+  renderAdminCustomLists();
+  renderBank();
+}
+
+async function deleteCustomList(id){
+  if(!confirm('Delete this custom list?')) return;
+  customLists=customLists.filter(l=>l.id!==id);
+  // If the deleted list was being viewed, reset bank view
+  if(bankView==='custom:'+id) setBankView('all',document.getElementById('bank-view-all-pill'));
+  await saveCustomListsToCloud();
+  renderCustomListPills();
+  renderAdminCustomLists();
+}
+
+function renderCustomListPills(){
+  const pillRow=document.getElementById('bank-custom-lists-row');
+  const pillContainer=document.getElementById('bank-custom-list-pills');
+  if(!pillRow||!pillContainer) return;
+  if(!customLists.length){ pillRow.style.display='none'; return; }
+  pillRow.style.display='flex';
+  pillContainer.innerHTML=customLists.map(list=>{
+    const isActive=bankView==='custom:'+list.id;
+    return `<span class="custom-list-pill${isActive?' active':''}" id="clpill-${list.id}" onclick="setBankViewCustom('${list.id}',this)">${esc(list.name)} <span style="font-size:11px;color:var(--t3);">(${list.danceIds.length})</span></span>`;
+  }).join('');
+}
+
+function setBankViewCustom(listId, el){
+  bankView='custom:'+listId;
+  // Reset all standard pills
+  ['bank-view-all-pill','bank-view-know-pill','bank-view-learn-pill','bank-view-new-pill'].forEach(id=>{
+    const p=document.getElementById(id);
+    if(!p) return;
+    p.style.background='';p.style.color='';p.style.borderColor='';p.classList.remove('active');
+  });
+  // Reset other custom pills
+  document.querySelectorAll('.custom-list-pill').forEach(p=>{p.classList.remove('active');});
+  if(el) el.classList.add('active');
+  // Reset fav filter
+  if(bankFavFilterActive){
+    bankFavFilterActive=false;
+    const favBtn=document.getElementById('bank-fav-btn');
+    if(favBtn) favBtn.classList.remove('active');
+  }
+  renderBank();
+}
+
+function renderAdminCustomLists(){
+  const el=document.getElementById('admin-custom-lists-list');
+  if(!el) return;
+  if(!customLists.length){el.innerHTML=`<div class="empty">No custom lists yet. Click "+ New List" to create one.</div>`;return;}
+  el.innerHTML=customLists.map(list=>{
+    const danceNames=list.danceIds.map(id=>{
+      const d=bank.find(b=>b.id===id);
+      return d?`<span style="font-size:12px;background:var(--bg3);border:0.5px solid var(--b3);border-radius:4px;padding:2px 7px;color:var(--t1);">${esc(d.name)}</span>`:'';
+    }).filter(Boolean).join('');
+    return `<div class="admin-custom-list-item" id="acl-${list.id}">
+      <div class="admin-custom-list-head" onclick="document.getElementById('acl-${list.id}').classList.toggle('open')">
+        <span class="acl-name">${esc(list.name)}</span>
+        <span class="acl-count">${list.danceIds.length} dance${list.danceIds.length!==1?'s':''}</span>
+        <div style="display:flex;gap:6px;flex-shrink:0;" onclick="event.stopPropagation()">
+          <button class="btn xs info" onclick="openCustomListModalWithCache('${list.id}')">&#9998; Edit</button>
+          <button class="btn xs danger" onclick="deleteCustomList('${list.id}')">Delete</button>
+        </div>
+        <span style="font-size:11px;color:var(--t3);transition:transform .2s;" id="acl-caret-${list.id}">&#9660;</span>
+      </div>
+      <div class="admin-custom-list-body">
+        <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Dances in this list</div>
+        ${danceNames||`<span style="font-size:13px;color:var(--t3);">No dances selected.</span>`}
+        <div style="margin-top:10px;">
+          <button class="btn sm amber" onclick="openCustomListModalWithCache('${list.id}')">&#9998; Edit List</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
 async function savePicksToCloud(){
   setSyncStatus('syncing','Syncing...');
@@ -2250,6 +2565,7 @@ async function authSubmit() {
     await loadDJList();
     await loadModList();
     await loadHomeConfig();
+    await loadCustomLists();
     await loadDrewDJFreestyles();
     await clLoad();
     enterApp(finalUsername);
@@ -2304,6 +2620,10 @@ function enterApp(username){
   updateSubmissionsBadge();
   renderDJDropdown();
   renderBank();renderList('know');renderList('learn');initNightDate();renderDJRecords();renderPicks();
+  renderCustomListPills();
+  // Show admin-only create list button
+  const createListBtn=document.getElementById('admin-create-list-btn');
+  if(createListBtn) createListBtn.style.display=isAdmin?'inline-block':'none';
   if(isAdmin) initDrewsNightDate();
   // Restore the tab the user was on before the last refresh, default to home
   const savedTab = localStorage.getItem('ld_active_tab') || 'home';
@@ -2411,6 +2731,7 @@ async function tryAutoLogin() {
       await loadDJList();
       await loadModList();
       await loadHomeConfig();
+      await loadCustomLists();
       await loadDrewDJFreestyles();
       await clLoad();
       enterApp(user);
@@ -2574,23 +2895,26 @@ function setListFilter(type,diff,el){
 }
 function setBankView(view,el){
   bankView=view;
-  // Reset fav filter when switching to learn view (favs are only for know list)
-  if(view==='learn'&&bankFavFilterActive){
+  // Reset fav filter when switching to learn/new view (favs are only for know list)
+  if((view==='learn'||view==='new')&&bankFavFilterActive){
     bankFavFilterActive=false;
     const favBtn=document.getElementById('bank-fav-btn');
     if(favBtn) favBtn.classList.remove('active');
   }
   // Update pill styles for view row
-  ['bank-view-all-pill','bank-view-know-pill','bank-view-learn-pill'].forEach(id=>{
+  ['bank-view-all-pill','bank-view-know-pill','bank-view-learn-pill','bank-view-new-pill'].forEach(id=>{
     const p=document.getElementById(id);
     if(!p) return;
     p.style.background='';p.style.color='';p.style.borderColor='';
     p.classList.remove('active');
   });
+  // Also reset any custom list pills
+  document.querySelectorAll('.custom-list-pill').forEach(p=>p.classList.remove('active'));
   if(view==='all'){el.style.background='var(--t1)';el.style.color='var(--bg)';el.style.borderColor='var(--t1)';}
   else if(view==='know'){el.style.background='var(--green-bg)';el.style.color='var(--green-text)';el.style.borderColor='var(--green-border)';}
   else if(view==='learn'){el.style.background='var(--blue-bg)';el.style.color='var(--blue-text)';el.style.borderColor='var(--blue-border)';}
-  // Show difficulty filters for all views (all, know, learn)
+  else if(view==='new'){el.style.background='var(--amber-bg)';el.style.color='var(--amber-text)';el.style.borderColor='var(--amber-border)';}
+  // Show difficulty filters for all views (all, know, learn, new)
   const diffRow=document.getElementById('bank-diff-filters');
   if(diffRow) diffRow.style.display='';
   renderBank();
@@ -2599,6 +2923,89 @@ function isInList(name,type){return state[type].some(d=>d.name.toLowerCase()===n
 function renderBank(){
   const el=document.getElementById('bank-list');
   const q=(document.getElementById('bank-search')?.value||'');
+
+  // --- Custom list view ---
+  if(bankView.startsWith('custom:')){
+    const listId=bankView.slice(7);
+    const list=customLists.find(l=>l.id===listId);
+    if(!list){el.innerHTML=`<div class="empty">List not found.</div>`;return;}
+    let items=list.danceIds.map(id=>bank.find(d=>d.id===id)).filter(Boolean);
+    if(q) items=items.filter(d=>d.name.toLowerCase().includes(q.toLowerCase()));
+    if(bankFilter!=='all') items=items.filter(d=>d.difficulty===bankFilter);
+    if(sortState.bank) items.sort((a,b)=>a.name.localeCompare(b.name));
+    if(!items.length){
+      el.innerHTML=`<div class="empty">${q?'No dances match your search.':'No dances in this list yet.'}</div>`;
+      return;
+    }
+    el.innerHTML=items.map(d=>{
+      const inKnow=isInList(d.name,'know'),inLearn=isInList(d.name,'learn');
+      const diffBadge=d.difficulty?`<span class="diff-badge diff-${d.difficulty}">${d.difficulty}</span>`:'';
+      const statusPill=inKnow?`<span class="diff-badge" style="background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border)">&#10003; I Know It</span>`:inLearn?`<span class="diff-badge" style="background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border)">&#9733; Learning</span>`:'';
+      const demoBtn=d.demo?`<a class="link-btn demo" href="${escA(d.demo)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#9654; Demo</a>`:'';
+      const tutBtn=d.tutorial?`<a class="link-btn tutorial" href="${escA(d.tutorial)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#127891; Tutorial</a>`:'';
+      const spotifyBtn=renderSpotifyBtns(getSpotifyLinks(d),true);
+      const statPills=[
+        d.counts!=null?`<span class="bank-detail-stat"><strong>${d.counts}</strong> counts</span>`:'',
+        d.walls!=null?`<span class="bank-detail-stat"><strong>${d.walls}</strong> walls</span>`:'',
+        d.tags!=null?`<span class="bank-detail-stat"><strong>${d.tags}</strong> tags</span>`:'',
+      ].filter(Boolean).join('');
+      const addBtns=(!inKnow&&!inLearn)
+        ?`<button class="btn sm success" onclick="addFromBankById('know','${d.id}')">&#43; I Know It</button><button class="btn sm info" onclick="addFromBankById('learn','${d.id}')">&#43; Want to Learn</button>`
+        :inLearn?`<button class="btn sm success" onclick="addFromBankById('know','${d.id}')">&#43; I Know It</button>`:'';
+      const hasBody=demoBtn||tutBtn||spotifyBtn||statPills||addBtns;
+      return `<div class="bank-item" id="bcl-${d.id}">
+        <div class="bank-item-head" onclick="this.parentElement.classList.toggle('open')">
+          <span class="bank-item-name">${esc(d.name)}</span>
+          <div class="bank-item-meta">${diffBadge}${statusPill}</div>
+          <span class="bank-item-caret">&#9660;</span>
+        </div>
+        ${hasBody?`<div class="bank-item-body">
+          ${statPills?`<div class="bank-detail-row">${statPills}</div>`:''}
+          ${(demoBtn||tutBtn||spotifyBtn)?`<div class="bank-detail-links">${demoBtn}${tutBtn}${spotifyBtn}</div>`:''}
+          ${addBtns?`<div class="bank-detail-actions">${addBtns}</div>`:''}
+        </div>`:''}
+      </div>`;
+    }).join('');
+    return;
+  }
+
+  // --- New to Me view (not in know or learn) ---
+  if(bankView==='new'){
+    let items=bank.filter(d=>!isInList(d.name,'know')&&!isInList(d.name,'learn'));
+    if(q) items=items.filter(d=>d.name.toLowerCase().includes(q.toLowerCase()));
+    if(bankFilter!=='all') items=items.filter(d=>d.difficulty===bankFilter);
+    if(sortState.bank) items.sort((a,b)=>a.name.localeCompare(b.name));
+    if(!items.length){
+      el.innerHTML=`<div class="empty">${bank.length===0?'No dances in the bank yet.':(q?'No new dances match your search.':"You've added every dance to your lists — nice work!")}</div>`;
+      return;
+    }
+    el.innerHTML=items.map(d=>{
+      const diffBadge=d.difficulty?`<span class="diff-badge diff-${d.difficulty}">${d.difficulty}</span>`:'';
+      const demoBtn=d.demo?`<a class="link-btn demo" href="${escA(d.demo)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#9654; Demo</a>`:'';
+      const tutBtn=d.tutorial?`<a class="link-btn tutorial" href="${escA(d.tutorial)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#127891; Tutorial</a>`:'';
+      const spotifyBtn=renderSpotifyBtns(getSpotifyLinks(d),true);
+      const statPills=[
+        d.counts!=null?`<span class="bank-detail-stat"><strong>${d.counts}</strong> counts</span>`:'',
+        d.walls!=null?`<span class="bank-detail-stat"><strong>${d.walls}</strong> walls</span>`:'',
+        d.tags!=null?`<span class="bank-detail-stat"><strong>${d.tags}</strong> tags</span>`:'',
+      ].filter(Boolean).join('');
+      const addBtns=`<button class="btn sm success" onclick="addFromBankById('know','${d.id}')">&#43; I Know It</button><button class="btn sm info" onclick="addFromBankById('learn','${d.id}')">&#43; Want to Learn</button>`;
+      const hasBody=demoBtn||tutBtn||spotifyBtn||statPills;
+      return `<div class="bank-item" id="bnew-${d.id}">
+        <div class="bank-item-head" onclick="this.parentElement.classList.toggle('open')">
+          <span class="bank-item-name">${esc(d.name)}</span>
+          <div class="bank-item-meta">${diffBadge}</div>
+          <span class="bank-item-caret">&#9660;</span>
+        </div>
+        <div class="bank-item-body">
+          ${statPills?`<div class="bank-detail-row">${statPills}</div>`:''}
+          ${(demoBtn||tutBtn||spotifyBtn)?`<div class="bank-detail-links">${demoBtn}${tutBtn}${spotifyBtn}</div>`:''}
+          <div class="bank-detail-actions">${addBtns}</div>
+        </div>
+      </div>`;
+    }).join('');
+    return;
+  }
 
   // --- My Lists view (know / learn) ---
   if(bankView==='know'||bankView==='learn'){
@@ -2628,7 +3035,7 @@ function renderBank(){
       const diffBadge=bankEntry?.difficulty?`<span class="diff-badge diff-${bankEntry.difficulty}">${bankEntry.difficulty}</span>`:'';
       const demoBtn=bankEntry?.demo?`<a class="link-btn demo" href="${escA(bankEntry.demo)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#9654; Demo</a>`:'';
       const tutBtn=bankEntry?.tutorial?`<a class="link-btn tutorial" href="${escA(bankEntry.tutorial)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#127891; Tutorial</a>`:'';
-      const spotifyBtn=bankEntry?.spotify?`<a class="link-btn spotify" href="${escA(bankEntry.spotify)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#9835; Spotify</a>`:'';
+      const spotifyBtn=renderSpotifyBtns(getSpotifyLinks(bankEntry),true);
       const statPills=bankEntry?[
         bankEntry.counts!=null?`<span class="bank-detail-stat"><strong>${bankEntry.counts}</strong> counts</span>`:'',
         bankEntry.walls!=null?`<span class="bank-detail-stat"><strong>${bankEntry.walls}</strong> walls</span>`:'',
@@ -2678,7 +3085,7 @@ function renderBank(){
     const statusPill=inKnow?`<span class="diff-badge" style="background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border)">&#10003; I Know It</span>`:inLearn?`<span class="diff-badge" style="background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border)">&#9733; Learning</span>`:'';
     const demoBtn=d.demo?`<a class="link-btn demo" href="${escA(d.demo)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#9654; Demo</a>`:'';
     const tutBtn=d.tutorial?`<a class="link-btn tutorial" href="${escA(d.tutorial)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#127891; Tutorial</a>`:'';
-    const spotifyBtn=d.spotify?`<a class="link-btn spotify" href="${escA(d.spotify)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#9835; Spotify</a>`:'';
+    const spotifyBtn=renderSpotifyBtns(getSpotifyLinks(d),true);
     const statPills=[
       d.counts!=null?`<span class="bank-detail-stat"><strong>${d.counts}</strong> counts</span>`:'',
       d.walls!=null?`<span class="bank-detail-stat"><strong>${d.walls}</strong> walls</span>`:'',
@@ -2790,22 +3197,31 @@ function adminAddDance(){
   const name=document.getElementById('bank-name').value.trim();
   const demo=document.getElementById('bank-demo').value.trim();
   const tutorial=document.getElementById('bank-tutorial').value.trim();
-  const spotify=document.getElementById('bank-spotify').value.trim();
+  const spotifyLinks=spEditorGetLinks('bank-spotify-editor');
   const difficulty=document.getElementById('bank-diff').value;
   const counts=document.getElementById('bank-counts').value.trim();
   const walls=document.getElementById('bank-walls').value.trim();
   const tags=document.getElementById('bank-tags').value.trim();
   if(!name){alert('Please enter a dance name.');return;}
   if(bank.some(d=>d.name.toLowerCase()===name.toLowerCase())){alert('That dance is already in the bank.');return;}
-  bank.push({id:Date.now()+'',name,demo,tutorial,spotify,difficulty,counts:counts?Number(counts):null,walls:walls?Number(walls):null,tags:tags?Number(tags):null,added:new Date().toISOString()});
-  document.getElementById('bank-name').value='';document.getElementById('bank-demo').value='';document.getElementById('bank-tutorial').value='';document.getElementById('bank-spotify').value='';document.getElementById('bank-diff').value='';document.getElementById('bank-counts').value='';document.getElementById('bank-walls').value='';document.getElementById('bank-tags').value='';
+  bank.push({id:Date.now()+'',name,demo,tutorial,spotifyLinks,difficulty,counts:counts?Number(counts):null,walls:walls?Number(walls):null,tags:tags?Number(tags):null,added:new Date().toISOString()});
+  document.getElementById('bank-name').value='';document.getElementById('bank-demo').value='';document.getElementById('bank-tutorial').value='';renderSpotifyLinksEditor('bank-spotify-editor',[]);document.getElementById('bank-diff').value='';document.getElementById('bank-counts').value='';document.getElementById('bank-walls').value='';document.getElementById('bank-tags').value='';
   saveBankToCloud();renderAdminBank();renderBank();
 }
 function adminRemoveDance(id){
   if(!isAdmin)return;if(!confirm('Remove this dance from the bank?'))return;
   bank=bank.filter(d=>d.id!==id);saveBankToCloud();renderAdminBank();renderBank();
 }
-function toggleEditForm(id){const f=document.getElementById('edit-'+id);if(f)f.classList.toggle('open');}
+function toggleEditForm(id){
+  const f=document.getElementById('edit-'+id);
+  if(f){
+    f.classList.toggle('open');
+    if(f.classList.contains('open')){
+      const d=bank.find(x=>x.id===id);
+      if(d) initSpotifyEditor('edit-spotify-editor-'+id, d);
+    }
+  }
+}
 function adminSaveEdit(id){
   const d=bank.find(x=>x.id===id);if(!d)return;
   const oldName=d.name;
@@ -2813,7 +3229,8 @@ function adminSaveEdit(id){
   d.name=newName;
   d.demo=document.getElementById('edit-demo-'+id).value.trim();
   d.tutorial=document.getElementById('edit-tut-'+id).value.trim();
-  d.spotify=document.getElementById('edit-spotify-'+id).value.trim();
+  d.spotifyLinks=spEditorGetLinks('edit-spotify-editor-'+id);
+  delete d.spotify; // remove old field if present
   d.difficulty=document.getElementById('edit-diff-'+id).value;
   const counts=document.getElementById('edit-counts-'+id).value.trim();
   const walls=document.getElementById('edit-walls-'+id).value.trim();
@@ -2840,7 +3257,8 @@ function renderAdminBank(){
     const diffBadge=d.difficulty?`<span class="diff-badge diff-${d.difficulty}">${d.difficulty}</span>`:'';
     const demoLink=d.demo?`<a class="link-btn demo" href="${escA(d.demo)}" target="_blank" rel="noopener">&#9654; Demo</a>`:`<span style="font-size:12px;color:var(--t3)">No demo</span>`;
     const tutLink=d.tutorial?`<a class="link-btn tutorial" href="${escA(d.tutorial)}" target="_blank" rel="noopener">&#127891; Tutorial</a>`:`<span style="font-size:12px;color:var(--t3)">No tutorial</span>`;
-    const spotifyAdminLink=d.spotify?`<a class="link-btn spotify" href="${escA(d.spotify)}" target="_blank" rel="noopener">&#9835; Spotify</a>`:`<span style="font-size:12px;color:var(--t3)">No Spotify</span>`;
+    const spLinks=getSpotifyLinks(d);
+    const spotifyAdminLink=spLinks.length?renderSpotifyBtns(spLinks,false):`<span style="font-size:12px;color:var(--t3)">No Spotify</span>`;
     const statPills=[
       d.counts!=null?`<span class="bank-detail-stat"><strong>${d.counts}</strong> counts</span>`:'',
       d.walls!=null?`<span class="bank-detail-stat"><strong>${d.walls}</strong> walls</span>`:'',
@@ -2865,7 +3283,10 @@ function renderAdminBank(){
             <input type="text" id="edit-name-${d.id}" value="${escA(d.name)}" placeholder="Dance name" class="full">
             <input type="url" id="edit-demo-${d.id}" value="${escA(d.demo||'')}" placeholder="Demo link">
             <input type="url" id="edit-tut-${d.id}" value="${escA(d.tutorial||'')}" placeholder="Tutorial link">
-            <input type="url" id="edit-spotify-${d.id}" value="${escA(d.spotify||'')}" placeholder="Spotify link" class="full">
+            <div class="full" style="display:flex;flex-direction:column;gap:6px;">
+              <div id="edit-spotify-editor-${d.id}" class="sp-links-editor"></div>
+              <button type="button" class="sp-add-link-btn" onclick="spEditorAddRow('edit-spotify-editor-${d.id}')">+ Add Spotify link</button>
+            </div>
             <select id="edit-diff-${d.id}" class="full">
               <option value="">No difficulty</option>
               <option value="Beginner" ${d.difficulty==='Beginner'?'selected':''}>Beginner</option>
@@ -3019,17 +3440,17 @@ async function modAddDance(){
   if(bank.some(d=>d.name.toLowerCase()===name.toLowerCase())){alert('That dance is already in the bank.');return;}
   const demo=document.getElementById('mod-bank-demo').value.trim();
   const tutorial=document.getElementById('mod-bank-tutorial').value.trim();
-  const spotify=document.getElementById('mod-bank-spotify').value.trim();
+  const spotifyLinks=spEditorGetLinks('mod-bank-spotify-editor');
   const difficulty=document.getElementById('mod-bank-diff').value;
   const counts=document.getElementById('mod-bank-counts').value.trim();
   const walls=document.getElementById('mod-bank-walls').value.trim();
   const tags=document.getElementById('mod-bank-tags').value.trim();
-  bank.push({id:Date.now()+'',name,demo,tutorial,spotify,difficulty,counts:counts?Number(counts):null,walls:walls?Number(walls):null,tags:tags?Number(tags):null,added:new Date().toISOString()});
+  bank.push({id:Date.now()+'',name,demo,tutorial,spotifyLinks,difficulty,counts:counts?Number(counts):null,walls:walls?Number(walls):null,tags:tags?Number(tags):null,added:new Date().toISOString()});
   saveBankToCloud();renderBank();renderModBank();
   document.getElementById('mod-bank-name').value='';
   document.getElementById('mod-bank-demo').value='';
   document.getElementById('mod-bank-tutorial').value='';
-  document.getElementById('mod-bank-spotify').value='';
+  renderSpotifyLinksEditor('mod-bank-spotify-editor',[]);
   document.getElementById('mod-bank-diff').value='';
   document.getElementById('mod-bank-counts').value='';
   document.getElementById('mod-bank-walls').value='';
@@ -3046,7 +3467,8 @@ function renderModBank(){
     const diffBadge=d.difficulty?`<span class="diff-badge diff-${d.difficulty}">${d.difficulty}</span>`:'';
     const demoLink=d.demo?`<a class="link-btn demo" href="${escA(d.demo)}" target="_blank" rel="noopener">&#9654; Demo</a>`:`<span style="font-size:12px;color:var(--t3)">No demo</span>`;
     const tutLink=d.tutorial?`<a class="link-btn tutorial" href="${escA(d.tutorial)}" target="_blank" rel="noopener">&#127891; Tutorial</a>`:`<span style="font-size:12px;color:var(--t3)">No tutorial</span>`;
-    const spotifyLink=d.spotify?`<a class="link-btn spotify" href="${escA(d.spotify)}" target="_blank" rel="noopener">&#9835; Spotify</a>`:`<span style="font-size:12px;color:var(--t3)">No Spotify</span>`;
+    const modSpLinks=getSpotifyLinks(d);
+    const spotifyLink=modSpLinks.length?renderSpotifyBtns(modSpLinks,false):`<span style="font-size:12px;color:var(--t3)">No Spotify</span>`;
     const statPills=[
       d.counts!=null?`<span class="bank-detail-stat"><strong>${d.counts}</strong> counts</span>`:'',
       d.walls!=null?`<span class="bank-detail-stat"><strong>${d.walls}</strong> walls</span>`:'',
@@ -3071,7 +3493,10 @@ function renderModBank(){
             <input type="text" id="mod-edit-name-${d.id}" value="${escA(d.name)}" placeholder="Dance name" class="full">
             <input type="url" id="mod-edit-demo-${d.id}" value="${escA(d.demo||'')}" placeholder="Demo link">
             <input type="url" id="mod-edit-tut-${d.id}" value="${escA(d.tutorial||'')}" placeholder="Tutorial link">
-            <input type="url" id="mod-edit-spot-${d.id}" value="${escA(d.spotify||'')}" placeholder="Spotify link" class="full">
+            <div class="full" style="display:flex;flex-direction:column;gap:6px;">
+              <div id="mod-edit-spotify-editor-${d.id}" class="sp-links-editor"></div>
+              <button type="button" class="sp-add-link-btn" onclick="spEditorAddRow('mod-edit-spotify-editor-${d.id}')">+ Add Spotify link</button>
+            </div>
             <select id="mod-edit-diff-${d.id}" class="full">
               <option value="">No difficulty</option>
               <option value="Beginner" ${d.difficulty==='Beginner'?'selected':''}>Beginner</option>
@@ -3093,7 +3518,13 @@ function renderModBank(){
 }
 function toggleModEditForm(id){
   const f=document.getElementById('mod-edit-form-'+id);
-  if(f) f.classList.toggle('open');
+  if(f){
+    f.classList.toggle('open');
+    if(f.classList.contains('open')){
+      const d=bank.find(x=>x.id===id);
+      if(d) initSpotifyEditor('mod-edit-spotify-editor-'+id, d);
+    }
+  }
 }
 async function modSaveEdit(id){
   if(!isMod) return;
@@ -3103,7 +3534,8 @@ async function modSaveEdit(id){
   d.name=newName;
   d.demo=document.getElementById('mod-edit-demo-'+id).value.trim();
   d.tutorial=document.getElementById('mod-edit-tut-'+id).value.trim();
-  d.spotify=document.getElementById('mod-edit-spot-'+id).value.trim();
+  d.spotifyLinks=spEditorGetLinks('mod-edit-spotify-editor-'+id);
+  delete d.spotify;
   d.difficulty=document.getElementById('mod-edit-diff-'+id).value;
   const counts=document.getElementById('mod-edit-counts-'+id).value.trim();
   const walls=document.getElementById('mod-edit-walls-'+id).value.trim();
@@ -3215,7 +3647,7 @@ function renderList(type){
     const diffBadge=bankEntry?.difficulty?`<span class="diff-badge diff-${bankEntry.difficulty}" style="font-size:10px;">${bankEntry.difficulty}</span>`:'';
     const demoBtn=bankEntry?.demo?`<a class="link-btn demo" href="${escA(bankEntry.demo)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#9654; Demo</a>`:'';
     const tutBtn=bankEntry?.tutorial?`<a class="link-btn tutorial" href="${escA(bankEntry.tutorial)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#127891; Tutorial</a>`:'';
-    const spotifyBtn=bankEntry?.spotify?`<a class="link-btn spotify" href="${escA(bankEntry.spotify)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#9835; Spotify</a>`:'';
+    const spotifyBtn=renderSpotifyBtns(getSpotifyLinks(bankEntry),true);
     const statPills=bankEntry?[
       bankEntry.counts!=null?`<span class="bank-detail-stat"><strong>${bankEntry.counts}</strong> counts</span>`:'',
       bankEntry.walls!=null?`<span class="bank-detail-stat"><strong>${bankEntry.walls}</strong> walls</span>`:'',
@@ -4516,14 +4948,21 @@ function dismissSubmission(id){
 }
 function toggleSubForm(id){
   const f=document.getElementById('sub-form-'+id);
-  if(f) f.classList.toggle('open');
+  if(f){
+    f.classList.toggle('open');
+    if(f.classList.contains('open')){
+      // init empty spotify editor
+      if(!document.getElementById('sub-sp-editor-'+id)?.children.length)
+        renderSpotifyLinksEditor('sub-sp-editor-'+id,[]);
+    }
+  }
 }
 function addSubmissionToBank(id){
   const s=submissions.find(x=>x.id===id);if(!s)return;
   const name=document.getElementById('sub-bn-'+id).value.trim()||s.name;
   const demo=document.getElementById('sub-bd-'+id).value.trim();
   const tutorial=document.getElementById('sub-bt-'+id).value.trim();
-  const spotify=document.getElementById('sub-bsp-'+id).value.trim();
+  const spotifyLinks=spEditorGetLinks('sub-sp-editor-'+id);
   const difficulty=document.getElementById('sub-diff-'+id).value;
   const counts=document.getElementById('sub-counts-'+id).value.trim();
   const walls=document.getElementById('sub-walls-'+id).value.trim();
@@ -4531,7 +4970,7 @@ function addSubmissionToBank(id){
   if(bank.some(d=>d.name.toLowerCase()===name.toLowerCase())){
     alert('That dance is already in the bank.');return;
   }
-  bank.push({id:Date.now()+'',name,demo,tutorial,spotify,difficulty,counts:counts?Number(counts):null,walls:walls?Number(walls):null,tags:tags?Number(tags):null,added:new Date().toISOString()});
+  bank.push({id:Date.now()+'',name,demo,tutorial,spotifyLinks,difficulty,counts:counts?Number(counts):null,walls:walls?Number(walls):null,tags:tags?Number(tags):null,added:new Date().toISOString()});
   saveBankToCloud();renderBank();renderAdminBank();
   submissions=submissions.filter(x=>x.id!==id);
   saveSubmissionsToCloud();renderSubmissions();updateSubmissionsBadge();
@@ -4578,7 +5017,10 @@ function renderSubmissions(){
             <input type="text" id="sub-bn-${s.id}" value="${escA(s.name)}" placeholder="Dance name" class="full">
             <input type="url" id="sub-bd-${s.id}" placeholder="Demo link (YouTube URL)">
             <input type="url" id="sub-bt-${s.id}" placeholder="Tutorial link (YouTube URL)">
-            <input type="url" id="sub-bsp-${s.id}" placeholder="Spotify link (optional)" class="full">
+            <div class="full" style="display:flex;flex-direction:column;gap:6px;">
+              <div id="sub-sp-editor-${s.id}" class="sp-links-editor"></div>
+              <button type="button" class="sp-add-link-btn" onclick="spEditorAddRow('sub-sp-editor-${s.id}')">+ Add Spotify link</button>
+            </div>
             <select id="sub-diff-${s.id}" class="full">
               <option value="">Difficulty (optional)</option>
               <option value="Beginner">Beginner</option>
@@ -4627,6 +5069,73 @@ function formatDate(d){
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function escA(s){return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function enc(s){return encodeURIComponent(s);}
+
+// ---- Spotify multi-link helpers ----
+// Normalize a dance entry's spotify data to an array of {url,label}
+function getSpotifyLinks(d){
+  if(!d) return [];
+  if(Array.isArray(d.spotifyLinks)) return d.spotifyLinks.filter(l=>l&&l.url);
+  // backwards-compat: old single-string field
+  if(d.spotify) return [{url:d.spotify, label:''}];
+  return [];
+}
+
+// Render display buttons from links array
+function renderSpotifyBtns(links, stopProp){
+  if(!links||!links.length) return '';
+  const sp=stopProp?'onclick="event.stopPropagation()"':'';
+  return links.map(l=>{
+    const labelText=l.label&&l.label.trim()?esc(l.label.trim()):'&#9835; Spotify';
+    return `<a class="link-btn spotify" href="${escA(l.url)}" target="_blank" rel="noopener" ${sp}>&#9835; ${labelText}</a>`;
+  }).join('');
+}
+
+// Render the multi-link editor HTML for a given containerId and existing links
+function renderSpotifyLinksEditor(containerId, links){
+  const el=document.getElementById(containerId);
+  if(!el) return;
+  el.innerHTML=(links||[]).map((_,i)=>`
+    <div class="sp-link-row" id="${containerId}-row-${i}">
+      <input type="text" placeholder="Label (e.g. Artist - Song)" value="${escA(links[i].label||'')}" class="sp-link-label" data-idx="${i}">
+      <input type="url" placeholder="Spotify URL" value="${escA(links[i].url||'')}" class="sp-link-url" data-idx="${i}">
+      <button type="button" class="sp-link-remove" onclick="spEditorRemoveRow('${containerId}',${i})">✕</button>
+    </div>`).join('');
+}
+
+// Add a new empty row to an editor
+function spEditorAddRow(containerId){
+  const el=document.getElementById(containerId);
+  if(!el) return;
+  const existing=spEditorGetLinks(containerId);
+  existing.push({url:'',label:''});
+  renderSpotifyLinksEditor(containerId, existing);
+}
+
+// Remove a row from an editor
+function spEditorRemoveRow(containerId, idx){
+  const links=spEditorGetLinks(containerId);
+  links.splice(idx,1);
+  renderSpotifyLinksEditor(containerId, links);
+}
+
+// Read current links from an editor container
+function spEditorGetLinks(containerId){
+  const el=document.getElementById(containerId);
+  if(!el) return [];
+  const rows=el.querySelectorAll('.sp-link-row');
+  const links=[];
+  rows.forEach(row=>{
+    const url=(row.querySelector('.sp-link-url')?.value||'').trim();
+    const label=(row.querySelector('.sp-link-label')?.value||'').trim();
+    if(url) links.push({url,label});
+  });
+  return links;
+}
+
+// Initialize editor with existing dance data
+function initSpotifyEditor(containerId, dance){
+  renderSpotifyLinksEditor(containerId, getSpotifyLinks(dance));
+}
 
 // ---- Dance rename propagation ----
 function propagateDanceRename(oldName,newName,userState){
@@ -5766,14 +6275,14 @@ function closeSpotifyModal(){ document.getElementById('sp-playlist-modal').style
 // ---- Render the dance list inside the modal ----
 function renderSpModal(){
   const q=(document.getElementById('sp-search')?.value||'').toLowerCase();
-  // All bank dances that have a spotify link
-  const withSpotify=bank.filter(d=>d.spotify&&spUriFromLink(d.spotify));
+  // All bank dances that have at least one valid spotify track link
+  const withSpotify=bank.filter(d=>getSpotifyLinks(d).some(l=>spUriFromLink(l.url)));
   const filtered=q?withSpotify.filter(d=>d.name.toLowerCase().includes(q)):withSpotify;
   const sorted=[...filtered].sort((a,b)=>a.name.localeCompare(b.name));
 
   const el=document.getElementById('sp-dance-list');
   if(!sorted.length){
-    el.innerHTML=`<div class="sp-empty">${bank.some(d=>d.spotify)?'No dances match your search.':'No dances have Spotify links yet.<br>Add a Spotify URL to dances in the bank via the Admin panel.'}</div>`;
+    el.innerHTML=`<div class="sp-empty">${bank.some(d=>getSpotifyLinks(d).length)?'No dances match your search.':'No dances have Spotify links yet.<br>Add Spotify URLs to dances in the bank via the Admin panel.'}</div>`;
     spUpdateFooter(); return;
   }
 
@@ -5800,7 +6309,7 @@ function spToggle(id){
 }
 
 function spSelectGroup(group){
-  const withSpotify=bank.filter(d=>d.spotify&&spUriFromLink(d.spotify));
+  const withSpotify=bank.filter(d=>getSpotifyLinks(d).some(l=>spUriFromLink(l.url)));
   const knowNames=new Set(state.know.map(d=>d.name.toLowerCase()));
   const learnNames=new Set(state.learn.map(d=>d.name.toLowerCase()));
   spSelectedIds.clear();
@@ -5907,9 +6416,11 @@ async function spCreatePlaylist(){
   const skipped=[];
   spSelectedIds.forEach(id=>{
     const d=bank.find(x=>x.id===id);
-    const u=d&&spUriFromLink(d.spotify);
-    if(u) uris.push(u);
-    else if(d) skipped.push(d.name+' (raw: '+d.spotify+')');
+    if(!d){return;}
+    const links=getSpotifyLinks(d);
+    const validUris=links.map(l=>spUriFromLink(l.url)).filter(Boolean);
+    if(validUris.length) uris.push(...validUris);
+    else skipped.push(d.name);
   });
 
   // Show exactly what we're sending so we can debug
@@ -5963,7 +6474,11 @@ async function spCreatePlaylist(){
 // Fallback: if no client ID, just open the first few links
 function spOpenLinksOnly(){
   const links=[];
-  spSelectedIds.forEach(id=>{ const d=bank.find(x=>x.id===id); if(d?.spotify) links.push({name:d.name,url:d.spotify}); });
+  spSelectedIds.forEach(id=>{
+    const d=bank.find(x=>x.id===id);
+    if(!d) return;
+    getSpotifyLinks(d).forEach(l=>{ if(l.url) links.push({name:d.name+(l.label?' – '+l.label:''),url:l.url}); });
+  });
   if(!links.length){ spShowStatus('error','No Spotify links found.'); return; }
   // Copy links to clipboard as a friendly list
   const text=links.map((l,i)=>`${i+1}. ${l.name}\n${l.url}`).join('\n\n');
