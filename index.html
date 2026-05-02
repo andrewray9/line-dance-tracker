@@ -65,6 +65,7 @@
     .user-pill .logout{cursor:pointer;color:var(--t3);font-size:15px;line-height:1;background:none;border:none;font-family:inherit;padding:0;}
     .user-pill .logout:hover{color:var(--red-text);}
     .admin-badge{font-size:11px;font-weight:500;background:var(--amber-bg);color:var(--amber-text);border:0.5px solid var(--amber-border);border-radius:20px;padding:3px 9px;}
+    .mod-badge{font-size:11px;font-weight:500;background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border);border-radius:20px;padding:3px 9px;}
     .subtitle{font-size:13px;color:var(--t2);margin-bottom:1.25rem;}
     .sync-bar{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t2);margin-bottom:1.25rem;}
     .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--t3);flex-shrink:0;}
@@ -85,7 +86,9 @@
     .tab[data-tab="dj"].active{background:#F0FDF4;color:#166534;border-color:#86efac;}
     .tab[data-tab="drewsnight"].active{background:#FFF0E6;color:#8B3A00;border-color:#FFAA66;}
     .tab.admin-tab{color:var(--amber-text);}
+    .tab.mod-tab{color:var(--blue-text);}
     .tab[data-tab="submissions"].active,.tab[data-tab="admin"].active,.tab[data-tab="editpeople"].active{background:#FAEEDA;color:#633806;border-color:#FAC775;}
+    .tab[data-tab="modpanel"].active{background:#E6F1FB;color:#0C447C;border-color:#B5D4F4;}
     .tab[data-tab="feedback"].active{background:#F0FDF4;color:#166534;border-color:#86efac;}
     .tab[data-tab="changelog"].active{background:#F5F0FF;color:#5B21B6;border-color:#C4B5FD;}
 
@@ -131,6 +134,7 @@
       .tab[data-tab="dj"].active{background:#052e16;color:#4ade80;border-color:#16a34a;}
       .tab[data-tab="drewsnight"].active{background:#2e1800;color:#ffaa66;border-color:#8B3A00;}
       .tab[data-tab="submissions"].active,.tab[data-tab="admin"].active,.tab[data-tab="editpeople"].active{background:#2a1d08;color:#f0a840;border-color:#7a4a0a;}
+      .tab[data-tab="modpanel"].active{background:#0e1e2e;color:#6ab4f5;border-color:#1a5a9e;}
       .tab[data-tab="feedback"].active{background:#052e16;color:#4ade80;border-color:#16a34a;}
       .tab[data-tab="changelog"].active{background:#1e1430;color:#a78bfa;border-color:#5B21B6;}
     }
@@ -831,6 +835,7 @@
       <div class="user-pill">
         <span id="user-label"></span>
         <span class="admin-badge" id="admin-badge" style="display:none">Admin</span>
+        <span class="mod-badge" id="mod-badge" style="display:none">Mod</span>
         <button class="logout" onclick="if(confirm('Sign out?'))logout()" title="Sign out">&#215;</button>
       </div>
     </div>
@@ -854,12 +859,13 @@
     <button class="mobile-tab" data-tab="friends" onclick="mobileSwitch('friends')"><span class="mtab-dot"></span>Friends</button>
     <button class="mobile-tab" data-tab="feedback" onclick="mobileSwitch('feedback')"><span class="mtab-dot"></span>Suggestions &amp; Bugs</button>
     <button class="mobile-tab" data-tab="changelog" onclick="mobileSwitch('changelog')"><span class="mtab-dot" style="background:#8b5cf6;"></span>Changelog</button>
-    <button class="mobile-tab" data-tab="drewsnight" id="mobile-tab-drewsnight" style="display:none" onclick="mobileSwitch('drewsnight')"><span class="mtab-dot" style="background:#ff8c42;"></span>Drew's Night</button>
+    <button class="mobile-tab" data-tab="drewsnight" id="mobile-tab-drewsnight" style="display:none" onclick="mobileSwitch('drewsnight')"><span class="mtab-dot" style="background:#ff8c42;"></span>Night</button>
     <div class="mobile-menu-section" id="mobile-admin-section" style="display:none">Admin</div>
     <button class="mobile-tab" data-tab="dj" id="mobile-tab-dj" style="display:none" onclick="mobileSwitch('dj')"><span class="mtab-dot"></span>Test Features</button>
     <button class="mobile-tab" data-tab="submissions" id="mobile-tab-submissions" style="display:none" onclick="mobileSwitch('submissions')"><span class="mtab-dot"></span>&#9888; Submissions</button>
     <button class="mobile-tab" data-tab="admin" id="mobile-tab-admin" style="display:none" onclick="mobileSwitch('admin')"><span class="mtab-dot"></span>&#9733; Admin</button>
     <button class="mobile-tab" data-tab="editpeople" id="mobile-tab-editpeople" style="display:none" onclick="mobileSwitch('editpeople')"><span class="mtab-dot"></span>&#9998; Edit People</button>
+    <button class="mobile-tab" data-tab="modpanel" id="mobile-tab-modpanel" style="display:none" onclick="mobileSwitch('modpanel')"><span class="mtab-dot" style="background:#3b82f6;"></span>&#128737; Mod Panel</button>
     <button class="mobile-tab" data-tab="debug" id="mobile-tab-debug" style="display:none" onclick="mobileSwitch('debug')"><span class="mtab-dot" style="background:#6366f1;"></span>&#128269; Debug</button>
   </div>
 
@@ -870,7 +876,7 @@
     <button class="tab" data-tab="learn" onclick="switchTab('learn')" style="display:none">Want to Learn</button>
     <button class="tab" data-tab="night" onclick="switchTab('night')">My Night</button>
     <button class="tab" data-tab="log" onclick="switchTab('log')">Analytics</button>
-    <button class="tab" data-tab="drewsnight" id="drewsnight-tab-btn" style="display:none" onclick="switchTab('drewsnight')">🌟 Drew's Night</button>
+    <button class="tab" data-tab="drewsnight" id="drewsnight-tab-btn" style="display:none" onclick="switchTab('drewsnight')">Night</button>
     <button class="tab" data-tab="dj" id="dj-tab-btn" style="display:none" onclick="switchTab('dj')">Test Features</button>
     <button class="tab" data-tab="friends" onclick="switchTab('friends')">Friends</button>
     <button class="tab" data-tab="feedback" onclick="switchTab('feedback')">Suggestions &amp; Bugs</button>
@@ -878,7 +884,8 @@
     <button class="tab admin-tab" data-tab="submissions" id="submissions-tab" style="display:none" onclick="switchTab('submissions')">&#9888; Submissions <span id="submissions-badge" style="display:none;background:var(--red-text);color:#fff;font-size:10px;padding:1px 6px;border-radius:20px;margin-left:4px;"></span></button>
     <button class="tab admin-tab" data-tab="admin" id="admin-tab" style="display:none" onclick="switchTab('admin')">&#9733; Admin</button>
     <button class="tab admin-tab" data-tab="editpeople" id="editpeople-tab" style="display:none" onclick="switchTab('editpeople')">&#9998; Edit People</button>
-    <button class="tab admin-tab" data-tab="debug" id="debug-tab" style="display:none" onclick="switchTab('debug')">&#128269; Debug</button>
+    <button class="tab mod-tab" data-tab="modpanel" id="modpanel-tab" style="display:none" onclick="switchTab('modpanel')"> Mod Panel</button>
+    <button class="tab admin-tab" data-tab="debug" id="debug-tab" style="display:none" onclick="switchTab('debug')">Debug</button>
   </div>
 
   <!-- HOME -->
@@ -935,7 +942,7 @@
       </button>
       <button class="home-card hc-rose" id="home-card-drewsnight" style="display:none" onclick="switchTab('drewsnight')">
         <span class="home-card-icon">🌟</span>
-        <span class="home-card-title">Drew's Night</span>
+        <span class="home-card-title">Night</span>
         <span class="home-card-desc">Log dances performed &amp; not performed</span>
         <span class="home-card-arrow">→</span>
       </button>
@@ -955,6 +962,12 @@
         <span class="home-card-icon">⚠️</span>
         <span class="home-card-title">Submissions <span id="home-sub-badge" style="display:none;background:rgba(255,255,255,0.35);color:#fff;font-size:11px;padding:1px 7px;border-radius:20px;margin-left:4px;vertical-align:middle;"></span></span>
         <span class="home-card-desc">Review user dance suggestions</span>
+        <span class="home-card-arrow">→</span>
+      </button>
+      <button class="home-card" id="home-card-modpanel" style="display:none;background:linear-gradient(135deg,#3b82f6,#1d4ed8);" onclick="switchTab('modpanel')">
+        <span class="home-card-icon">🛡️</span>
+        <span class="home-card-title">Mod Panel</span>
+        <span class="home-card-desc">Manage the dance bank</span>
         <span class="home-card-arrow">→</span>
       </button>
       <button class="home-card" id="home-card-debug" style="display:none;background:linear-gradient(135deg,#4f46e5,#7c3aed);" onclick="switchTab('debug')">
@@ -1175,60 +1188,51 @@
     <div id="dj-records-list"></div>
 
     <!-- PERSONAL STATS DASHBOARD -->
-    <div class="section-title" style="margin-top:2rem">&#127942; Personal Stats</div>
+    <div class="section-title" style="margin-top:2rem"> Personal Stats</div>
     <div class="stats-grid" id="tf-personal-stats"></div>
 
     <!-- REPERTOIRE PROGRESS -->
-    <div class="section-title" style="margin-top:1.5rem">&#127891; Repertoire Progress</div>
+    <div class="section-title" style="margin-top:1.5rem"> Dance Progress</div>
     <div id="tf-repertoire"></div>
 
     <!-- NIGHT PATTERNS -->
-    <div class="section-title" style="margin-top:1.5rem">&#128197; Night Patterns</div>
+    <div class="section-title" style="margin-top:1.5rem"> Night Patterns</div>
     <div id="tf-night-patterns"></div>
 
-    <!-- LEARNING TIMELINE -->
-    <div class="section-title" style="margin-top:1.5rem">&#128200; Learning Timeline</div>
-    <p class="section-note">Songs added to your "Dances I Know" list per month.</p>
-    <div id="tf-learn-timeline"></div>
-
     <!-- NEVER DANCED -->
-    <div class="section-title" style="margin-top:1.5rem">&#128373; Dances You Know But Never Logged</div>
-    <p class="section-note">These are in your "Dances I Know" list but haven't appeared on any logged night.</p>
+    <div class="section-title" style="margin-top:1.5rem"> Dances You Know But Never Logged</div>
     <div id="tf-never-danced"></div>
 
     <!-- ACTIVITY HEATMAP -->
-    <div class="section-title" style="margin-top:1.5rem">&#128293; Activity Heatmap</div>
-    <p class="section-note">Your dance nights — scales to fit your data, darker = more dances.</p>
+    <div class="section-title" style="margin-top:1.5rem">Activity Heatmap</div>
     <div id="tf-heatmap"></div>
 
     <!-- SIGNATURE MOVES -->
-    <div class="section-title" style="margin-top:1.5rem">&#11088; Signature Moves</div>
-    <p class="section-note">Dances you perform on the highest % of your nights out. Ties share a rank.</p>
+    <div class="section-title" style="margin-top:1.5rem"> Signature Moves</div>
+    <p class="section-note">Dances you perform the most</p>
     <div id="tf-signature"></div>
 
     <!-- DJ CHEMISTRY -->
-    <div class="section-title" style="margin-top:1.5rem">&#127926; DJ Chemistry</div>
-    <p class="section-note">Average dances per night with each DJ.</p>
+    <div class="section-title" style="margin-top:1.5rem"> DJ Chemistry</div>
+    <p class="section-note">Average dances per night with each DJ</p>
     <div id="tf-dj-chem"></div>
 
     <!-- DJ FREESTYLE BAR CHART -->
-    <div class="section-title" style="margin-top:1.5rem">&#127926; DJ Freestyle Times</div>
-    <p class="section-note">Total freestyle time logged per DJ — colorful comparison.</p>
+    <div class="section-title" style="margin-top:1.5rem">DJ Freestyle Times</div>
+    <p class="section-note">Total freestyle time logged per DJ</p>
     <div id="tf-dj-freestyle-chart"></div>
 
     <!-- TRENDING -->
-    <div class="section-title" style="margin-top:1.5rem">&#128200; Trending &amp; Fading</div>
-    <p class="section-note">Compared to your all-time habits, what's heating up or cooling off lately?</p>
+    <div class="section-title" style="margin-top:1.5rem"> Trending &amp; Fading</div>
     <div id="tf-trending"></div>
 
     <!-- FAVORITES VS REALITY -->
-    <div class="section-title" style="margin-top:1.5rem">&#10084; Favorites vs. Reality</div>
-    <p class="section-note">How often do your hearted favorites actually make it onto a night?</p>
+    <div class="section-title" style="margin-top:1.5rem"> Favorites vs. Reality</div>
     <div id="tf-favs-reality"></div>
 
     <!-- NIGHT VIEWER -->
-    <div class="section-title" style="margin-top:2rem">&#128269; Night Viewer</div>
-    <p class="section-note">Select one of your nights to see a full breakdown and activity heatmap.</p>
+    <div class="section-title" style="margin-top:2rem"> Night Viewer</div>
+    <p class="section-note">Select one of your nights to see a full breakdown and activity heatmap</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;align-items:flex-end;">
       <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:160px;">
         <label style="font-size:12px;font-weight:500;color:var(--t2);">Date</label>
@@ -1395,6 +1399,72 @@
         <div id="admin-users-list"><p class="section-note">Loading...</p></div>
       </div>
     </div>
+    <div class="admin-section-collapsible collapsed" id="admin-mods-section">
+      <div class="admin-section-header" onclick="toggleAdminSection('admin-mods-section');adminLoadModSection()">Manage moderators <span class="admin-caret">&#9660;</span></div>
+      <div class="admin-section-body">
+        <p style="font-size:13px;color:var(--t2);margin-bottom:1rem;">Moderators get a <span style="font-size:11px;font-weight:500;background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border);border-radius:20px;padding:2px 8px;">Mod</span> badge and access to the Mod Panel to manage the dance bank.</p>
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <select id="admin-mod-user-select" style="flex:1;min-width:160px;padding:8px 12px;border:0.5px solid var(--blue-border);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;">
+            <option value="">— Select a user —</option>
+          </select>
+          <button class="btn info" onclick="adminAddMod()">Add Mod</button>
+        </div>
+        <div id="admin-mod-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+    </div>
+    <div class="admin-section-collapsible collapsed" id="admin-tab-visibility-section">
+      <div class="admin-section-header" onclick="toggleAdminSection('admin-tab-visibility-section');renderAdminTabVisibility()">&#128065; Tab Visibility by Role <span class="admin-caret">&#9660;</span></div>
+      <div class="admin-section-body">
+        <p style="font-size:13px;color:var(--t2);margin-bottom:1rem;">Control which tabs (and their home screen cards) are visible for each role. Admins always see everything. Changes take effect on next login.</p>
+        <div id="admin-tab-visibility-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOD PANEL -->
+  <div id="tab-modpanel" class="section">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap;">
+      <div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:4px;">Mod Panel</h2>
+        <p class="section-note" style="margin:0">Manage the dance bank</p>
+      </div>
+      <span style="margin-left:auto;font-size:11px;font-weight:500;background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border);border-radius:20px;padding:4px 12px;">Mod</span>
+    </div>
+
+    <!-- Add Dance -->
+    <div class="admin-form collapsed" id="mod-add-dance-form">
+      <div class="admin-form-title" onclick="toggleAdminSection('mod-add-dance-form')">&#43; Add a dance to the bank <span class="admin-caret">&#9660;</span></div>
+      <div class="admin-form-body">
+        <div class="admin-form-grid">
+          <input type="text" id="mod-bank-name" placeholder="Dance name" class="full">
+          <input type="url" id="mod-bank-demo" placeholder="Demo link (YouTube URL)">
+          <input type="url" id="mod-bank-tutorial" placeholder="Tutorial link (YouTube URL)">
+          <input type="url" id="mod-bank-spotify" placeholder="Spotify link (optional)" class="full">
+          <select id="mod-bank-diff" class="full">
+            <option value="">Difficulty (optional)</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Improver">Improver</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+          </select>
+          <input type="number" id="mod-bank-counts" placeholder="Counts (e.g. 32)" min="0">
+          <input type="number" id="mod-bank-walls" placeholder="Walls (e.g. 4)" min="0">
+          <input type="number" id="mod-bank-tags" placeholder="Tags (e.g. 0)" min="0">
+        </div>
+        <div class="admin-form-row"><button class="btn info" onclick="modAddDance()">Add to bank</button></div>
+      </div>
+    </div>
+
+    <!-- Edit Dance Bank -->
+    <div class="admin-section-collapsible collapsed" id="mod-bank-section">
+      <div class="admin-section-header" onclick="toggleAdminSection('mod-bank-section')">Edit dance bank <span class="admin-caret">&#9660;</span></div>
+      <div class="admin-section-body">
+        <div style="margin-bottom:10px;">
+          <input type="text" id="mod-bank-search" placeholder="Search dances..." oninput="renderModBank()" style="width:100%;padding:8px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;">
+        </div>
+        <div id="mod-bank-list"></div>
+      </div>
+    </div>
   </div>
 
   <!-- DEBUG -->
@@ -1518,7 +1588,7 @@ const SUPABASE_URL='https://chuvnwaqtgyqrwdpzpfx.supabase.co';
 const SUPABASE_KEY='sb_publishable_1k44O83Uhj5OABd-VB_wLQ_fFJb1woU';
 const ADMIN_USER='drew';
 
-let currentUser=null,isAdmin=false;
+let currentUser=null,isAdmin=false,isMod=false;
 let state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[],favoriteFriends:[]};
 let drewDJFreestyles={}; // Drew's DJ freestyle data, loaded for all users
 let bank=[];
@@ -1526,7 +1596,27 @@ let drewPicks=[];
 let submissions=[]; // shared list of user-submitted dances not in bank
 let friendCards=[]; // shared list of friend profile cards
 let djList=[]; // shared list of DJs managed by admin
+let modList=[]; // shared list of moderator usernames
 let homeConfig={}; // admin-configurable home card gradients
+let tabVisibilityConfig={}; // admin-configurable tab visibility per role
+
+// Tabs that can have their visibility toggled per role by the admin.
+// 'alwaysFor' lists roles that always see it (not toggleable).
+// 'roles' lists roles the admin can grant/revoke visibility for.
+const TAB_VISIBILITY_REGISTRY=[
+  {key:'bank',      label:'Dance Bank',        tabId:'tab-btn-bank',      homeCardId:'home-card-bank',      mobileTabId:null,                    alwaysFor:['all'],  roles:[]},
+  {key:'night',     label:'My Night',          tabId:null,                homeCardId:'home-card-night',     mobileTabId:null,                    alwaysFor:['all'],  roles:[]},
+  {key:'log',       label:'Analytics',         tabId:null,                homeCardId:'home-card-log',       mobileTabId:null,                    alwaysFor:['all'],  roles:[]},
+  {key:'friends',   label:'Friends',           tabId:null,                homeCardId:'home-card-friends',   mobileTabId:null,                    alwaysFor:['all'],  roles:[]},
+  {key:'feedback',  label:'Suggestions & Bugs',tabId:null,                homeCardId:'home-card-feedback',  mobileTabId:null,                    alwaysFor:['all'],  roles:[]},
+  {key:'changelog', label:'Changelog',         tabId:null,                homeCardId:null,                  mobileTabId:null,                    alwaysFor:['all'],  roles:[]},
+  {key:'modpanel',  label:'Mod Panel',         tabId:'modpanel-tab',      homeCardId:'home-card-modpanel',  mobileTabId:'mobile-tab-modpanel',   alwaysFor:['admin'],roles:['mod']},
+  {key:'dj',        label:'Test Features',     tabId:'dj-tab-btn',        homeCardId:'home-card-dj',        mobileTabId:'mobile-tab-dj',         alwaysFor:['admin'],roles:['mod']},
+  {key:'submissions',label:'Submissions',      tabId:'submissions-tab',   homeCardId:'home-card-submissions',mobileTabId:'mobile-tab-submissions',alwaysFor:['admin'],roles:['mod']},
+  {key:'editpeople',label:'Edit People',       tabId:'editpeople-tab',    homeCardId:null,                  mobileTabId:'mobile-tab-editpeople', alwaysFor:['admin'],roles:['mod']},
+  {key:'drewsnight',label:"Night",             tabId:'drewsnight-tab-btn',homeCardId:'home-card-drewsnight',mobileTabId:'mobile-tab-drewsnight', alwaysFor:['admin'],roles:['mod']},
+  {key:'debug',     label:'Debug',             tabId:'debug-tab',         homeCardId:'home-card-debug',     mobileTabId:'mobile-tab-debug',      alwaysFor:['admin'],roles:['mod']},
+];
 let selectedDate='',nightSelections={};
 let drewsSelectedDate='',drewsNightSelections={},drewsNotPerfSelections={};
 let drewsNightSaveTimeout=null;
@@ -1810,6 +1900,18 @@ async function loadDJList(){
   const r=await sbFetch(`/rest/v1/dances?username=eq.__djlist__&select=data`);
   djList=(r.ok&&r.data&&r.data.length>0)?(r.data[0].data.djs||[]):[];
 }
+async function loadModList(){
+  const r=await sbFetch(`/rest/v1/dances?username=eq.__modlist__&select=data`);
+  modList=(r.ok&&r.data&&r.data.length>0)?(r.data[0].data.mods||[]):[];
+}
+async function saveModListToCloud(){
+  const check=await sbFetch(`/rest/v1/dances?username=eq.__modlist__&select=username`);
+  if(check.ok&&check.data&&check.data.length>0){
+    await sbFetch(`/rest/v1/dances?username=eq.__modlist__`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:{mods:modList},updated_at:new Date().toISOString()})});
+  } else {
+    await sbFetch('/rest/v1/dances',{method:'POST',prefer:'return=minimal',body:JSON.stringify({username:'__modlist__',password:'__modlist__',data:{mods:modList}})});
+  }
+}
 async function loadDrewDJFreestyles(){
   // Load Drew's freestyle data so all users can see the DJ stats on Analytics
   if(isAdmin){
@@ -1837,16 +1939,19 @@ async function saveDJListToCloud(){
 
 async function loadHomeConfig(){
   const r=await sbFetch(`/rest/v1/dances?username=eq.__homeconfig__&select=data`);
-  homeConfig=(r.ok&&r.data&&r.data.length>0)?(r.data[0].data.cards||{}):{}; 
+  const data=(r.ok&&r.data&&r.data.length>0)?r.data[0].data:{};
+  homeConfig=data.cards||{};
+  tabVisibilityConfig=data.tabVisibility||{};
   applyHomeCardGradients();
 }
 async function saveHomeConfigToCloud(){
   setSyncStatus('syncing','Syncing...');
   const check=await sbFetch(`/rest/v1/dances?username=eq.__homeconfig__&select=username`);
+  const payload={cards:homeConfig,tabVisibility:tabVisibilityConfig};
   if(check.ok&&check.data&&check.data.length>0){
-    await sbFetch(`/rest/v1/dances?username=eq.__homeconfig__`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:{cards:homeConfig},updated_at:new Date().toISOString()})});
+    await sbFetch(`/rest/v1/dances?username=eq.__homeconfig__`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:payload,updated_at:new Date().toISOString()})});
   } else {
-    await sbFetch('/rest/v1/dances',{method:'POST',prefer:'return=minimal',body:JSON.stringify({username:'__homeconfig__',password:'__homeconfig__',data:{cards:homeConfig}})});
+    await sbFetch('/rest/v1/dances',{method:'POST',prefer:'return=minimal',body:JSON.stringify({username:'__homeconfig__',password:'__homeconfig__',data:payload})});
   }
   setSyncStatus('synced','Synced');
   applyHomeCardGradients();
@@ -1864,6 +1969,9 @@ const HOME_CARD_DEFAULTS={
   'home-card-admin':       'linear-gradient(135deg,#fc5c7d,#6a82fb)',
   'home-card-submissions': 'linear-gradient(135deg,#e52d27,#b31217)',
   'home-card-feedback':    'linear-gradient(135deg,#11998e,#38ef7d)',
+  'home-card-modpanel':    'linear-gradient(135deg,#3b82f6,#1d4ed8)',
+  'home-card-changelog':   'linear-gradient(135deg,#7c3aed,#a855f7)',
+  'home-card-drewsnight':  'linear-gradient(135deg,#fc5c7d,#6a82fb)',
 };
 const HOME_CARD_LABELS={
   'home-card-bank':'Dance Bank','home-card-know':'Dances I Know',
@@ -1871,6 +1979,8 @@ const HOME_CARD_LABELS={
   'home-card-log':'Analytics','home-card-friends':'Friends',
   'home-card-dj':'Test Features','home-card-admin':'Admin',
   'home-card-submissions':'Submissions','home-card-feedback':'Suggestions & Bugs',
+  'home-card-modpanel':'Mod Panel','home-card-changelog':'Changelog',
+  'home-card-drewsnight':'Night (Drew\'s Night)',
 };
 function applyHomeCardGradients(){
   Object.keys(HOME_CARD_DEFAULTS).forEach(id=>{
@@ -1922,6 +2032,116 @@ function resetHomeCardGrad(cardId){
   delete homeConfig[cardId];
   applyHomeCardGradients();
   saveHomeConfigToCloud();
+}
+
+// ---- Tab Visibility ----
+function isTabVisible(entry){
+  // Admin always sees everything
+  if(isAdmin) return entry.alwaysFor.includes('admin')||entry.alwaysFor.includes('all')||entry.roles.length>0;
+  // All users always see 'all' tabs
+  if(entry.alwaysFor.includes('all')) return true;
+  // Check role-based visibility toggled by admin
+  if(isMod&&entry.roles.includes('mod')){
+    // Default: mod sees modpanel by default, others only if admin toggled on
+    const cfg=tabVisibilityConfig[entry.key];
+    if(cfg&&cfg.mod===false) return false;
+    if(entry.key==='modpanel') return true; // modpanel is on for mods by default
+    return cfg&&cfg.mod===true;
+  }
+  return false;
+}
+
+function applyTabVisibility(){
+  // Always hide admin-only UI elements for non-admins
+  ['admin-tab','submissions-tab','editpeople-tab','debug-tab'].forEach(id=>{
+    const el=document.getElementById(id);if(el) el.style.display=isAdmin?'inline-block':'none';
+  });
+  ['mobile-tab-submissions','mobile-tab-admin','mobile-tab-editpeople','mobile-tab-debug'].forEach(id=>{
+    const el=document.getElementById(id);if(el) el.style.display=isAdmin?'':'none';
+  });
+  // Apply registry-driven visibility
+  TAB_VISIBILITY_REGISTRY.forEach(entry=>{
+    const visible=isTabVisible(entry);
+    if(entry.tabId){
+      const el=document.getElementById(entry.tabId);
+      if(el) el.style.display=visible?'inline-block':'none';
+    }
+    if(entry.mobileTabId){
+      const el=document.getElementById(entry.mobileTabId);
+      if(el) el.style.display=visible?'':'none';
+    }
+    if(entry.homeCardId){
+      const el=document.getElementById(entry.homeCardId);
+      if(el){
+        // For admin-only cards shown to admin, always show; for mod home card don't show admin duplicate
+        if(isAdmin){
+          // Admin sees their own special cards, not the mod version of modpanel home card
+          if(entry.key==='modpanel') el.style.display='none';
+          else el.style.display=visible?'':'none';
+        } else {
+          el.style.display=visible?'':'none';
+        }
+      }
+    }
+  });
+  // Admin-only home cards always visible for admin
+  if(isAdmin){
+    ['home-card-admin','home-card-dj','home-card-submissions','home-card-debug'].forEach(id=>{
+      const el=document.getElementById(id);if(el) el.style.display='';
+    });
+  }
+  // For admin/mod: replace My Night card with Night (drewsnight) card in the same position
+  const nightCard=document.getElementById('home-card-night');
+  const drewsNightCard=document.getElementById('home-card-drewsnight');
+  if(isAdmin||isMod){
+    // Move Night card to My Night's position if not already there
+    if(nightCard&&drewsNightCard&&nightCard.parentNode&&drewsNightCard.parentNode===nightCard.parentNode){
+      nightCard.parentNode.insertBefore(drewsNightCard,nightCard);
+    }
+    if(nightCard) nightCard.style.display='none';
+    if(drewsNightCard) drewsNightCard.style.display='';
+  } else {
+    if(nightCard) nightCard.style.display='';
+    // drewsnight home card visibility for regular users handled by registry above
+  }
+}
+
+function renderAdminTabVisibility(){
+  const el=document.getElementById('admin-tab-visibility-list');
+  if(!el) return;
+  // Only show tabs that have configurable roles
+  const configurable=TAB_VISIBILITY_REGISTRY.filter(e=>e.roles.length>0);
+  el.innerHTML=configurable.map(entry=>{
+    const allRoles=['mod']; // expandable in future
+    const roleToggles=allRoles.filter(r=>entry.roles.includes(r)).map(role=>{
+      const cfg=tabVisibilityConfig[entry.key];
+      // Determine current checked state
+      let checked;
+      if(entry.key==='modpanel'&&role==='mod') checked=cfg?.mod!==false; // on by default
+      else checked=cfg?.mod===true;
+      const roleLabel=role==='mod'?'Mod':'';
+      const roleColor=role==='mod'?'var(--blue-text)':'var(--t2)';
+      const roleBg=role==='mod'?'var(--blue-bg)':'var(--bg2)';
+      const roleBorder=role==='mod'?'var(--blue-border)':'var(--b3)';
+      return `<label style="display:flex;align-items:center;gap:7px;cursor:pointer;padding:5px 10px;border-radius:var(--radius-md);background:${roleBg};border:0.5px solid ${roleBorder};">
+        <input type="checkbox" ${checked?'checked':''} onchange="setTabVisibility('${entry.key}','${role}',this.checked)" style="width:15px;height:15px;accent-color:var(--blue-text);cursor:pointer;flex-shrink:0;">
+        <span style="font-size:12px;font-weight:500;color:${roleColor};">${roleLabel}</span>
+      </label>`;
+    }).join('');
+    return `<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;border:0.5px solid var(--b3);border-radius:var(--radius-md);background:var(--bg);flex-wrap:wrap;">
+      <div style="flex:1;min-width:120px;">
+        <div style="font-size:13px;font-weight:500;color:var(--t1);">${entry.label}</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px;">tab: ${entry.key}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">${roleToggles}</div>
+    </div>`;
+  }).join('');
+}
+
+async function setTabVisibility(tabKey,role,enabled){
+  if(!tabVisibilityConfig[tabKey]) tabVisibilityConfig[tabKey]={};
+  tabVisibilityConfig[tabKey][role]=enabled;
+  await saveHomeConfigToCloud();
 }
 
 function toggleAuthMode() {
@@ -2028,6 +2248,7 @@ async function authSubmit() {
     await loadSubmissions();
     await loadFriendCards();
     await loadDJList();
+    await loadModList();
     await loadHomeConfig();
     await loadDrewDJFreestyles();
     await clLoad();
@@ -2042,6 +2263,8 @@ async function authSubmit() {
 
 function enterApp(username){
   currentUser=username;isAdmin=username===ADMIN_USER;
+  // Check if user is a moderator (loaded from modList)
+  isMod=isAdmin||modList.includes(username);
   localStorage.setItem('ld_user',username);
   loadFavoriteFriends();
   hideSplash();
@@ -2051,6 +2274,8 @@ function enterApp(username){
   clMaybeShowModal();
   document.getElementById('user-label').textContent=username;
   document.getElementById('admin-badge').style.display=isAdmin?'inline':'none';
+  const modBadgeEl=document.getElementById('mod-badge');
+  if(modBadgeEl) modBadgeEl.style.display=(!isAdmin&&isMod)?'inline':'none';
   document.getElementById('admin-tab').style.display=isAdmin?'inline-block':'none';
   document.getElementById('submissions-tab').style.display=isAdmin?'inline-block':'none';
   document.getElementById('editpeople-tab').style.display=isAdmin?'inline-block':'none';
@@ -2058,21 +2283,9 @@ function enterApp(username){
   document.getElementById('dj-tab-btn').style.display=isAdmin?'inline-block':'none';
   document.getElementById('drewsnight-tab-btn').style.display=isAdmin?'inline-block':'none';
   document.getElementById('picks-admin-panel').style.display=isAdmin?'block':'none';
-  const homeAdminCard=document.getElementById('home-card-admin');
-  const homeDJCard=document.getElementById('home-card-dj');
-  const homeSubCard=document.getElementById('home-card-submissions');
-  if(homeAdminCard) homeAdminCard.style.display=isAdmin?'':'none';
-  if(homeDJCard) homeDJCard.style.display=isAdmin?'':'none';
-  if(homeSubCard) homeSubCard.style.display=isAdmin?'':'none';
-  const homeDrawNightCard=document.getElementById('home-card-drewsnight');
-  if(homeDrawNightCard) homeDrawNightCard.style.display=isAdmin?'':'none';
-  const homeDebugCard=document.getElementById('home-card-debug');
-  if(homeDebugCard) homeDebugCard.style.display=isAdmin?'':'none';
-  ['mobile-tab-dj','mobile-tab-submissions','mobile-tab-admin','mobile-tab-editpeople','mobile-tab-drewsnight','mobile-tab-debug'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.style.display=isAdmin?'':'none';
-  });
+  applyTabVisibility();
   const adminSection=document.getElementById('mobile-admin-section');
-  if(adminSection) adminSection.style.display=isAdmin?'':'none';
+  if(adminSection) adminSection.style.display=(isAdmin||isMod)?'':'none';
   const greet=document.getElementById('home-greeting');
   recRefresh();
   if(greet){greet.textContent='Where would you like to go?';}
@@ -2095,7 +2308,8 @@ function enterApp(username){
   // Restore the tab the user was on before the last refresh, default to home
   const savedTab = localStorage.getItem('ld_active_tab') || 'home';
   const adminTabs = ['submissions','admin','editpeople','dj','drewsnight','debug'];
-  if(savedTab && !(adminTabs.includes(savedTab) && !isAdmin)){
+  const modTabs = ['modpanel'];
+  if(savedTab && !(adminTabs.includes(savedTab) && !isAdmin) && !(modTabs.includes(savedTab) && !isMod)){
     switchTab(savedTab);
   } else {
     switchTab('home');
@@ -2195,6 +2409,7 @@ async function tryAutoLogin() {
       await loadSubmissions();
       await loadFriendCards();
       await loadDJList();
+      await loadModList();
       await loadHomeConfig();
       await loadDrewDJFreestyles();
       await clLoad();
@@ -2298,7 +2513,7 @@ function switchTab(tab,_fromSwipe=false){
   if(tab==='drewsnight') renderDrewsNight();
   if(tab==='log'){renderHistoryStats();renderTop5();renderLog();renderDJAnalytics();renderTFDJFavs();}
   if(tab==='admin'){
-    ['admin-gradients-form','admin-dj-form','admin-add-dance-form','admin-bank-section','admin-users-section'].forEach(id=>{
+    ['admin-gradients-form','admin-dj-form','admin-add-dance-form','admin-bank-section','admin-users-section','admin-mods-section','admin-tab-visibility-section'].forEach(id=>{
       const s=document.getElementById(id);if(s) s.classList.add('collapsed');
     });
     const bs=document.getElementById('admin-bank-search');if(bs) bs.value='';
@@ -2315,6 +2530,7 @@ function switchTab(tab,_fromSwipe=false){
   if(tab==='editpeople') epRefreshUsers();
   if(tab==='debug') renderDebugTab();
   if(tab==='changelog') renderChangelog();
+  if(tab==='modpanel') renderModBank();
 }
 
 // ---- Sort helpers ----
@@ -2716,6 +2932,7 @@ function renderAdminUsers(){
       <div style="display:flex;align-items:center;gap:10px;padding:10px 15px;cursor:pointer;transition:background 0.1s;" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background=''" onclick="adminToggleUser('${safeId}')">
         <span style="flex:1;font-size:14px;font-weight:500;">${esc(u.username)}</span>
         ${u.username===ADMIN_USER?'<span class="admin-badge">Admin</span>':''}
+        ${modList.includes(u.username)&&u.username!==ADMIN_USER?'<span class="mod-badge">Mod</span>':''}
         <span style="display:flex;gap:4px;flex-shrink:0;">
           <span style="font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--green-bg);border:0.5px solid var(--green-border);color:var(--green-text)">${knowCount} know</span>
           <span style="font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--blue-bg);border:0.5px solid var(--blue-border);color:var(--blue-text)">${learnCount} learning</span>
@@ -2753,7 +2970,161 @@ function adminEditUser(username){
   }
 }
 
-// ---- My lists ----
+// ---- Mod Management (admin only) ----
+async function adminLoadModSection(){
+  // Load users into the select
+  const sel=document.getElementById('admin-mod-user-select');
+  if(!sel||sel.options.length>1) return; // already loaded
+  const r=await sbFetch(`/rest/v1/dances?username=neq.__bank__&username=neq.__picks__&username=neq.__submissions__&username=neq.__friendcards__&username=neq.__djlist__&username=neq.__modlist__&username=neq.__homeconfig__&username=neq.__changelog__&select=username&order=username.asc`);
+  if(!r.ok||!r.data) return;
+  const users=r.data.filter(u=>!u.username.startsWith('__')&&u.username!==ADMIN_USER);
+  sel.innerHTML=`<option value="">— Select a user —</option>`+users.map(u=>`<option value="${escA(u.username)}">${esc(u.username)}</option>`).join('');
+  renderAdminModList();
+}
+async function adminAddMod(){
+  if(!isAdmin) return;
+  const sel=document.getElementById('admin-mod-user-select');
+  const username=sel?.value;
+  if(!username){alert('Please select a user.');return;}
+  if(modList.includes(username)){alert('That user is already a moderator.');return;}
+  modList.push(username);
+  await saveModListToCloud();
+  renderAdminModList();
+  sel.value='';
+}
+async function adminRemoveMod(username){
+  if(!isAdmin) return;
+  if(!confirm(`Remove mod role from "${username}"?`)) return;
+  modList=modList.filter(m=>m!==username);
+  await saveModListToCloud();
+  renderAdminModList();
+}
+function renderAdminModList(){
+  const el=document.getElementById('admin-mod-list');
+  if(!el) return;
+  if(!modList.length){el.innerHTML=`<div class="empty" style="font-size:13px;color:var(--t3);">No moderators yet.</div>`;return;}
+  el.innerHTML=modList.map(username=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border:0.5px solid var(--blue-border);border-radius:var(--radius-md);background:var(--blue-bg);">
+      <span style="flex:1;font-size:13px;font-weight:500;color:var(--t1)">${esc(username)}</span>
+      <span style="font-size:11px;font-weight:500;background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border);border-radius:20px;padding:2px 9px;">Mod</span>
+      <button class="btn xs danger" onclick="adminRemoveMod('${escA(username)}')">Remove</button>
+    </div>`).join('');
+}
+
+// ---- Mod Panel (mod + admin) ----
+async function modAddDance(){
+  if(!isMod) return;
+  const name=document.getElementById('mod-bank-name').value.trim();
+  if(!name){alert('Please enter a dance name.');return;}
+  if(bank.some(d=>d.name.toLowerCase()===name.toLowerCase())){alert('That dance is already in the bank.');return;}
+  const demo=document.getElementById('mod-bank-demo').value.trim();
+  const tutorial=document.getElementById('mod-bank-tutorial').value.trim();
+  const spotify=document.getElementById('mod-bank-spotify').value.trim();
+  const difficulty=document.getElementById('mod-bank-diff').value;
+  const counts=document.getElementById('mod-bank-counts').value.trim();
+  const walls=document.getElementById('mod-bank-walls').value.trim();
+  const tags=document.getElementById('mod-bank-tags').value.trim();
+  bank.push({id:Date.now()+'',name,demo,tutorial,spotify,difficulty,counts:counts?Number(counts):null,walls:walls?Number(walls):null,tags:tags?Number(tags):null,added:new Date().toISOString()});
+  saveBankToCloud();renderBank();renderModBank();
+  document.getElementById('mod-bank-name').value='';
+  document.getElementById('mod-bank-demo').value='';
+  document.getElementById('mod-bank-tutorial').value='';
+  document.getElementById('mod-bank-spotify').value='';
+  document.getElementById('mod-bank-diff').value='';
+  document.getElementById('mod-bank-counts').value='';
+  document.getElementById('mod-bank-walls').value='';
+  document.getElementById('mod-bank-tags').value='';
+}
+function renderModBank(){
+  const el=document.getElementById('mod-bank-list');
+  if(!el) return;
+  if(!bank.length){el.innerHTML=`<div class="empty">No dances in the bank yet.</div>`;return;}
+  const q=(document.getElementById('mod-bank-search')?.value||'').trim().toLowerCase();
+  const sorted=[...bank].sort((a,b)=>a.name.localeCompare(b.name)).filter(d=>!q||d.name.toLowerCase().includes(q));
+  if(!sorted.length){el.innerHTML=`<div class="empty">No dances match your search.</div>`;return;}
+  el.innerHTML=sorted.map(d=>{
+    const diffBadge=d.difficulty?`<span class="diff-badge diff-${d.difficulty}">${d.difficulty}</span>`:'';
+    const demoLink=d.demo?`<a class="link-btn demo" href="${escA(d.demo)}" target="_blank" rel="noopener">&#9654; Demo</a>`:`<span style="font-size:12px;color:var(--t3)">No demo</span>`;
+    const tutLink=d.tutorial?`<a class="link-btn tutorial" href="${escA(d.tutorial)}" target="_blank" rel="noopener">&#127891; Tutorial</a>`:`<span style="font-size:12px;color:var(--t3)">No tutorial</span>`;
+    const spotifyLink=d.spotify?`<a class="link-btn spotify" href="${escA(d.spotify)}" target="_blank" rel="noopener">&#9835; Spotify</a>`:`<span style="font-size:12px;color:var(--t3)">No Spotify</span>`;
+    const statPills=[
+      d.counts!=null?`<span class="bank-detail-stat"><strong>${d.counts}</strong> counts</span>`:'',
+      d.walls!=null?`<span class="bank-detail-stat"><strong>${d.walls}</strong> walls</span>`:'',
+      d.tags!=null?`<span class="bank-detail-stat"><strong>${d.tags}</strong> tags</span>`:'',
+    ].filter(Boolean).join('');
+    return `
+      <div class="bank-item">
+        <div class="bank-item-head" onclick="toggleModEditForm('${d.id}')">
+          <span class="bank-item-name">${esc(d.name)}</span>
+          <div class="bank-item-meta">${diffBadge}${statPills}</div>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            <button class="btn xs info" onclick="event.stopPropagation();toggleModEditForm('${d.id}')">Edit</button>
+            <button class="btn xs danger" onclick="event.stopPropagation();modDeleteDance('${d.id}')">Delete</button>
+          </div>
+          <span class="bank-item-caret">&#9660;</span>
+        </div>
+        <div class="edit-form" id="mod-edit-form-${d.id}">
+          <div style="display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+            ${demoLink}${tutLink}${spotifyLink}
+          </div>
+          <div class="edit-form-grid">
+            <input type="text" id="mod-edit-name-${d.id}" value="${escA(d.name)}" placeholder="Dance name" class="full">
+            <input type="url" id="mod-edit-demo-${d.id}" value="${escA(d.demo||'')}" placeholder="Demo link">
+            <input type="url" id="mod-edit-tut-${d.id}" value="${escA(d.tutorial||'')}" placeholder="Tutorial link">
+            <input type="url" id="mod-edit-spot-${d.id}" value="${escA(d.spotify||'')}" placeholder="Spotify link" class="full">
+            <select id="mod-edit-diff-${d.id}" class="full">
+              <option value="">No difficulty</option>
+              <option value="Beginner" ${d.difficulty==='Beginner'?'selected':''}>Beginner</option>
+              <option value="Improver" ${d.difficulty==='Improver'?'selected':''}>Improver</option>
+              <option value="Intermediate" ${d.difficulty==='Intermediate'?'selected':''}>Intermediate</option>
+              <option value="Advanced" ${d.difficulty==='Advanced'?'selected':''}>Advanced</option>
+            </select>
+            <input type="number" id="mod-edit-counts-${d.id}" value="${d.counts!=null?d.counts:''}" placeholder="Counts (e.g. 32)" min="0">
+            <input type="number" id="mod-edit-walls-${d.id}" value="${d.walls!=null?d.walls:''}" placeholder="Walls (e.g. 4)" min="0">
+            <input type="number" id="mod-edit-tags-${d.id}" value="${d.tags!=null?d.tags:''}" placeholder="Tags (e.g. 0)" min="0">
+          </div>
+          <div class="edit-form-row">
+            <button class="btn xs" onclick="toggleModEditForm('${d.id}')">Cancel</button>
+            <button class="btn xs amber" onclick="modSaveEdit('${d.id}')">Save changes</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+function toggleModEditForm(id){
+  const f=document.getElementById('mod-edit-form-'+id);
+  if(f) f.classList.toggle('open');
+}
+async function modSaveEdit(id){
+  if(!isMod) return;
+  const d=bank.find(b=>b.id===id);if(!d) return;
+  const newName=document.getElementById('mod-edit-name-'+id).value.trim()||d.name;
+  const oldName=d.name;
+  d.name=newName;
+  d.demo=document.getElementById('mod-edit-demo-'+id).value.trim();
+  d.tutorial=document.getElementById('mod-edit-tut-'+id).value.trim();
+  d.spotify=document.getElementById('mod-edit-spot-'+id).value.trim();
+  d.difficulty=document.getElementById('mod-edit-diff-'+id).value;
+  const counts=document.getElementById('mod-edit-counts-'+id).value.trim();
+  const walls=document.getElementById('mod-edit-walls-'+id).value.trim();
+  const tags=document.getElementById('mod-edit-tags-'+id).value.trim();
+  d.counts=counts!==''?Number(counts):null;
+  d.walls=walls!==''?Number(walls):null;
+  d.tags=tags!==''?Number(tags):null;
+  await saveBankToCloud();
+  if(newName!==oldName) await propagateRenameToAllUsers(oldName,newName);
+  renderBank();renderModBank();
+  if(isAdmin) renderAdminBank();
+}
+async function modDeleteDance(id){
+  if(!isMod) return;
+  const d=bank.find(b=>b.id===id);
+  if(!d||!confirm(`Delete "${d.name}" from the bank?`)) return;
+  bank=bank.filter(b=>b.id!==id);
+  await saveBankToCloud();
+  renderBank();renderModBank();
+  if(isAdmin) renderAdminBank();
+}
 function isFav(id){return(state.favorites||[]).includes(id);}
 function toggleBankFavFilter(){
   bankFavFilterActive=!bankFavFilterActive;
@@ -2836,7 +3207,7 @@ function renderList(type){
     el.innerHTML=`<div class="empty">${
       favFilterActive&&type==='know'?'No favorites yet — click the heart on any dance!'
       :type==='know'?'No dances yet — browse the Dance Bank or add one above!'
-      :'No dances on your wish list yet.'
+      :'No dances on your learning list yet.'
     }</div>`;return;
   }
   el.innerHTML=items.map(d=>{
@@ -3625,6 +3996,31 @@ const GRADIENTS=[
   'linear-gradient(135deg,#ff9a9e,#fad0c4)',
   'linear-gradient(135deg,#a18cd1,#fbc2eb)',
   'linear-gradient(135deg,#ffd1ff,#fad0c4)',
+  // Pastel collection
+  'linear-gradient(135deg,#fbc2eb,#a6c1ee)',
+  'linear-gradient(135deg,#fdcbf1,#e6dee9)',
+  'linear-gradient(135deg,#c1dfc4,#deecdd)',
+  'linear-gradient(135deg,#b8f7d4,#c8f7e4)',
+  'linear-gradient(135deg,#f8c8d4,#fde8c8)',
+  'linear-gradient(135deg,#d4b8f7,#f7b8e8)',
+  'linear-gradient(135deg,#b8d4f7,#c8e8ff)',
+  'linear-gradient(135deg,#fff1eb,#ace0f9)',
+  'linear-gradient(135deg,#f5f7fa,#c3cfe2)',
+  'linear-gradient(135deg,#e0f7fa,#b2ebf2)',
+  'linear-gradient(135deg,#fce4ec,#f8bbd0)',
+  'linear-gradient(135deg,#f3e5f5,#e1bee7)',
+  'linear-gradient(135deg,#e8f5e9,#c8e6c9)',
+  'linear-gradient(135deg,#fff9c4,#fff59d)',
+  'linear-gradient(135deg,#ffe0b2,#ffcc80)',
+  'linear-gradient(135deg,#ffd6e0,#ffafcc)',
+  'linear-gradient(135deg,#c9f0ff,#a8d8ff)',
+  'linear-gradient(135deg,#d8f3dc,#b7e4c7)',
+  'linear-gradient(135deg,#ede7f6,#d1c4e9)',
+  'linear-gradient(135deg,#e3f2fd,#bbdefb)',
+  'linear-gradient(135deg,#fef9c3,#fde68a)',
+  'linear-gradient(135deg,#fce7f3,#fbcfe8)',
+  'linear-gradient(135deg,#ecfdf5,#a7f3d0)',
+  'linear-gradient(135deg,#eff6ff,#bfdbfe)',
 ];
 
 let fcPickSelections=[]; // ordered array of dance ids, up to 5
@@ -4791,7 +5187,7 @@ function renderTFDJChem(){
 
   el.innerHTML=`
     <div style="background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:1rem 1.25rem;">
-      <div style="font-size:11px;color:var(--t3);margin-bottom:6px;">Average dances per night, ranked</div>
+      <div style="font-size:11px;color:var(--t3);margin-bottom:6px;">Average dances per night</div>
       ${rows}
     </div>`;
 }
@@ -4898,11 +5294,11 @@ function renderTFTrending(){
   el.innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
       <div style="background:var(--bg);border:0.5px solid var(--green-border);border-radius:var(--radius-lg);padding:1rem 1.25rem;">
-        <div style="font-size:12px;font-weight:500;color:var(--green-dark);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">🔥 Heating Up</div>
+        <div style="font-size:12px;font-weight:500;color:var(--green-dark);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">Heating Up</div>
         ${heating.length?heating.map(c=>makeRow(c,true)).join(''):noData}
       </div>
       <div style="background:var(--bg);border:0.5px solid var(--red-border);border-radius:var(--radius-lg);padding:1rem 1.25rem;">
-        <div style="font-size:12px;font-weight:500;color:var(--red-text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">🧊 Cooling Off</div>
+        <div style="font-size:12px;font-weight:500;color:var(--red-text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">Cooling Off</div>
         ${cooling.length?cooling.map(c=>makeRow(c,false)).join(''):noData}
       </div>
     </div>
@@ -5104,7 +5500,7 @@ function renderTFPersonalStats(){
 
   el.innerHTML=`
     <div class="stat-card"><div class="stat-label">Total Dances Logged</div><div class="stat-value">${totalDances}</div><div class="stat-sub">across ${nights.length} night${nights.length!==1?'s':''}</div></div>
-    <div class="stat-card"><div class="stat-label">Repertoire Size</div><div class="stat-value">${totalKnow}</div><div class="stat-sub">${totalLearn} more on wish list</div></div>
+    <div class="stat-card"><div class="stat-label">Repertoire Size</div><div class="stat-value">${totalKnow}</div><div class="stat-sub">${totalLearn} more on learning list</div></div>
     <div class="stat-card"><div class="stat-label">Avg Dances / Night</div><div class="stat-value">${avg}</div><div class="stat-sub">per night out</div></div>
     <div class="stat-card"><div class="stat-label">Weekly Streak</div><div class="stat-value">${streak}</div><div class="stat-sub">week${streak!==1?'s':''} in a row</div></div>
     <div class="stat-card"><div class="stat-label">Best Night</div><div class="stat-value" style="font-size:18px">${bestNight.date?formatDate(bestNight.date):'—'}</div><div class="stat-sub">${(bestNight.dances||[]).length} dances</div></div>
@@ -5225,11 +5621,11 @@ function renderTFNightPatterns(){
   el.innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
       <div style="background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:1.25rem;">
-        <div style="font-size:12px;font-weight:500;color:var(--t2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em;">Dances by Night (Thu–Sat)</div>
+        <div style="font-size:12px;font-weight:500;color:var(--t2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em;">Dances by Night</div>
         <div style="display:flex;gap:8px;align-items:flex-end;">${dayBars}</div>
       </div>
       <div style="background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:1.25rem;">
-        <div style="font-size:12px;font-weight:500;color:var(--t2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em;">Dances by Month (last 12)</div>
+        <div style="font-size:12px;font-weight:500;color:var(--t2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em;">Dances by Month</div>
         ${monthKeys.length?`<div style="display:flex;gap:3px;align-items:flex-end;">${monthBars}</div>`:'<div style="font-size:13px;color:var(--t3);">Not enough data yet.</div>'}
       </div>
     </div>
