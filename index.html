@@ -120,9 +120,6 @@
     .changelog-entry-body .cl-notes{font-size:14px;color:var(--t1);line-height:1.7;white-space:pre-wrap;}
     .changelog-entry-body .cl-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;}
     .changelog-add-row{display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap;align-items:flex-end;}
-    .sp-fetch-btn{padding:7px 10px;border:0.5px solid #1DB954;border-radius:var(--radius-md);background:#1DB954;color:#fff;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:opacity 0.12s;}
-    .sp-fetch-btn:hover{opacity:0.82;}
-    .sp-fetch-btn:disabled{opacity:0.45;cursor:not-allowed;}
     .changelog-add-row input{padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;}
     .changelog-add-row input:focus{outline:none;border-color:var(--b1);}
     .changelog-add-row input::placeholder{color:var(--t3);}
@@ -326,8 +323,8 @@
     @media(prefers-color-scheme:dark){.link-btn.spotify{background:#0a2e18;color:#4ade80;border-color:#16a34a;}}
     /* Multi-spotify editor */
     .sp-links-editor{display:flex;flex-direction:column;gap:6px;margin-bottom:6px;}
-    .sp-link-row{display:grid;grid-template-columns:1fr auto 1fr auto;gap:6px;align-items:center;}
-    @media(max-width:600px){.sp-link-row{grid-template-columns:1fr auto auto;}.sp-link-row .sp-link-label{grid-column:1/2;}.sp-link-row .sp-fetch-btn{grid-column:2/3;}.sp-link-row .sp-link-remove{grid-column:3/4;}.sp-link-row .sp-link-url{grid-column:1/-1;}}
+    .sp-link-row{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:center;}
+    @media(max-width:540px){.sp-link-row{grid-template-columns:1fr auto;}.sp-link-row .sp-link-url{grid-column:1/-2;}}
     .sp-link-row input{padding:7px 10px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;width:100%;}
     .sp-link-row input:focus{outline:none;border-color:var(--b1);}
     .sp-link-row input::placeholder{color:var(--t3);}
@@ -5099,9 +5096,8 @@ function renderSpotifyLinksEditor(containerId, links){
   if(!el) return;
   el.innerHTML=(links||[]).map((_,i)=>`
     <div class="sp-link-row" id="${containerId}-row-${i}">
+      <input type="text" placeholder="Label (e.g. Artist - Song)" value="${escA(links[i].label||'')}" class="sp-link-label" data-idx="${i}">
       <input type="url" placeholder="Spotify URL" value="${escA(links[i].url||'')}" class="sp-link-url" data-idx="${i}">
-      <button type="button" class="sp-fetch-btn" title="Fetch song title &amp; artist from Spotify link" onclick="spEditorFetchMeta('${containerId}',${i})">&#9835; Fetch</button>
-      <input type="text" placeholder="Song Title - Artist" value="${escA(links[i].label||'')}" class="sp-link-label" data-idx="${i}">
       <button type="button" class="sp-link-remove" onclick="spEditorRemoveRow('${containerId}',${i})">✕</button>
     </div>`).join('');
 }
@@ -5113,41 +5109,6 @@ function spEditorAddRow(containerId){
   const existing=spEditorGetLinks(containerId);
   existing.push({url:'',label:''});
   renderSpotifyLinksEditor(containerId, existing);
-}
-
-// Fetch song title + artist from a Spotify track URL
-async function spEditorFetchMeta(containerId, idx){
-  const row=document.getElementById(`${containerId}-row-${idx}`);
-  if(!row) return;
-  const urlInput=row.querySelector('.sp-link-url');
-  const labelInput=row.querySelector('.sp-link-label');
-  const fetchBtn=row.querySelector('.sp-fetch-btn');
-  const spotifyUrl=(urlInput?.value||'').trim();
-  if(!spotifyUrl){alert('Please enter a Spotify URL first.');return;}
-  const trackMatch=spotifyUrl.match(/spotify\.com\/track\/([A-Za-z0-9]+)/i);
-  if(!trackMatch){alert('Please enter a Spotify track URL (e.g. https://open.spotify.com/track/...)');return;}
-  if(fetchBtn){fetchBtn.disabled=true;fetchBtn.textContent='...';}
-  try{
-    // Use allorigins as a CORS proxy to fetch the Spotify page HTML
-    const trackId=trackMatch[1];
-    const cleanUrl=`https://open.spotify.com/track/${trackId}`;
-    const proxyUrl=`https://api.allorigins.win/get?url=${encodeURIComponent(cleanUrl)}`;
-    const resp=await fetch(proxyUrl);
-    if(!resp.ok) throw new Error('Fetch failed');
-    const json=await resp.json();
-    const html=json.contents||'';
-    // Spotify page <title> is "Song Title - Artist Name | Spotify" or "Song Title - Artist | Spotify"
-    const m=html.match(/<title>([^<]+)<\/title>/i);
-    if(!m) throw new Error('Could not parse page');
-    // Strip " | Spotify" suffix then decode HTML entities
-    const raw=m[1].replace(/\s*\|\s*Spotify\s*$/i,'').trim();
-    const label=raw.replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
-    if(labelInput && label) labelInput.value=label;
-  } catch(e){
-    alert('Could not fetch song info. Make sure it\'s a valid public Spotify track link.');
-  } finally{
-    if(fetchBtn){fetchBtn.disabled=false;fetchBtn.textContent='♩ Fetch';}
-  }
 }
 
 // Remove a row from an editor
