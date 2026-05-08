@@ -91,6 +91,7 @@
     .tab.admin-tab{color:var(--amber-text);}
     .tab.mod-tab{color:var(--blue-text);}
     .tab[data-tab="submissions"].active,.tab[data-tab="admin"].active,.tab[data-tab="editpeople"].active{background:#FAEEDA;color:#633806;border-color:#FAC775;}
+    .tab[data-tab="adminanalytics"].active{background:#0f2027;color:#7dd3fc;border-color:#2c5364;}
     .tab[data-tab="modpanel"].active{background:#E6F1FB;color:#0C447C;border-color:#B5D4F4;}
     .tab[data-tab="feedback"].active{background:#F0FDF4;color:#166534;border-color:#86efac;}
     .tab[data-tab="changelog"].active{background:#F5F0FF;color:#5B21B6;border-color:#C4B5FD;}
@@ -1005,6 +1006,7 @@
     <button class="tab admin-tab" data-tab="editpeople" id="editpeople-tab" style="display:none" onclick="switchTab('editpeople')">&#9998; Edit People</button>
     <button class="tab mod-tab" data-tab="modpanel" id="modpanel-tab" style="display:none" onclick="switchTab('modpanel')"> Mod Panel</button>
     <button class="tab admin-tab" data-tab="debug" id="debug-tab" style="display:none" onclick="switchTab('debug')">Debug</button>
+    <button class="tab admin-tab" data-tab="adminanalytics" id="adminanalytics-tab" style="display:none" onclick="switchTab('adminanalytics')">&#128202; Analytics</button>
   </div>
 
   <!-- HOME -->
@@ -1093,6 +1095,12 @@
         <span class="home-card-icon">🔍</span>
         <span class="home-card-title">Debug</span>
         <span class="home-card-desc">Inspect raw night data</span>
+        <span class="home-card-arrow">→</span>
+      </button>
+      <button class="home-card" id="home-card-adminanalytics" style="display:none;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);" onclick="switchTab('adminanalytics')">
+        <span class="home-card-icon">📊</span>
+        <span class="home-card-title">Admin Analytics</span>
+        <span class="home-card-desc">App-wide stats & insights</span>
         <span class="home-card-arrow">→</span>
       </button>
     </div>
@@ -1543,6 +1551,7 @@
           <button class="btn info" onclick="adminAddMod()">Add Mod</button>
         </div>
         <div id="admin-mod-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+        <div id="admin-mod-refresh-note" style="display:none;margin-top:10px;font-size:12px;color:var(--green-text);background:var(--green-bg);border:0.5px solid var(--green-border);border-radius:var(--radius-md);padding:8px 12px;"></div>
       </div>
     </div>
     <div class="admin-section-collapsible collapsed" id="admin-tab-visibility-section">
@@ -1630,6 +1639,44 @@
     </div>
     <div id="debug-status" style="font-size:13px;color:var(--t2);margin-bottom:1rem;"></div>
     <div id="debug-night-output"></div>
+  </div>
+
+  <!-- ADMIN ANALYTICS -->
+  <div id="tab-adminanalytics" class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.5rem;">
+      <div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:4px;">Admin Analytics</h2>
+        <p style="font-size:13px;color:var(--t2);">App-wide stats across all users. Refreshed each time you visit.</p>
+      </div>
+      <button class="btn amber" onclick="renderAdminAnalytics()">&#8635; Refresh</button>
+    </div>
+    <div id="aa-loading" style="font-size:13px;color:var(--t2);padding:2rem 0;text-align:center;display:none;">Loading…</div>
+    <div id="aa-content" style="display:none;">
+      <!-- Top stat cards -->
+      <div class="section-title">Overview</div>
+      <div class="stats-grid" id="aa-stats-grid"></div>
+
+      <!-- User activity table -->
+      <div class="section-title" style="margin-top:1.5rem;">User Leaderboard</div>
+      <p style="font-size:12px;color:var(--t3);margin-bottom:.75rem;">Ranked by total dances known. Click a row to expand.</p>
+      <div id="aa-user-table"></div>
+
+      <!-- Top dances across all users -->
+      <div class="section-title" style="margin-top:1.5rem;">Most Known Dances (across all users)</div>
+      <div id="aa-top-dances"></div>
+
+      <!-- Most wanted to learn -->
+      <div class="section-title" style="margin-top:1.5rem;">Most Wanted to Learn</div>
+      <div id="aa-top-learn"></div>
+
+      <!-- Difficulty distribution -->
+      <div class="section-title" style="margin-top:1.5rem;">Bank: Difficulty Distribution</div>
+      <div id="aa-diff-bars"></div>
+
+      <!-- User activity over time -->
+      <div class="section-title" style="margin-top:1.5rem;">Most Active Nights (by # of users who logged that date)</div>
+      <div id="aa-top-nights"></div>
+    </div>
   </div>
 
   <!-- CHANGELOG SECTION -->
@@ -1790,6 +1837,7 @@ const TAB_VISIBILITY_REGISTRY=[
   {key:'editpeople',label:'Edit People',       tabId:'editpeople-tab',    homeCardId:null,                  mobileTabId:'mobile-tab-editpeople', alwaysFor:['admin'],roles:['mod']},
   {key:'drewsnight',label:"Night",             tabId:'drewsnight-tab-btn',homeCardId:'home-card-drewsnight',mobileTabId:'mobile-tab-drewsnight', alwaysFor:['admin'],roles:['mod']},
   {key:'debug',     label:'Debug',             tabId:'debug-tab',         homeCardId:'home-card-debug',     mobileTabId:'mobile-tab-debug',      alwaysFor:['admin'],roles:['mod']},
+  {key:'adminanalytics',label:'Admin Analytics',tabId:'adminanalytics-tab',homeCardId:'home-card-adminanalytics',mobileTabId:null,              alwaysFor:['admin'],roles:[]},
 ];
 let selectedDate='',nightSelections={};
 let drewsSelectedDate='',drewsNightSelections={},drewsNotPerfSelections={};
@@ -2350,6 +2398,9 @@ async function loadDJList(){
   const r=await sbFetch(`/rest/v1/dances?username=eq.__djlist__&select=data`);
   djList=(r.ok&&r.data&&r.data.length>0)?(r.data[0].data.djs||[]):[];
   djColors=(r.ok&&r.data&&r.data.length>0)?(r.data[0].data.djColors||{}):{}; 
+  // Re-populate any dropdowns that may already be in the DOM so the DJ list
+  // is never empty due to a load-order race between DJ data and the night tab.
+  try{ renderDJDropdown(); }catch(e){}
 }
 async function loadModList(){
   const r=await sbFetch(`/rest/v1/dances?username=eq.__modlist__&select=data`);
@@ -2423,6 +2474,7 @@ const HOME_CARD_DEFAULTS={
   'home-card-modpanel':    'linear-gradient(135deg,#3b82f6,#1d4ed8)',
   'home-card-changelog':   'linear-gradient(135deg,#7c3aed,#a855f7)',
   'home-card-drewsnight':  'linear-gradient(135deg,#fc5c7d,#6a82fb)',
+  'home-card-adminanalytics': 'linear-gradient(135deg,#0f2027,#203a43,#2c5364)',
 };
 const HOME_CARD_LABELS={
   'home-card-bank':'Dance Bank','home-card-know':'Dances I Know',
@@ -2432,6 +2484,7 @@ const HOME_CARD_LABELS={
   'home-card-submissions':'Submissions','home-card-feedback':'Suggestions & Bugs',
   'home-card-modpanel':'Mod Panel','home-card-changelog':'Changelog',
   'home-card-drewsnight':'Night (Drew\'s Night)',
+  'home-card-adminanalytics':'Admin Analytics',
 };
 function applyHomeCardGradients(){
   Object.keys(HOME_CARD_DEFAULTS).forEach(id=>{
@@ -2537,7 +2590,7 @@ function applyTabVisibility(){
   });
   // Admin-only home cards always visible for admin
   if(isAdmin){
-    ['home-card-admin','home-card-dj','home-card-submissions','home-card-debug'].forEach(id=>{
+    ['home-card-admin','home-card-dj','home-card-submissions','home-card-debug','home-card-adminanalytics'].forEach(id=>{
       const el=document.getElementById(id);if(el) el.style.display='';
     });
   }
@@ -2725,6 +2778,7 @@ function enterGuestMode(){
   _hide('debug-tab');
   _hide('dj-tab-btn');
   _hide('drewsnight-tab-btn');
+  _hide('adminanalytics-tab');
   _hide('picks-admin-panel');
   _hide('mobile-admin-section');
   try { applyTabVisibility(); } catch(e){ console.warn('applyTabVisibility error', e); }
@@ -2787,6 +2841,7 @@ function enterApp(username){
   document.getElementById('debug-tab').style.display=isAdmin?'inline-block':'none';
   document.getElementById('dj-tab-btn').style.display=isAdmin?'inline-block':'none';
   document.getElementById('drewsnight-tab-btn').style.display=isAdmin?'inline-block':'none';
+  document.getElementById('adminanalytics-tab').style.display=isAdmin?'inline-block':'none';
   document.getElementById('picks-admin-panel').style.display=isAdmin?'block':'none';
   applyTabVisibility();
   const adminSection=document.getElementById('mobile-admin-section');
@@ -2816,7 +2871,7 @@ function enterApp(username){
   if(isAdmin) initDrewsNightDate();
   // Restore the tab the user was on before the last refresh, default to home
   const savedTab = localStorage.getItem('ld_active_tab') || 'home';
-  const adminTabs = ['submissions','admin','editpeople','dj','drewsnight','debug'];
+  const adminTabs = ['submissions','admin','editpeople','dj','drewsnight','debug','adminanalytics'];
   const modTabs = ['modpanel'];
   if(savedTab && !(adminTabs.includes(savedTab) && !isAdmin) && !(modTabs.includes(savedTab) && !isMod)){
     switchTab(savedTab);
@@ -2919,6 +2974,8 @@ async function tryAutoLogin() {
       if (!state.favoriteFriends) state.favoriteFriends = [];
       if (!state.drewsNights) state.drewsNights = {};
       state.__cloudUpdatedAt = r.data[0].updated_at || null;
+      await loadSubmissions();
+      await loadModList();
       enterApp(user);
       return true;
     }
@@ -3060,6 +3117,7 @@ function switchTab(tab,_fromSwipe=false,_noSave=false){
   if(tab==='debug') renderDebugTab();
   if(tab==='changelog') renderChangelog();
   if(tab==='modpanel') renderModBank();
+  if(tab==='adminanalytics') renderAdminAnalytics();
 }
 
 // ---- Sort helpers ----
@@ -3349,30 +3407,47 @@ function removeFromList(type,name){
 // ---- DJ List (admin managed) ----
 function renderDJDropdown(){
   const sorted=[...djList].sort((a,b)=>a.localeCompare(b));
-  // Night tab dropdown
-  const sel=document.getElementById('night-dj');
-  if(sel){
-    const current=sel.value;
-    sel.innerHTML='<option value="">— Select DJ (optional) —</option>';
-    sorted.forEach(dj=>{const opt=document.createElement('option');opt.value=dj;opt.textContent=dj;sel.appendChild(opt);});
-    if(current&&djList.includes(current)) sel.value=current;
+
+  function _populate(sel, placeholder, getStateValue){
+    if(!sel) return;
+    // Capture whatever is currently displayed; fall back to reading from state
+    // so a saved DJ is always restored even on first render.
+    let current=sel.value;
+    if(!current && typeof getStateValue==='function') current=getStateValue()||'';
+    sel.innerHTML='<option value="">'+placeholder+'</option>';
+    sorted.forEach(function(dj){
+      var opt=document.createElement('option');
+      opt.value=dj; opt.textContent=dj;
+      sel.appendChild(opt);
+    });
+    // Restore even if the DJ was removed from the list — show it as selected
+    // so the saved data isn't silently cleared on next save.
+    if(current) sel.value=current;
   }
-  // Drew's Night dropdown
-  const dsel=document.getElementById('drewsnight-dj');
-  if(dsel){
-    const dcurrent=dsel.value;
-    dsel.innerHTML='<option value="">— Select DJ (optional) —</option>';
-    sorted.forEach(dj=>{const opt=document.createElement('option');opt.value=dj;opt.textContent=dj;dsel.appendChild(opt);});
-    if(dcurrent&&djList.includes(dcurrent)) dsel.value=dcurrent;
-  }
-  // DJ Freestyle / Test Features dropdown
-  const fsel=document.getElementById('dj-entry-name');
-  if(fsel){
-    const fcurrent=fsel.value;
-    fsel.innerHTML='<option value="">— Select DJ —</option>';
-    sorted.forEach(dj=>{const opt=document.createElement('option');opt.value=dj;opt.textContent=dj;fsel.appendChild(opt);});
-    if(fcurrent&&djList.includes(fcurrent)) fsel.value=fcurrent;
-  }
+
+  _populate(
+    document.getElementById('night-dj'),
+    '— Select DJ (optional) —',
+    function(){
+      if(!selectedDate) return '';
+      var nd=state.nights&&state.nights[selectedDate];
+      if(!nd) return '';
+      return Array.isArray(nd)?'':(nd.dj||'');
+    }
+  );
+
+  _populate(
+    document.getElementById('drewsnight-dj'),
+    '— Select DJ (optional) —',
+    function(){
+      if(!drewsSelectedDate) return '';
+      var nd=state.nights&&state.nights[drewsSelectedDate];
+      if(!nd) return '';
+      return Array.isArray(nd)?'':(nd.dj||'');
+    }
+  );
+
+  _populate(document.getElementById('dj-entry-name'), '— Select DJ —');
 }
 function adminAddDJ(){
   if(!isAdmin)return;
@@ -3670,15 +3745,23 @@ async function adminAddMod(){
   if(modList.includes(username)){alert('That user is already a moderator.');return;}
   modList.push(username);
   await saveModListToCloud();
+  // If admin modded themselves, update isMod immediately
+  if(username===currentUser){ isMod=true; applyTabVisibility(); }
   renderAdminModList();
   sel.value='';
+  const note=document.getElementById('admin-mod-refresh-note');
+  if(note){ note.textContent=`✓ ${username} added as mod. They'll need to refresh or re-login to see their new permissions.`; note.style.display=''; setTimeout(()=>{note.style.display='none';},6000); }
 }
 async function adminRemoveMod(username){
   if(!isAdmin) return;
   if(!confirm(`Remove mod role from "${username}"?`)) return;
   modList=modList.filter(m=>m!==username);
   await saveModListToCloud();
+  // If admin removed their own mod role, update isMod immediately
+  if(username===currentUser){ isMod=isAdmin; applyTabVisibility(); }
   renderAdminModList();
+  const note=document.getElementById('admin-mod-refresh-note');
+  if(note){ note.textContent=`✓ ${username} removed from mods. They'll need to refresh or re-login for this to take effect.`; note.style.display=''; setTimeout(()=>{note.style.display='none';},6000); }
 }
 function renderAdminModList(){
   const el=document.getElementById('admin-mod-list');
@@ -3953,16 +4036,28 @@ function initNightDate(){
   const inp=document.getElementById('night-date');
   const today=localDateStr();
   inp.value=today;selectedDate=today;
+  renderDJDropdown(); // populate before setting DJ value
   loadNightSelections();renderPickList();renderDidList();loadNightDJ();renderHighlightsDisplay();
-  inp.onchange=()=>{selectedDate=inp.value;loadNightSelections();renderPickList();renderDidList();loadNightDJ();renderHighlightsDisplay();};
+  inp.onchange=()=>{selectedDate=inp.value;renderDJDropdown();loadNightSelections();renderPickList();renderDidList();loadNightDJ();renderHighlightsDisplay();};
 }
 function loadNightSelections(){
   nightSelections={};const nd=getNightData(selectedDate);nd.dances.forEach(id=>nightSelections[id]=true);
 }
-function loadNightDJ(){const nd=getNightData(selectedDate);document.getElementById('night-dj').value=nd.dj||'';document.getElementById('night-arrive').value=nd.arriveTime||'';document.getElementById('night-leave').value=nd.leaveTime||'';}
+function loadNightDJ(){
+  const nd=getNightData(selectedDate);
+  const djEl=document.getElementById('night-dj');
+  // If dropdown has no DJ options yet (race on first load), populate it now
+  if(djEl && djEl.options.length<=1 && djList.length>0) renderDJDropdown();
+  if(djEl) djEl.value=nd.dj||'';
+  const arrEl=document.getElementById('night-arrive');
+  const lvEl=document.getElementById('night-leave');
+  if(arrEl) arrEl.value=nd.arriveTime||'';
+  if(lvEl) lvEl.value=nd.leaveTime||'';
+}
 function renderNight(){
   if(!selectedDate)initNightDate();
   selectedDate=document.getElementById('night-date').value||localDateStr();
+  renderDJDropdown(); // ensure options are present before loadNightDJ sets the value
   loadNightSelections();renderPickList();renderDidList();loadNightDJ();renderHighlightsDisplay();
 }
 function renderPickList(){
@@ -4116,11 +4211,13 @@ function initDrewsNightDate(){
   if(!inp) return;
   const today=localDateStr();
   inp.value=today; drewsSelectedDate=today;
+  renderDJDropdown(); // populate before setting DJ value
   loadDrewsNightSelections();
   renderDrewsPickList();renderDrewsNotPerfList();renderDrewsDidList();
   loadDrewsNightDJ();renderDrewsHighlightsDisplay();
   inp.onchange=()=>{
     drewsSelectedDate=inp.value;
+    renderDJDropdown(); // re-populate so saved DJ value restores correctly on date change
     loadDrewsNightSelections();
     renderDrewsPickList();renderDrewsNotPerfList();renderDrewsDidList();
     loadDrewsNightDJ();renderDrewsHighlightsDisplay();
@@ -4137,6 +4234,8 @@ function loadDrewsNightDJ(){
   const djEl=document.getElementById('drewsnight-dj');
   const arrEl=document.getElementById('drewsnight-arrive');
   const lvEl=document.getElementById('drewsnight-leave');
+  // If dropdown has no DJ options yet (race on first load), populate it now
+  if(djEl && djEl.options.length<=1 && djList.length>0) renderDJDropdown();
   if(djEl) djEl.value=nd.dj||'';
   if(arrEl) arrEl.value=nd.arriveTime||'';
   if(lvEl) lvEl.value=nd.leaveTime||'';
@@ -4144,6 +4243,7 @@ function loadDrewsNightDJ(){
 function renderDrewsNight(){
   if(!drewsSelectedDate) initDrewsNightDate();
   drewsSelectedDate=document.getElementById('drewsnight-date').value||localDateStr();
+  renderDJDropdown(); // ensure options are present before loadDrewsNightDJ sets the value
   loadDrewsNightSelections();
   renderDrewsPickList();renderDrewsNotPerfList();renderDrewsDidList();
   loadDrewsNightDJ();renderDrewsHighlightsDisplay();
@@ -7591,122 +7691,253 @@ function renderDebugNight(){
   const date=document.getElementById('debug-date-select')?.value;
   const out=document.getElementById('debug-night-output');
   if(!out) return;
-  if(!date||!debugUserState){out.innerHTML=`<div class="empty">Select a user and night above to inspect data.</div>`;return;}
+  if(!date||!debugUserState){out.innerHTML='<div class="empty">Select a user and night above to inspect data.</div>';return;}
 
   const nights=debugUserState.nights||{};
   const nd=nights[date];
-  if(!nd){out.innerHTML=`<div class="empty">No data found for ${esc(date)}.</div>`;return;}
+  if(!nd){out.innerHTML='<div class="empty">No data found for '+esc(date)+'.</div>';return;}
 
   const nightObj=Array.isArray(nd)?{dances:nd,dj:'',highlights:null,arriveTime:'',leaveTime:'',notPerformed:[]}:{notPerformed:[],...nd};
-  const danceLog=((debugUserState.danceLog)||[]).filter(e=>e.date===date);
+
+  // Stamp every danceLog entry with a stable _eid so we can look them up by
+  // key instead of array index (indices shift when entries are deleted/filtered).
+  if(!debugUserState.danceLog) debugUserState.danceLog=[];
+  debugUserState.danceLog.forEach((e,i)=>{
+    if(!e._eid) e._eid='eid_'+i+'_'+(e.timestamp||Date.now()+'_'+i);
+  });
+
+  const fullLog=debugUserState.danceLog;
+  const danceLog=fullLog.filter(e=>e.date===date);
   const performed=danceLog.filter(e=>e.type!=='not_performed'&&e.type!=='palace_times'&&(e.danceId||e.danceName));
   const notPerformed=danceLog.filter(e=>e.type==='not_performed'&&(e.danceId||e.danceName));
-
-  // For resolving IDs — use the inspected user's know list + bank
   const userKnow=debugUserState.know||[];
 
   function pill(label,val,color){
-    return`<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:3px 10px;border-radius:20px;background:${color||'var(--bg2)'};border:0.5px solid var(--b3);color:var(--t1);white-space:nowrap;">${esc(label)}: <strong>${esc(String(val??'—'))}</strong></span>`;
+    return'<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:3px 10px;border-radius:20px;background:'+(color||'var(--bg2)')+';border:0.5px solid var(--b3);color:var(--t1);white-space:nowrap;">'+esc(label)+': <strong>'+esc(String(val??'—'))+'</strong></span>';
   }
-  function section(title,color,content){
-    return`<div style="margin-bottom:1.25rem;">
-      <div style="font-size:11px;font-weight:600;color:${color};text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">${title}</div>
-      ${content}
-    </div>`;
+  function section(title,color,body){
+    return'<div style="margin-bottom:1.25rem;"><div style="font-size:11px;font-weight:600;color:'+color+';text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">'+title+'</div>'+body+'</div>';
   }
   function fmtDebugTime(e){
-    if(e.timestamp){
-      const d=new Date(e.timestamp);
-      return d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true});
-    }
+    if(e.timestamp){const d=new Date(e.timestamp);return d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true});}
     return e.localTime||'—';
   }
-  function logTable(entries,emptyMsg){
-    if(!entries.length) return`<div style="font-size:13px;color:var(--t3);padding:6px 0;">${emptyMsg}</div>`;
-    return`<div style="border:0.5px solid var(--b3);border-radius:var(--radius-lg);overflow:hidden;">
-      <table style="width:100%;border-collapse:collapse;font-size:12px;">
-        <thead>
-          <tr style="background:var(--bg2);">
-            <th style="padding:7px 12px;text-align:left;font-weight:500;color:var(--t2);border-bottom:0.5px solid var(--b3);">Dance</th>
-            <th style="padding:7px 12px;text-align:left;font-weight:500;color:var(--t2);border-bottom:0.5px solid var(--b3);">Time</th>
-            <th style="padding:7px 12px;text-align:left;font-weight:500;color:var(--t2);border-bottom:0.5px solid var(--b3);">DJ</th>
-            <th style="padding:7px 12px;text-align:left;font-weight:500;color:var(--t2);border-bottom:0.5px solid var(--b3);">Timestamp (ISO)</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${entries.map((e,i)=>`<tr style="background:${i%2?'var(--bg2)':'var(--bg)'};">
-            <td style="padding:7px 12px;border-bottom:0.5px solid var(--b3);">${esc(e.danceName||e.danceId||'?')}</td>
-            <td style="padding:7px 12px;border-bottom:0.5px solid var(--b3);font-variant-numeric:tabular-nums;">${esc(fmtDebugTime(e))}</td>
-            <td style="padding:7px 12px;border-bottom:0.5px solid var(--b3);">${esc(e.dj||'—')}</td>
-            <td style="padding:7px 12px;border-bottom:0.5px solid var(--b3);font-size:11px;color:var(--t2);font-variant-numeric:tabular-nums;">${esc(e.timestamp||'—')}</td>
-          </tr>`).join('')}
-        </tbody>
-      </table>
-    </div>`;
+
+  const djOpts='<option value=""></option>'+djList.slice().sort((a,b)=>a.localeCompare(b)).map(dj=>'<option value="'+escA(dj)+'">'+esc(dj)+'</option>').join('');
+
+  function editableLogTable(entries,tableId,emptyMsg){
+    if(!entries.length) return'<div style="font-size:13px;color:var(--t3);padding:6px 0;">'+emptyMsg+'</div>';
+    const rows=entries.map((e,i)=>{
+      const eid=e._eid;
+      const rowBg=i%2?'var(--bg2)':'var(--bg)';
+      return'<tr data-eid="'+escA(eid)+'" style="background:'+rowBg+';">'
+        +'<td style="padding:5px 8px;border-bottom:0.5px solid var(--b3);">'
+          +'<input class="debug-edit-input" data-field="danceName" data-eid="'+escA(eid)+'" value="'+escA(e.danceName||e.danceId||'')+'" style="width:100%;min-width:100px;padding:4px 7px;border:0.5px solid var(--b2);border-radius:5px;background:var(--bg2);color:var(--t1);font-size:12px;font-family:\'DM Sans\',sans-serif;">'
+        +'</td>'
+        +'<td style="padding:5px 8px;border-bottom:0.5px solid var(--b3);white-space:nowrap;font-variant-numeric:tabular-nums;font-size:12px;color:var(--t2);">'+esc(fmtDebugTime(e))+'</td>'
+        +'<td style="padding:5px 8px;border-bottom:0.5px solid var(--b3);">'
+          +'<select class="debug-edit-select" data-field="dj" data-eid="'+escA(eid)+'" style="padding:4px 7px;border:0.5px solid var(--b2);border-radius:5px;background:var(--bg2);color:var(--t1);font-size:12px;font-family:\'DM Sans\',sans-serif;min-width:110px;">'+djOpts+'</select>'
+        +'</td>'
+        +'<td style="padding:5px 8px;border-bottom:0.5px solid var(--b3);">'
+          +'<input class="debug-edit-input" data-field="timestamp" data-eid="'+escA(eid)+'" value="'+escA(e.timestamp||'')+'" style="width:100%;min-width:160px;padding:4px 7px;border:0.5px solid var(--b2);border-radius:5px;background:var(--bg2);color:var(--t1);font-size:11px;font-family:monospace;">'
+        +'</td>'
+        +'<td style="padding:5px 8px;border-bottom:0.5px solid var(--b3);white-space:nowrap;">'
+          +'<button class="btn xs danger" onclick="debugDeleteLogEntry(\''+date+'\',\''+escA(eid)+'\')">&#215;</button>'
+        +'</td>'
+      +'</tr>';
+    }).join('');
+    return'<div style="overflow-x:auto;border:0.5px solid var(--b3);border-radius:var(--radius-lg);overflow:hidden;">'
+      +'<table id="'+tableId+'" style="width:100%;border-collapse:collapse;font-size:12px;">'
+        +'<thead><tr style="background:var(--bg2);">'
+          +'<th style="padding:7px 10px;text-align:left;font-weight:500;color:var(--t2);border-bottom:0.5px solid var(--b3);">Dance</th>'
+          +'<th style="padding:7px 10px;text-align:left;font-weight:500;color:var(--t2);border-bottom:0.5px solid var(--b3);">Time</th>'
+          +'<th style="padding:7px 10px;text-align:left;font-weight:500;color:var(--t2);border-bottom:0.5px solid var(--b3);">'
+            +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'
+              +'DJ'
+              +'<select id="debug-apply-dj-sel-'+tableId+'" style="padding:3px 6px;border:0.5px solid var(--blue-border);border-radius:5px;background:var(--blue-bg);color:var(--blue-text);font-size:11px;font-family:\'DM Sans\',sans-serif;font-weight:600;">'+djOpts+'</select>'
+              +'<button class="btn xs" style="background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue-border);font-size:11px;padding:3px 8px;" onclick="debugApplyDJToAll(\''+tableId+'\')">Apply to All</button>'
+            +'</div>'
+          +'</th>'
+          +'<th style="padding:7px 10px;text-align:left;font-weight:500;color:var(--t2);border-bottom:0.5px solid var(--b3);">Timestamp (ISO)</th>'
+          +'<th style="padding:7px 10px;border-bottom:0.5px solid var(--b3);"></th>'
+        +'</tr></thead>'
+        +'<tbody>'+rows+'</tbody>'
+      +'</table>'
+    +'</div>';
   }
 
-  const hlNames=(nightObj.highlights||[]).map(id=>{
-    const d=userKnow.find(k=>k.id===id);
-    return d?d.name:id||'—';
+  const hlNames=(nightObj.highlights||[]).map(id=>{const d=userKnow.find(k=>k.id===id);return d?d.name:id||'—';});
+  const storedPerformed=(nightObj.dances||[]).map(id=>{const d=userKnow.find(k=>k.id===id);return d?d.name:id;}).sort((a,b)=>a.localeCompare(b));
+  const storedNotPerf=(nightObj.notPerformed||[]).map(id=>{const d=bank.find(k=>k.id===id)||userKnow.find(k=>k.id===id);return d?d.name:id;}).sort((a,b)=>a.localeCompare(b));
+
+  out.innerHTML=
+    '<div style="background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:1.5rem;">'
+    +'<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap;">'
+      +'<div style="flex:1;">'
+        +'<div style="font-family:\'Playfair Display\',serif;font-size:20px;font-weight:700;margin-bottom:2px;">'+formatDate(date)+'</div>'
+        +'<div style="font-size:12px;color:var(--t2);font-family:monospace;">'+esc(date)+' · user: '+esc(debugUsername)+'</div>'
+      +'</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">'
+        +'<button class="btn sm success" id="debug-save-btn" onclick="debugSaveNight(\''+date+'\')">&#10003; Save Changes</button>'
+        +'<button class="btn sm danger" onclick="debugDeleteNight(\''+date+'\')">&#128465; Delete Night</button>'
+      +'</div>'
+    +'</div>'
+    +'<div id="debug-save-status" style="font-size:13px;margin-bottom:1rem;display:none;padding:8px 12px;border-radius:var(--radius-md);border:0.5px solid var(--b3);"></div>'
+    +section('Night metadata — editable','var(--t2)',
+      '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;">'
+        +'<div>'
+          +'<label style="font-size:11px;font-weight:600;color:var(--t2);display:block;margin-bottom:4px;">DJ</label>'
+          +'<select id="debug-meta-dj" style="width:100%;padding:7px 10px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:13px;font-family:\'DM Sans\',sans-serif;">'+djOpts+'</select>'
+        +'</div>'
+        +'<div>'
+          +'<label style="font-size:11px;font-weight:600;color:var(--t2);display:block;margin-bottom:4px;">Arrived</label>'
+          +'<input type="time" id="debug-meta-arrive" value="'+escA(nightObj.arriveTime||'')+'" style="width:100%;padding:7px 10px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:13px;font-family:\'DM Sans\',sans-serif;">'
+        +'</div>'
+        +'<div>'
+          +'<label style="font-size:11px;font-weight:600;color:var(--t2);display:block;margin-bottom:4px;">Left</label>'
+          +'<input type="time" id="debug-meta-leave" value="'+escA(nightObj.leaveTime||'')+'" style="width:100%;padding:7px 10px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:13px;font-family:\'DM Sans\',sans-serif;">'
+        +'</div>'
+        +'<div style="display:flex;flex-direction:column;justify-content:flex-end;">'
+          +pill('Performed',(nightObj.dances||[]).length,'var(--green-bg)')
+        +'</div>'
+      +'</div>'
+    )
+    +section('Highlights','var(--amber-text)',nightObj.highlights&&nightObj.highlights.some(Boolean)
+      ?'<div style="display:flex;flex-direction:column;gap:6px;">'+hlNames.map((n,i)=>n&&n!=='—'?'<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:0.5px solid var(--amber-border);border-radius:var(--radius-md);background:var(--amber-bg);"><span style="font-family:\'Playfair Display\',serif;font-size:15px;font-weight:700;color:var(--amber-text);min-width:20px;">'+(i+1)+'</span><span style="font-size:13px;font-weight:500;">'+esc(n)+'</span></div>':'').join('')+'</div>'
+      :'<div style="font-size:13px;color:var(--t3);">No highlights saved for this night.</div>'
+    )
+    +section('Performed dances','var(--green-text)',storedPerformed.length
+      ?'<div style="display:flex;flex-wrap:wrap;gap:5px;">'+storedPerformed.map(n=>'<span style="font-size:12px;font-weight:500;padding:3px 10px;border-radius:20px;background:var(--green-bg);border:0.5px solid var(--green-border);color:var(--green-text);">'+esc(n)+'</span>').join('')+'</div>'
+      :'<div style="font-size:13px;color:var(--t3);">None stored.</div>'
+    )
+    +(storedNotPerf.length?section('Not performed dances','var(--red-text)','<div style="display:flex;flex-wrap:wrap;gap:5px;">'+storedNotPerf.map(n=>'<span style="font-size:12px;font-weight:500;padding:3px 10px;border-radius:20px;background:var(--red-bg);border:0.5px solid var(--red-border);color:var(--red-text);">'+esc(n)+'</span>').join('')+'</div>'):'')
+    +section('Dance log — performed ('+performed.length+' entries) <span style="font-size:10px;font-weight:400;color:var(--t3);">— edit cells then Save Changes</span>','var(--blue-text)',editableLogTable(performed,'debug-log-performed','No performed log entries for this night.'))
+    +(notPerformed.length?section('Dance log — not performed ('+notPerformed.length+' entries)','var(--purple-text)',editableLogTable(notPerformed,'debug-log-notperformed','No not-performed log entries.')):'')
+    +'<div style="margin-top:1.5rem;border-top:0.5px solid var(--b3);padding-top:1rem;">'
+      +'<div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Raw JSON</div>'
+      +'<pre id="debug-raw-json" style="font-size:11px;font-family:monospace;background:var(--bg2);border:0.5px solid var(--b3);border-radius:var(--radius-md);padding:12px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;color:var(--t1);max-height:300px;overflow-y:auto;">'+esc(JSON.stringify({night:nightObj,danceLog:danceLog},null,2))+'</pre>'
+    +'</div>'
+  +'</div>';
+
+  // Set select values after innerHTML (selects need value set post-render)
+  const metaDjSel=document.getElementById('debug-meta-dj');
+  if(metaDjSel) metaDjSel.value=nightObj.dj||'';
+  out.querySelectorAll('.debug-edit-select[data-field="dj"]').forEach(sel=>{
+    const eid=sel.dataset.eid;
+    const entry=fullLog.find(e=>e._eid===eid);
+    if(entry) sel.value=entry.dj||'';
   });
-  const storedPerformed=(nightObj.dances||[]).map(id=>{
-    const d=userKnow.find(k=>k.id===id);
-    return d?d.name:id;
-  }).sort((a,b)=>a.localeCompare(b));
-  const storedNotPerf=(nightObj.notPerformed||[]).map(id=>{
-    const d=bank.find(k=>k.id===id)||userKnow.find(k=>k.id===id);
-    return d?d.name:id;
-  }).sort((a,b)=>a.localeCompare(b));
+}
 
-  // Determine if this is the admin's own data (can delete directly) or another user's
-  const isOwnData=debugUsername===currentUser;
+// Apply a single DJ to every row in a log table
+function debugApplyDJToAll(tableId){
+  const selEl=document.getElementById('debug-apply-dj-sel-'+tableId);
+  if(!selEl) return;
+  const dj=selEl.value;
+  const out=document.getElementById('debug-night-output');
+  if(!out) return;
+  out.querySelectorAll('#'+tableId+' .debug-edit-select[data-field="dj"]').forEach(sel=>{
+    sel.value=dj;
+  });
+}
 
-  out.innerHTML=`
-    <div style="background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:1.5rem;">
-      <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap;">
-        <div style="flex:1;">
-          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:2px;">${formatDate(date)}</div>
-          <div style="font-size:12px;color:var(--t2);font-family:monospace;">${esc(date)} · user: ${esc(debugUsername)}</div>
-        </div>
-        <button class="btn sm danger" onclick="debugDeleteNight('${date}')">&#128465; Delete Night</button>
-      </div>
+async function debugSaveNight(date){
+  if(!isAdmin||!debugUserState||!debugUsername) return;
+  const statusEl=document.getElementById('debug-save-status');
+  const btn=document.getElementById('debug-save-btn');
 
-      ${section('Night metadata','var(--t2)',`
-        <div style="display:flex;flex-wrap:wrap;gap:6px;">
-          ${pill('DJ',nightObj.dj||'None')}
-          ${pill('Arrived',nightObj.arriveTime||'—')}
-          ${pill('Left',nightObj.leaveTime||'—')}
-          ${pill('Performed count',(nightObj.dances||[]).length)}
-          ${pill('Not performed count',(nightObj.notPerformed||[]).length)}
-        </div>
-      `)}
+  function setStatus(msg,color,bg){
+    if(!statusEl) return;
+    statusEl.style.display='';
+    statusEl.style.color=color||'var(--t2)';
+    statusEl.style.background=bg||'var(--bg2)';
+    statusEl.style.borderColor=color||'var(--b3)';
+    statusEl.textContent=msg;
+  }
 
-      ${section('Highlights','var(--amber-text)',nightObj.highlights&&nightObj.highlights.some(Boolean)
-        ?`<div style="display:flex;flex-direction:column;gap:6px;">
-            ${hlNames.map((n,i)=>n&&n!=='—'?`<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:0.5px solid var(--amber-border);border-radius:var(--radius-md);background:var(--amber-bg);">
-              <span style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--amber-text);min-width:20px;">${i+1}</span>
-              <span style="font-size:13px;font-weight:500;">${esc(n)}</span>
-            </div>`:'').join('')}
-          </div>`
-        :`<div style="font-size:13px;color:var(--t3);">No highlights saved for this night.</div>`
-      )}
+  setStatus('Saving…','var(--t2)');
+  if(btn) btn.disabled=true;
 
-      ${section('Performed dances','var(--green-text)',storedPerformed.length
-        ?`<div style="display:flex;flex-wrap:wrap;gap:5px;">${storedPerformed.map(n=>`<span style="font-size:12px;font-weight:500;padding:3px 10px;border-radius:20px;background:var(--green-bg);border:0.5px solid var(--green-border);color:var(--green-text);">${esc(n)}</span>`).join('')}</div>`
-        :`<div style="font-size:13px;color:var(--t3);">None stored.</div>`
-      )}
+  const nights=debugUserState.nights||{};
+  const nd=nights[date];
+  if(!nd){setStatus('Night not found.','var(--red-text)','var(--red-bg)');if(btn)btn.disabled=false;return;}
+  const nightObj=Array.isArray(nd)?{dances:nd,dj:'',highlights:null,arriveTime:'',leaveTime:'',notPerformed:[]}:{notPerformed:[],...nd};
 
-      ${storedNotPerf.length?section('Not performed dances','var(--red-text)',`<div style="display:flex;flex-wrap:wrap;gap:5px;">${storedNotPerf.map(n=>`<span style="font-size:12px;font-weight:500;padding:3px 10px;border-radius:20px;background:var(--red-bg);border:0.5px solid var(--red-border);color:var(--red-text);">${esc(n)}</span>`).join('')}</div>`):''}
+  // Read metadata
+  const metaDj=document.getElementById('debug-meta-dj');
+  const metaArrive=document.getElementById('debug-meta-arrive');
+  const metaLeave=document.getElementById('debug-meta-leave');
+  if(metaDj) nightObj.dj=metaDj.value||'';
+  if(metaArrive) nightObj.arriveTime=metaArrive.value||'';
+  if(metaLeave) nightObj.leaveTime=metaLeave.value||'';
+  debugUserState.nights[date]=nightObj;
 
-      ${section(`Dance log — performed (${performed.length} entries)`,'var(--blue-text)',logTable(performed,'No performed log entries for this night.'))}
+  // Read editable log rows by _eid (stable key, never shifts on delete/filter)
+  const fullLog=debugUserState.danceLog||[];
+  const out=document.getElementById('debug-night-output');
+  if(out){
+    out.querySelectorAll('.debug-edit-input').forEach(inp=>{
+      const eid=inp.dataset.eid;
+      const field=inp.dataset.field;
+      const entry=fullLog.find(e=>e._eid===eid);
+      if(entry&&field) entry[field]=inp.value;
+    });
+    out.querySelectorAll('.debug-edit-select').forEach(sel=>{
+      const eid=sel.dataset.eid;
+      const field=sel.dataset.field;
+      const entry=fullLog.find(e=>e._eid===eid);
+      if(entry&&field) entry[field]=sel.value||null;
+    });
+  }
 
-      ${notPerformed.length?section(`Dance log — not performed (${notPerformed.length} entries)`,'var(--purple-text)',logTable(notPerformed,'No not-performed log entries.')):''}
+  // Sync palace_times entry
+  const palaceIdx=fullLog.findIndex(e=>e.date===date&&e.type==='palace_times');
+  if(nightObj.arriveTime||nightObj.leaveTime){
+    const entry={type:'palace_times',date,arriveTime:nightObj.arriveTime,leaveTime:nightObj.leaveTime};
+    if(palaceIdx>=0) fullLog[palaceIdx]=entry; else fullLog.push(entry);
+  } else if(palaceIdx>=0){
+    fullLog.splice(palaceIdx,1);
+  }
 
-      <div style="margin-top:1.5rem;border-top:0.5px solid var(--b3);padding-top:1rem;">
-        <div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Raw JSON</div>
-        <pre style="font-size:11px;font-family:monospace;background:var(--bg2);border:0.5px solid var(--b3);border-radius:var(--radius-md);padding:12px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;color:var(--t1);max-height:300px;overflow-y:auto;">${esc(JSON.stringify({night:nightObj,danceLog:danceLog},null,2))}</pre>
-      </div>
-    </div>`;
+  // Strip internal _eid keys before saving to keep cloud data clean
+  const cleanLog=fullLog.map(e=>{const c={...e};delete c._eid;return c;});
+  debugUserState.danceLog=cleanLog;
+
+  try{
+    if(debugUsername===currentUser){
+      state.nights[date]=nightObj;
+      state.danceLog=cleanLog;
+      const ok=await saveToCloud();
+      if(!ok) throw new Error('Save failed — changes queued for retry');
+    } else {
+      const r=await sbFetch('/rest/v1/dances?username=eq.'+enc(debugUsername),{
+        method:'PATCH',
+        prefer:'return=minimal',
+        body:JSON.stringify({data:debugUserState,updated_at:new Date().toISOString()})
+      });
+      if(!r.ok) throw new Error('Save failed (server returned '+r.status+')');
+    }
+    setStatus('✓ Saved successfully','var(--green-dark)','var(--green-bg)');
+    // Refresh raw JSON preview
+    const rawEl=document.getElementById('debug-raw-json');
+    if(rawEl){
+      const dl2=(cleanLog).filter(e=>e.date===date);
+      rawEl.textContent=JSON.stringify({night:nightObj,danceLog:dl2},null,2);
+    }
+    // Re-stamp eids on cleanLog entries so subsequent saves still work
+    debugUserState.danceLog.forEach((e,i)=>{e._eid='eid_'+i+'_'+(e.timestamp||Date.now()+'_'+i);});
+    setTimeout(()=>{if(statusEl&&statusEl.textContent.startsWith('✓'))statusEl.style.display='none';},3000);
+  }catch(err){
+    setStatus('⚠ '+err.message,'var(--red-text)','var(--red-bg)');
+  }
+  if(btn) btn.disabled=false;
+}
+
+function debugDeleteLogEntry(date,eid){
+  if(!isAdmin||!debugUserState) return;
+  if(!confirm('Delete this log entry?')) return;
+  debugUserState.danceLog=(debugUserState.danceLog||[]).filter(e=>e._eid!==eid);
+  renderDebugNight();
 }
 
 async function debugDeleteNight(date){
@@ -8209,11 +8440,111 @@ window.recRefresh = recRefresh;
 
 tryAutoLogin();
 
+// ---- Session keep-alive & stale-tab recovery ----
+// Track when the app was last active so we can detect long absences.
+let _lastActiveAt = Date.now();
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    _onAppResume();
+  } else {
+    _lastActiveAt = Date.now();
+  }
+});
+
+// Also handle back/forward cache restores (bfcache) – the browser may serve
+// a frozen page without re-running any scripts at all.
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) _onAppResume();
+});
+
+async function _onAppResume() {
+  const awayMs = Date.now() - _lastActiveAt;
+  _lastActiveAt = Date.now();
+
+  // Always reload public data (bank, friend cards, home config) so
+  // any admin changes made while away show up immediately.
+  try {
+    await loadBank();
+    await loadFriendCards();
+    await loadHomeConfig();
+    await loadCustomLists();
+    await loadDJList();
+    await loadDrewDJFreestyles();
+    await clLoad();
+  } catch(e) {
+    console.warn('Resume: public data reload error', e);
+  }
+
+  // If the user was away for more than 30 minutes and is logged in,
+  // refresh their token and re-fetch their personal data so everything
+  // shows up without needing a manual page refresh.
+  const STALE_THRESHOLD_MS = 30 * 60 * 1000; // 30 minutes
+  if (awayMs < STALE_THRESHOLD_MS) {
+    // Short absence — just re-render with the data we already have
+    if (!isGuest) {
+      try { renderBank(); } catch(e) {}
+      try { renderFriendsTab(); } catch(e) {}
+      try { applyTabVisibility(); } catch(e) {}
+      try { applyHomeCardGradients(); } catch(e) {}
+    }
+    return;
+  }
+
+  // Long absence — token is likely expired; do a full re-auth + data reload.
+  if (!currentUser) return; // guest — nothing to restore
+
+  setSyncStatus('syncing', 'Reconnecting…');
+  try {
+    const refreshed = await tryRefreshToken();
+    if (!refreshed) {
+      // Token could not be refreshed — fall back to guest mode
+      setSyncStatus('error', 'Session expired');
+      logout();
+      return;
+    }
+
+    // Re-fetch personal state from the cloud
+    const r = await sbFetch(`/rest/v1/dances?username=eq.${enc(currentUser)}&select=data,updated_at`);
+    if (r.ok && r.data && r.data.length > 0) {
+      state = r.data[0].data || {know:[], learn:[], nights:{}, djFreestyles:{}, favorites:[], favoriteFriends:[]};
+      if (!state.djFreestyles)    state.djFreestyles = {};
+      if (!state.favorites)       state.favorites = [];
+      if (!state.danceLog)        state.danceLog = [];
+      if (!state.favoriteFriends) state.favoriteFriends = [];
+      if (!state.drewsNights)     state.drewsNights = {};
+      if (!state.nightColors)     state.nightColors = {};
+    }
+
+    // Re-load submissions / mod list (small payloads, always refresh)
+    try { await loadSubmissions(); } catch(e) {}
+    try { await loadModList(); } catch(e) {}
+
+    // Re-render everything
+    renderBank();
+    renderList('know');
+    renderList('learn');
+    renderDJDropdown();
+    renderPicks();
+    renderCustomListPills();
+    try { renderFriendsTab(); } catch(e) {}
+    try { applyTabVisibility(); } catch(e) {}
+    try { applyHomeCardGradients(); } catch(e) {}
+    if (isAdmin) {
+      try { initDrewsNightDate(); } catch(e) {}
+    }
+    setSyncStatus('synced', 'Synced');
+  } catch(e) {
+    console.warn('Resume re-auth error:', e);
+    setSyncStatus('error', 'Reconnect failed — try refreshing');
+  }
+}
+
 // Refresh the Supabase token every 45 minutes while the app is open,
 // so a long session never expires silently.
 setInterval(async()=>{
   if(!currentUser) return;
   await tryRefreshToken();
+  _lastActiveAt = Date.now(); // reset the stale timer after a successful background refresh
 }, 45 * 60 * 1000);
 
 // ---- CHANGELOG ----
@@ -8364,6 +8695,207 @@ function renderChangelog() {
 function showAppFooter() {
   const footer = document.getElementById('app-footer');
   if (footer) footer.style.display = '';
+}
+
+// ---- Admin Analytics ----
+async function renderAdminAnalytics() {
+  if (!isAdmin) return;
+  const loading = document.getElementById('aa-loading');
+  const content = document.getElementById('aa-content');
+  if (!loading || !content) return;
+  loading.style.display = 'block';
+  content.style.display = 'none';
+
+  // Fetch all user rows (exclude system rows)
+  const r = await sbFetch(`/rest/v1/dances?username=neq.__bank__&username=neq.__picks__&username=neq.__submissions__&username=neq.__friendcards__&username=neq.__djlist__&username=neq.__modlist__&username=neq.__homeconfig__&username=neq.__changelog__&select=username,updated_at,data&order=username.asc`);
+  if (!r.ok || !r.data) {
+    loading.textContent = 'Could not load data.';
+    return;
+  }
+  const users = r.data.filter(u => !u.username.startsWith('__'));
+  const totalUsers = users.length;
+  const bankSize = bank.length;
+  const totalMods = modList.length;
+
+  // Aggregate stats
+  let totalKnow = 0, totalLearn = 0, totalNights = 0;
+  const knowCounts = {}; // danceName -> count of users who know it
+  const learnCounts = {}; // danceName -> count of users who want to learn it
+  const nightDateCounts = {}; // date -> count of users who logged that night
+  const userRows = [];
+
+  users.forEach(u => {
+    const d = u.data || {};
+    const know = d.know || [];
+    const learn = d.learn || [];
+    const nights = d.nights || {};
+    const nightCount = Object.keys(nights).length;
+    totalKnow += know.length;
+    totalLearn += learn.length;
+    totalNights += nightCount;
+    know.forEach(dk => {
+      const name = dk.name || dk;
+      knowCounts[name] = (knowCounts[name] || 0) + 1;
+    });
+    learn.forEach(dl => {
+      const name = dl.name || dl;
+      learnCounts[name] = (learnCounts[name] || 0) + 1;
+    });
+    Object.keys(nights).forEach(date => {
+      nightDateCounts[date] = (nightDateCounts[date] || 0) + 1;
+    });
+    userRows.push({
+      username: u.username,
+      know: know.length,
+      learn: learn.length,
+      nights: nightCount,
+      lastActive: u.updated_at ? u.updated_at.slice(0, 10) : null,
+      isMod: modList.includes(u.username),
+      isAdmin: u.username === ADMIN_USER,
+    });
+  });
+
+  // Sort user rows by know desc
+  userRows.sort((a, b) => b.know - a.know || b.nights - a.nights);
+
+  const avgKnow = totalUsers ? (totalKnow / totalUsers).toFixed(1) : 0;
+  const avgLearn = totalUsers ? (totalLearn / totalUsers).toFixed(1) : 0;
+
+  // ---- Overview stat cards ----
+  const statsGrid = document.getElementById('aa-stats-grid');
+  const stats = [
+    { label: 'Registered Users', value: totalUsers, sub: `${totalMods} mod${totalMods !== 1 ? 's' : ''}` },
+    { label: 'Dances in Bank', value: bankSize, sub: 'total available' },
+    { label: 'Avg Dances Known', value: avgKnow, sub: 'per user' },
+    { label: 'Avg Want to Learn', value: avgLearn, sub: 'per user' },
+    { label: 'Total Nights Logged', value: totalNights, sub: 'across all users' },
+    { label: 'Unique Nights', value: Object.keys(nightDateCounts).length, sub: 'distinct dates' },
+  ];
+  statsGrid.innerHTML = stats.map(s => `
+    <div class="stat-card">
+      <div class="stat-label">${s.label}</div>
+      <div class="stat-value">${s.value}</div>
+      <div class="stat-sub">${s.sub}</div>
+    </div>`).join('');
+
+  // ---- User leaderboard ----
+  const userTable = document.getElementById('aa-user-table');
+  userTable.innerHTML = userRows.map((u, i) => {
+    const safeId = 'aa_u_' + u.username.replace(/[^a-zA-Z0-9]/g, '_');
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `<span style="color:var(--t3);font-size:13px;min-width:24px;display:inline-block;text-align:center">${i + 1}</span>`;
+    const pctKnow = bankSize ? Math.round((u.know / bankSize) * 100) : 0;
+    return `
+    <div style="border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);margin-bottom:6px;overflow:hidden;">
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 15px;cursor:pointer;transition:background 0.1s;" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background=''" onclick="document.getElementById('${safeId}').style.display=document.getElementById('${safeId}').style.display==='none'?'block':'none'">
+        <span style="font-size:16px;min-width:28px;text-align:center">${medal}</span>
+        <span style="flex:1;font-size:14px;font-weight:500">${esc(u.username)}</span>
+        ${u.isAdmin ? '<span class="admin-badge">Admin</span>' : ''}
+        ${u.isMod && !u.isAdmin ? '<span class="mod-badge">Mod</span>' : ''}
+        <span style="display:flex;gap:4px;flex-shrink:0;">
+          <span style="font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--green-bg);border:0.5px solid var(--green-border);color:var(--green-text)">${u.know} know</span>
+          <span style="font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--purple-bg);border:0.5px solid var(--purple-border);color:var(--purple-text)">${u.learn} learning</span>
+          <span style="font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--bg2);border:0.5px solid var(--b3);color:var(--t2)">${u.nights} nights</span>
+        </span>
+        <span style="font-size:11px;color:var(--t3);flex-shrink:0">${u.lastActive ? formatDate(u.lastActive) : '—'}</span>
+      </div>
+      <div id="${safeId}" style="display:none;padding:10px 15px;border-top:0.5px solid var(--b3);background:var(--bg2);">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div style="flex:1;">
+            <div style="font-size:11px;color:var(--t2);margin-bottom:5px;">Bank coverage</div>
+            <div style="background:var(--bg3);border-radius:20px;height:8px;overflow:hidden;min-width:120px;">
+              <div style="height:100%;width:${pctKnow}%;background:var(--green-dark);border-radius:20px;transition:width 0.4s;"></div>
+            </div>
+            <div style="font-size:11px;color:var(--t3);margin-top:3px">${pctKnow}% of bank known</div>
+          </div>
+          <div style="font-size:12px;color:var(--t2)">Last active: <strong style="color:var(--t1)">${u.lastActive ? formatDate(u.lastActive) : 'Unknown'}</strong></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('') || '<div class="empty">No users yet.</div>';
+
+  // ---- Top dances known ----
+  const topKnow = Object.entries(knowCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const topKnowEl = document.getElementById('aa-top-dances');
+  topKnowEl.innerHTML = topKnow.length ? topKnow.map(([name, count], i) => {
+    const pct = totalUsers ? Math.round((count / totalUsers) * 100) : 0;
+    return `
+    <div style="display:flex;align-items:center;gap:12px;padding:8px 14px;border:0.5px solid var(--b3);border-radius:var(--radius-md);background:var(--bg);margin-bottom:6px;">
+      <span style="font-size:16px;font-weight:700;color:var(--t3);font-family:'Playfair Display',serif;min-width:24px">${i + 1}</span>
+      <span style="flex:1;font-size:13px;font-weight:500">${esc(name)}</span>
+      <div style="width:100px;background:var(--bg3);border-radius:20px;height:6px;flex-shrink:0;">
+        <div style="height:100%;width:${pct}%;background:var(--green-dark);border-radius:20px;"></div>
+      </div>
+      <span style="font-size:12px;color:var(--t2);flex-shrink:0;min-width:70px;text-align:right">${count} / ${totalUsers} users</span>
+    </div>`;
+  }).join('') : '<div class="empty">No data yet.</div>';
+
+  // ---- Top dances wanted to learn ----
+  const topLearn = Object.entries(learnCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const topLearnEl = document.getElementById('aa-top-learn');
+  topLearnEl.innerHTML = topLearn.length ? topLearn.map(([name, count], i) => {
+    const pct = totalUsers ? Math.round((count / totalUsers) * 100) : 0;
+    return `
+    <div style="display:flex;align-items:center;gap:12px;padding:8px 14px;border:0.5px solid var(--purple-border);border-radius:var(--radius-md);background:var(--purple-bg);margin-bottom:6px;">
+      <span style="font-size:16px;font-weight:700;color:var(--purple-text);font-family:'Playfair Display',serif;min-width:24px">${i + 1}</span>
+      <span style="flex:1;font-size:13px;font-weight:500;color:var(--t1)">${esc(name)}</span>
+      <div style="width:100px;background:var(--bg3);border-radius:20px;height:6px;flex-shrink:0;">
+        <div style="height:100%;width:${pct}%;background:var(--purple-border);border-radius:20px;"></div>
+      </div>
+      <span style="font-size:12px;color:var(--purple-text);flex-shrink:0;min-width:70px;text-align:right">${count} user${count !== 1 ? 's' : ''}</span>
+    </div>`;
+  }).join('') : '<div class="empty">No data yet.</div>';
+
+  // ---- Difficulty distribution ----
+  const diffOrder = ['Beginner', 'Improver', 'Intermediate', 'Advanced', ''];
+  const diffColors = {
+    'Beginner': 'var(--green-text)', 'Improver': 'var(--blue-text)',
+    'Intermediate': 'var(--amber-text)', 'Advanced': 'var(--red-text)', '': 'var(--t3)'
+  };
+  const diffBgs = {
+    'Beginner': 'var(--green-bg)', 'Improver': 'var(--blue-bg)',
+    'Intermediate': 'var(--amber-bg)', 'Advanced': 'var(--red-bg)', '': 'var(--bg3)'
+  };
+  const diffBorders = {
+    'Beginner': 'var(--green-border)', 'Improver': 'var(--blue-border)',
+    'Intermediate': 'var(--amber-border)', 'Advanced': 'var(--red-border)', '': 'var(--b3)'
+  };
+  const diffCounts = {};
+  diffOrder.forEach(d => { diffCounts[d] = bank.filter(b => (b.difficulty || '') === d).length; });
+  const maxDiff = Math.max(...Object.values(diffCounts), 1);
+  const diffEl = document.getElementById('aa-diff-bars');
+  diffEl.innerHTML = diffOrder.map(d => {
+    const count = diffCounts[d];
+    const label = d || 'Unspecified';
+    const pct = Math.round((count / bankSize) * 100) || 0;
+    const barPct = Math.round((count / maxDiff) * 100);
+    return `
+    <div style="display:flex;align-items:center;gap:12px;padding:8px 14px;border:0.5px solid ${diffBorders[d]};border-radius:var(--radius-md);background:${diffBgs[d]};margin-bottom:6px;">
+      <span style="font-size:12px;font-weight:600;color:${diffColors[d]};min-width:90px">${label}</span>
+      <div style="flex:1;background:var(--bg3);border-radius:20px;height:8px;">
+        <div style="height:100%;width:${barPct}%;background:${diffColors[d]};border-radius:20px;transition:width 0.4s;"></div>
+      </div>
+      <span style="font-size:12px;color:var(--t2);flex-shrink:0;min-width:80px;text-align:right">${count} dances (${pct}%)</span>
+    </div>`;
+  }).join('');
+
+  // ---- Most active nights ----
+  const topNights = Object.entries(nightDateCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const topNightsEl = document.getElementById('aa-top-nights');
+  topNightsEl.innerHTML = topNights.length ? topNights.map(([date, count], i) => {
+    const pct = totalUsers ? Math.round((count / totalUsers) * 100) : 0;
+    return `
+    <div style="display:flex;align-items:center;gap:12px;padding:8px 14px;border:0.5px solid var(--b3);border-radius:var(--radius-md);background:var(--bg);margin-bottom:6px;">
+      <span style="font-size:16px;font-weight:700;color:var(--t3);font-family:'Playfair Display',serif;min-width:24px">${i + 1}</span>
+      <span style="flex:1;font-size:13px;font-weight:500">${formatDate(date)}</span>
+      <div style="width:100px;background:var(--bg3);border-radius:20px;height:6px;flex-shrink:0;">
+        <div style="height:100%;width:${pct}%;background:#0369a1;border-radius:20px;"></div>
+      </div>
+      <span style="font-size:12px;color:var(--t2);flex-shrink:0;min-width:70px;text-align:right">${count} user${count !== 1 ? 's' : ''}</span>
+    </div>`;
+  }).join('') : '<div class="empty">No nights logged yet.</div>';
+
+  loading.style.display = 'none';
+  content.style.display = 'block';
 }
 
 </script>
