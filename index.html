@@ -44,6 +44,9 @@
 
     /* AUTH */
     .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+    /* Guest mode: auth modal overlays the app */
+    .auth-modal-overlay{position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;padding:1rem;}
+    .auth-modal-wrap{width:100%;max-width:400px;}
     .auth-card{background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:2.5rem 2rem;width:100%;max-width:380px;}
     .auth-card h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-bottom:4px;}
     .auth-card .sub{font-size:13px;color:var(--t2);margin-bottom:2rem;}
@@ -58,7 +61,7 @@
     .auth-error{font-size:13px;color:var(--red-text);background:var(--red-bg);border:0.5px solid var(--red-border);border-radius:var(--radius-md);padding:8px 12px;margin-bottom:14px;display:none;}
 
     /* APP SHELL */
-    .app{max-width:880px;margin:0 auto;padding:2rem 1.25rem 4rem;display:none;}
+    .app{max-width:880px;margin:0 auto;padding:2rem 1.25rem 4rem;display:block;}
     .app-header{display:flex;align-items:center;gap:12px;margin-bottom:4px;flex-wrap:wrap;}
     h1{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;letter-spacing:-0.5px;flex:1;}
     .user-pill{font-size:12px;color:var(--t2);background:var(--bg2);border:0.5px solid var(--b3);border-radius:20px;padding:4px 12px;display:flex;align-items:center;gap:8px;}
@@ -597,6 +600,60 @@
     .fc-fav-num{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--t3);min-width:16px;}
     .fc-pills{display:flex;flex-wrap:wrap;gap:4px;}
     .fc-pill{font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;background:var(--bg2);color:var(--t2);border:0.5px solid var(--b3);}
+    /* ── NIGHT LOG CARDS ───────────────────────────────────────── */
+    .nights-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-bottom:.5rem;}
+    .nlc{border-radius:16px;overflow:hidden;border:0.5px solid var(--b3);cursor:pointer;transition:transform .15s,box-shadow .15s;display:flex;flex-direction:column;background:var(--bg);}
+    .nlc-color-btn{position:absolute;top:8px;right:8px;z-index:2;background:rgba(255,255,255,0.25);border:none;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;line-height:1;transition:background 0.15s;backdrop-filter:blur(4px);}
+    .nlc-color-btn:hover{background:rgba(255,255,255,0.45);}
+    .nlc-color-popup{position:fixed;z-index:4000;background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:12px;box-shadow:0 8px 32px rgba(0,0,0,0.18);width:220px;}
+    .nlc-color-popup-title{font-size:11px;font-weight:600;color:var(--t2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;}
+    .nlc-color-swatches{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:10px;}
+    .nlc-color-swatch{width:28px;height:28px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:border-color 0.12s,transform 0.1s;flex-shrink:0;}
+    .nlc-color-swatch:hover{transform:scale(1.12);}
+    .nlc-color-swatch.active{border-color:var(--t1);}
+    .nlc-color-popup-footer{display:flex;gap:6px;justify-content:flex-end;}
+    .nlc-color-reset{font-size:11px;padding:4px 10px;border-radius:20px;border:0.5px solid var(--b2);background:var(--bg2);color:var(--t2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.1s;}
+    .nlc-color-reset:hover{background:var(--bg3);}
+    .nlc:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.16);}
+    .nlc-head{padding:1.1rem 1.25rem 1rem;position:relative;min-height:76px;display:flex;flex-direction:column;justify-content:flex-end;}
+    .nlc-head::before{content:'';position:absolute;width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.1);top:-18px;right:-14px;pointer-events:none;}
+    .nlc-head::after{content:'';position:absolute;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.07);bottom:4px;left:-10px;pointer-events:none;}
+    .nlc-date{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.28);line-height:1.2;position:relative;z-index:1;}
+    .nlc-meta{font-size:11px;color:rgba(255,255,255,.78);font-weight:500;position:relative;z-index:1;margin-top:3px;}
+    .nlc-body{background:var(--bg);padding:.85rem 1.1rem;flex:1;}
+    .nlc-hl-list{display:flex;flex-direction:column;gap:5px;}
+    .nlc-hl-row{display:flex;align-items:center;gap:7px;}
+    .nlc-hl-num{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--t3);min-width:14px;flex-shrink:0;}
+    .nlc-hl-name{font-size:12px;font-weight:500;color:var(--t1);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .nlc-hl-label{font-size:10px;color:var(--t3);flex-shrink:0;}
+    .nlc-pills{display:flex;flex-wrap:wrap;gap:3px;}
+    .nlc-pill{font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--bg2);color:var(--t2);border:0.5px solid var(--b3);}
+    .nlc-more{font-size:10px;color:var(--t3);align-self:center;padding-left:2px;}
+    /* ── NIGHT DETAIL MODAL ────────────────────────────────────── */
+    .ndm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:2000;padding:1rem;}
+    .ndm-modal{background:var(--bg);border-radius:var(--radius-lg);width:100%;max-width:480px;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+    .ndm-mhead{padding:1.5rem 1.5rem 1.25rem;position:relative;flex-shrink:0;}
+    .ndm-mhead::before{content:'';position:absolute;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.09);top:-28px;right:-20px;pointer-events:none;}
+    .ndm-close{position:absolute;top:.9rem;right:.9rem;background:rgba(255,255,255,.22);border:none;color:#fff;font-size:17px;line-height:1;width:28px;height:28px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s;z-index:1;}
+    .ndm-close:hover{background:rgba(255,255,255,.38);}
+    .ndm-mdate{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.28);position:relative;z-index:1;}
+    .ndm-mmeta{font-size:12px;color:rgba(255,255,255,.8);margin-top:5px;position:relative;z-index:1;}
+    .ndm-mbody{padding:1.25rem 1.5rem 1.5rem;}
+    .ndm-slabel{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px;}
+    .ndm-hllist{display:flex;flex-direction:column;gap:7px;margin-bottom:1.25rem;}
+    .ndm-hlitem{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-lg);}
+    .ndm-hlitem.r1{background:linear-gradient(135deg,#FAEEDA,#FAC775);border:0.5px solid var(--amber-border);}
+    .ndm-hlitem.r2,.ndm-hlitem.r3{background:var(--bg2);border:0.5px solid var(--b2);}
+    .ndm-hlnum{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;min-width:28px;text-align:center;}
+    .ndm-hlitem.r1 .ndm-hlnum{color:#854F0B;}
+    .ndm-hlitem.r2 .ndm-hlnum,.ndm-hlitem.r3 .ndm-hlnum{color:var(--t3);}
+    .ndm-hlname{font-size:14px;font-weight:500;flex:1;}
+    .ndm-hlitem.r1 .ndm-hlname{color:#1a1a18;}
+    .ndm-hllabel{font-size:11px;color:var(--t2);}
+    .ndm-hlitem.r1 .ndm-hllabel{color:#5a3a0a;}
+    .ndm-dpills{display:flex;flex-wrap:wrap;gap:5px;}
+    .ndm-dpill{font-size:12px;font-weight:500;padding:3px 10px;border-radius:20px;background:var(--bg2);color:var(--t2);border:0.5px solid var(--b3);}
+    .ndm-delrow{display:flex;justify-content:flex-end;gap:8px;margin-top:1.25rem;padding-top:1rem;border-top:0.5px solid var(--b3);flex-wrap:wrap;}
     .friend-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:2000;padding:1rem;}
     .friend-modal{background:var(--bg);border-radius:var(--radius-lg);padding:2rem;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
     .friend-modal h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:6px;}
@@ -735,6 +792,18 @@
 })();
 </script>
 
+<script>
+// 1-in-18 chance of alternate splash screen
+(function(){
+  if(Math.random() < 1/9){
+    var img = document.getElementById('splash-logo-img');
+    var title = document.getElementById('splash-title-text');
+    if(img) img.src = 'https://i.imgur.com/WNiUH0Z.png';
+    if(title) title.textContent = 'Line Dance Tracker';
+  }
+})();
+</script>
+
 <!-- HIGHLIGHTS MODAL -->
 <div class="modal-overlay" id="highlights-modal" style="display:none">
   <div class="modal-card">
@@ -837,8 +906,9 @@
   <div class="friend-modal" id="friend-detail-content"></div>
 </div>
 
-<!-- AUTH -->
-<div class="auth-wrap" id="auth-wrap">
+<!-- AUTH MODAL (shown as overlay when guest tries a write action, or on manual sign-in) -->
+<div class="auth-modal-overlay" id="auth-wrap" style="display:none">
+  <div class="auth-modal-wrap">
   <div class="auth-card">
     <h1>Line Dance Tracker</h1>
     <p class="sub" id="auth-sub">Sign in to sync your dances across devices</p>
@@ -865,6 +935,10 @@
     </div>
     <button class="auth-btn" id="auth-btn" onclick="authSubmit()">Sign in</button>
     <div class="auth-toggle" id="auth-toggle">No account? <span onclick="toggleAuthMode()">Create one</span></div>
+    <div style="text-align:center;margin-top:1rem;" id="auth-dismiss-row">
+      <button onclick="dismissAuthModal()" style="background:none;border:none;font-size:13px;color:var(--t2);cursor:pointer;text-decoration:underline;font-family:'DM Sans',sans-serif;">Continue browsing as guest</button>
+    </div>
+  </div>
   </div>
 </div>
 
@@ -874,7 +948,10 @@
     <h1>Line Dance Tracker</h1>
     <div style="display:flex;align-items:center;gap:8px;">
       <button class="hamburger-btn" id="hamburger-btn" onclick="switchTab('home');mobileSwitch('home')" aria-label="Home" style="font-size:18px;padding:6px 10px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="display:block;color:var(--t1);"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
-      <div class="user-pill">
+      <!-- Guest sign-in button (shown when not logged in) -->
+      <button id="guest-signin-btn" onclick="openAuthModal('signin')" style="font-size:13px;font-weight:500;padding:5px 14px;border:1.5px solid var(--b2);border-radius:20px;background:var(--bg2);color:var(--t1);cursor:pointer;font-family:'DM Sans',sans-serif;display:none;">Sign in</button>
+      <!-- User pill (shown when logged in) -->
+      <div class="user-pill" id="user-pill-wrap" style="display:none;">
         <span id="user-label"></span>
         <span class="admin-badge" id="admin-badge" style="display:none">Admin</span>
         <span class="mod-badge" id="mod-badge" style="display:none">Mod</span>
@@ -883,7 +960,7 @@
     </div>
   </div>
   <p class="subtitle">Track your dances, your progress, and your nights out</p>
-  <div class="sync-bar"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">Not synced</span></div>
+  <div class="sync-bar"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">Browsing as guest — <button onclick="openAuthModal('signin')" style="background:none;border:none;font-size:12px;color:var(--t1);cursor:pointer;font-weight:500;text-decoration:underline;font-family:'DM Sans',sans-serif;padding:0;">sign in</button> to save your data</span></div>
 
   <!-- MOBILE MENU -->
   <div class="mobile-menu-overlay" id="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
@@ -1234,6 +1311,11 @@
     </div>
     <div class="section-title">Freestyle records by DJ</div>
     <div id="dj-records-list"></div>
+
+    <!-- SONG TIME HEATMAP -->
+    <div class="section-title" style="margin-top:2rem">Time Heatmap</div>
+    <p class="section-note">Songs are played throughout the night — click any point for details</p>
+    <div id="tf-song-heatmap"></div>
 
     <!-- PERSONAL STATS DASHBOARD -->
     <div class="section-title" style="margin-top:2rem"> Personal Stats</div>
@@ -1678,14 +1760,15 @@ const SUPABASE_URL='https://chuvnwaqtgyqrwdpzpfx.supabase.co';
 const SUPABASE_KEY='sb_publishable_1k44O83Uhj5OABd-VB_wLQ_fFJb1woU';
 const ADMIN_USER='drew';
 
-let currentUser=null,isAdmin=false,isMod=false;
-let state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[],favoriteFriends:[]};
+let currentUser=null,isAdmin=false,isMod=false,isGuest=true;
+let state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[],favoriteFriends:[],nightColors:{}};
 let drewDJFreestyles={}; // Drew's DJ freestyle data, loaded for all users
 let bank=[];
 let drewPicks=[];
 let submissions=[]; // shared list of user-submitted dances not in bank
 let friendCards=[]; // shared list of friend profile cards
 let djList=[]; // shared list of DJs managed by admin
+let djColors={}; // admin-set default gradient per DJ name
 let modList=[]; // shared list of moderator usernames
 let homeConfig={}; // admin-configurable home card gradients
 let tabVisibilityConfig={}; // admin-configurable tab visibility per role
@@ -1743,13 +1826,64 @@ function setSyncStatus(t,l){
   const dot=document.getElementById('sync-dot');
   const lbl=document.getElementById('sync-label');
   if(dot) dot.className='sync-dot '+t;
-  if(lbl) lbl.textContent=l;
+  if(lbl){
+    if(isGuest){
+      lbl.innerHTML='Browsing as guest — <button onclick="openAuthModal(\'signin\')" style="background:none;border:none;font-size:12px;color:var(--t1);cursor:pointer;font-weight:500;text-decoration:underline;font-family:\'DM Sans\',sans-serif;padding:0;">sign in</button> to save your data';
+    } else {
+      lbl.textContent=l;
+    }
+  }
+  // Start polling when we have pending changes; stop when we don't
+  if(t==='error' && retryQueued){
+    startPendingPoll();
+  } else {
+    stopPendingPoll();
+  }
 }
 
 // Retry queue — holds the most recent failed state snapshot.
 // We only ever need the latest snapshot since each save sends the full state.
 let retryQueued = false;
 let retryInProgress = false;
+
+// Polling interval used when changes are pending and we're waiting to reconnect.
+// Every 300ms we attempt to flush the queue; on success we reload from cloud.
+let pendingPollInterval = null;
+
+function startPendingPoll(){
+  if(pendingPollInterval) return; // already running
+  pendingPollInterval = setInterval(async()=>{
+    if(!retryQueued || retryInProgress || !currentUser) return;
+    // Try a lightweight connectivity probe before a full flush
+    try{
+      const probe = await sbFetch(`/rest/v1/dances?username=eq.${enc(currentUser)}&select=username&limit=1`);
+      if(probe.ok){
+        stopPendingPoll();
+        await flushRetryQueue();
+        if(!retryQueued){
+          // Flush succeeded — wait briefly for DB propagation then reload
+          let blocker = document.getElementById('sync-blocker');
+          if(!blocker){
+            blocker = document.createElement('div');
+            blocker.id = 'sync-blocker';
+            blocker.style.cssText = 'position:fixed;inset:0;z-index:9999;cursor:wait;';
+            document.body.appendChild(blocker);
+          }
+          await new Promise(res => setTimeout(res, 500));
+          blocker.remove();
+          await refreshFromCloud();
+        } else {
+          // Still failing — resume polling
+          startPendingPoll();
+        }
+      }
+    }catch(e){ /* still offline, keep polling */ }
+  }, 300);
+}
+
+function stopPendingPoll(){
+  if(pendingPollInterval){ clearInterval(pendingPollInterval); pendingPollInterval = null; }
+}
 
 async function flushRetryQueue(){
   if(!retryQueued || retryInProgress || !currentUser) return;
@@ -1789,6 +1923,7 @@ async function refreshFromCloud(){
       if(!state.danceLog) state.danceLog=[];
       if(!state.favoriteFriends) state.favoriteFriends=[];
       if(!state.drewsNights) state.drewsNights={};
+      if(!state.nightColors) state.nightColors={};
       if(isAdmin) drewDJFreestyles=state.djFreestyles||{};
       // Re-render everything that could have changed on another device
       renderBank();renderList('know');renderList('learn');renderDJRecords();renderPicks();
@@ -2214,6 +2349,7 @@ async function saveFriendCardsToCloud(){
 async function loadDJList(){
   const r=await sbFetch(`/rest/v1/dances?username=eq.__djlist__&select=data`);
   djList=(r.ok&&r.data&&r.data.length>0)?(r.data[0].data.djs||[]):[];
+  djColors=(r.ok&&r.data&&r.data.length>0)?(r.data[0].data.djColors||{}):{}; 
 }
 async function loadModList(){
   const r=await sbFetch(`/rest/v1/dances?username=eq.__modlist__&select=data`);
@@ -2245,9 +2381,9 @@ async function saveDJListToCloud(){
   setSyncStatus('syncing','Syncing...');
   const check=await sbFetch(`/rest/v1/dances?username=eq.__djlist__&select=username`);
   if(check.ok&&check.data&&check.data.length>0){
-    await sbFetch(`/rest/v1/dances?username=eq.__djlist__`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:{djs:djList},updated_at:new Date().toISOString()})});
+    await sbFetch(`/rest/v1/dances?username=eq.__djlist__`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:{djs:djList,djColors:djColors},updated_at:new Date().toISOString()})});
   } else {
-    await sbFetch('/rest/v1/dances',{method:'POST',prefer:'return=minimal',body:JSON.stringify({username:'__djlist__',password:'__djlist__',data:{djs:djList}})});
+    await sbFetch('/rest/v1/dances',{method:'POST',prefer:'return=minimal',body:JSON.stringify({username:'__djlist__',password:'__djlist__',data:{djs:djList,djColors:djColors}})});
   }
   setSyncStatus('synced','Synced');
 }
@@ -2557,17 +2693,11 @@ async function authSubmit() {
     if (!state.danceLog) state.danceLog = [];
     if (!state.favoriteFriends) state.favoriteFriends = [];
     if (!state.drewsNights) state.drewsNights = {};
+    if (!state.nightColors) state.nightColors = {};
 
-    await loadBank();
-    await loadPicks();
+    // Load any data not already fetched in guest mode
     await loadSubmissions();
-    await loadFriendCards();
-    await loadDJList();
     await loadModList();
-    await loadHomeConfig();
-    await loadCustomLists();
-    await loadDrewDJFreestyles();
-    await clLoad();
     enterApp(finalUsername);
 
   } catch (err) {
@@ -2577,7 +2707,58 @@ async function authSubmit() {
   }
 }
 
+function enterGuestMode(){
+  isGuest=true;
+  currentUser=null;
+  function _hide(id){ const el=document.getElementById(id); if(el) el.style.display='none'; }
+  function _show(id,v){ const el=document.getElementById(id); if(el) el.style.display=(v||''); }
+  _hide('auth-wrap');
+  _show('app','block');
+  showAppFooter();
+  // Show "Sign in" button, hide user pill
+  _show('guest-signin-btn','');
+  _hide('user-pill-wrap');
+  // Hide logged-in-only tabs
+  _hide('admin-tab');
+  _hide('submissions-tab');
+  _hide('editpeople-tab');
+  _hide('debug-tab');
+  _hide('dj-tab-btn');
+  _hide('drewsnight-tab-btn');
+  _hide('picks-admin-panel');
+  _hide('mobile-admin-section');
+  try { applyTabVisibility(); } catch(e){ console.warn('applyTabVisibility error', e); }
+  try { renderBank(); } catch(e){ console.warn('renderBank error', e); }
+  try { renderCustomListPills(); } catch(e){ console.warn('renderCustomListPills error', e); }
+  try { switchTab('home', false, true); } catch(e){ console.warn('switchTab error', e); }
+  hideSplash();
+}
+
+function openAuthModal(mode){
+  // mode: 'signin' or 'signup'
+  if(mode==='signup') { if(!isSignUp) toggleAuthMode(); }
+  else { if(isSignUp) toggleAuthMode(); }
+  // Hide the dismiss button only when this is triggered by a write-action gate
+  // (it's always shown; we keep it visible so users can cancel)
+  document.getElementById('auth-dismiss-row').style.display='';
+  document.getElementById('auth-wrap').style.display='flex';
+}
+
+function dismissAuthModal(){
+  document.getElementById('auth-wrap').style.display='none';
+}
+
+// Call this whenever a guest tries to do something that requires being logged in
+function requireLogin(message){
+  if(!isGuest) return false; // already logged in
+  const sub=document.getElementById('auth-sub');
+  if(sub) sub.textContent = message || 'Sign in to save your data across devices';
+  openAuthModal('signin');
+  return true; // blocked — caller should stop
+}
+
 function enterApp(username){
+  isGuest=false;
   currentUser=username;isAdmin=username===ADMIN_USER;
   // Check if user is a moderator (loaded from modList)
   isMod=isAdmin||modList.includes(username);
@@ -2588,7 +2769,15 @@ function enterApp(username){
   document.getElementById('app').style.display='block';
   showAppFooter();
   clMaybeShowModal();
+  // Show user pill, hide guest sign-in button
+  const guestBtn=document.getElementById('guest-signin-btn');
+  const userPill=document.getElementById('user-pill-wrap');
+  if(guestBtn) guestBtn.style.display='none';
+  if(userPill) userPill.style.display='';
   document.getElementById('user-label').textContent=username;
+  // Update sync bar to show normal logged-in state
+  const lbl=document.getElementById('sync-label');
+  if(lbl) lbl.textContent='Loading…';
   document.getElementById('admin-badge').style.display=isAdmin?'inline':'none';
   const modBadgeEl=document.getElementById('mod-badge');
   if(modBadgeEl) modBadgeEl.style.display=(!isAdmin&&isMod)?'inline':'none';
@@ -2645,6 +2834,7 @@ function logout() {
   friendCardSyncPending=false;
   currentUser = null;
   isAdmin = false;
+  isGuest = true;
   localStorage.removeItem('ld_user');
   localStorage.removeItem('sb_access_token');
   localStorage.removeItem('sb_refresh_token');
@@ -2656,8 +2846,6 @@ function logout() {
   bank = []; drewPicks = []; submissions = []; friendCards = []; favoriteFriends = [];
   friendsFavFilterActive = false;
   
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('auth-wrap').style.display = 'flex';
   // Re-fill remembered credentials if Remember Me is active
   const remMe = localStorage.getItem('ld_remember_me') === '1';
   document.getElementById('auth-email').value = remMe ? (localStorage.getItem('ld_remembered_email') || '') : '';
@@ -2666,6 +2854,18 @@ function logout() {
   document.getElementById('auth-username').value = '';
   document.getElementById('auth-btn').disabled = false;
   document.getElementById('auth-btn').textContent = 'Sign in';
+
+  // Reload public data and go back to guest mode
+  (async()=>{
+    await loadBank();
+    await loadPicks();
+    await loadFriendCards();
+    await loadDJList();
+    await loadHomeConfig();
+    await loadCustomLists();
+    await loadDrewDJFreestyles();
+    enterGuestMode();
+  })();
 }
 
 function hideSplash(){
@@ -2708,11 +2908,6 @@ async function tryAutoLogin() {
 
   const savedUser = localStorage.getItem('ld_user');
   const token = localStorage.getItem('sb_access_token');
-  
-  if (!savedUser || !token) {
-    hideSplash();
-    return;
-  }
 
   async function finishLogin(user) {
     const r = await sbFetch(`/rest/v1/dances?username=eq.${enc(user)}&select=data,updated_at`);
@@ -2724,35 +2919,45 @@ async function tryAutoLogin() {
       if (!state.favoriteFriends) state.favoriteFriends = [];
       if (!state.drewsNights) state.drewsNights = {};
       state.__cloudUpdatedAt = r.data[0].updated_at || null;
-      await loadBank();
-      await loadPicks();
-      await loadSubmissions();
-      await loadFriendCards();
-      await loadDJList();
-      await loadModList();
-      await loadHomeConfig();
-      await loadCustomLists();
-      await loadDrewDJFreestyles();
-      await clLoad();
       enterApp(user);
       return true;
     }
     return false;
   }
 
+  // Always load public data first so the app is usable as a guest.
+  // Wrapped in try/catch so a network error never leaves the splash stuck.
   try {
-    // Try with current token first
+    await loadBank();
+    await loadPicks();
+    await loadFriendCards();
+    await loadDJList();
+    await loadHomeConfig();
+    await loadCustomLists();
+    await loadDrewDJFreestyles();
+    await clLoad();
+  } catch(e) {
+    console.warn('Guest data load error:', e);
+  }
+
+  // If there's no saved session, show guest mode immediately and stop.
+  if (!savedUser || !token) {
+    enterGuestMode();
+    return;
+  }
+
+  // A saved session exists — keep the splash up a little longer so the home tab
+  // doesn't flash before we restore the user's last tab.
+  try {
     const ok = await finishLogin(savedUser);
     if (ok) return;
 
-    // Token may be expired — try refreshing it
     const refreshed = await tryRefreshToken();
     if (refreshed) {
       const ok2 = await finishLogin(savedUser);
       if (ok2) return;
     }
 
-    // If remember-me is set, silently re-authenticate with stored credentials
     if (rememberMe && rememberedEmail && rememberedPassword) {
       const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
         method: 'POST',
@@ -2770,12 +2975,15 @@ async function tryAutoLogin() {
       }
     }
 
-    logout();
-    hideSplash();
+    // Could not restore session — clear stale tokens, fall back to guest mode
+    localStorage.removeItem('ld_user');
+    localStorage.removeItem('sb_access_token');
+    localStorage.removeItem('sb_refresh_token');
+    enterGuestMode();
   } catch(e) {
-    // Network error during login — cannot load data without cloud connection
-    logout();
-    hideSplash();
+    console.warn('Background login error:', e);
+    // Fall back to guest mode so the app is usable
+    enterGuestMode();
   }
 }
 // ---- Tabs ----
@@ -2803,7 +3011,7 @@ let swipeHistory=['home'];   // stack of visited tabs
 let swipeForward=[];         // forward stack (filled when going back)
 let currentTabName='home';
 
-function switchTab(tab,_fromSwipe=false){
+function switchTab(tab,_fromSwipe=false,_noSave=false){
   if(!_fromSwipe){
     // Normal navigation: push current onto history, clear forward stack
     if(currentTabName && currentTabName!==tab){
@@ -2829,7 +3037,7 @@ function switchTab(tab,_fromSwipe=false){
   requestAnimationFrame(()=>{
     requestAnimationFrame(()=>{ el.classList.add('visible'); });
   });
-  localStorage.setItem('ld_active_tab', tab);
+  if(!_noSave) localStorage.setItem('ld_active_tab', tab);
   if(tab==='night') renderNight();
   if(tab==='drewsnight') renderDrewsNight();
   if(tab==='log'){renderHistoryStats();renderTop5();renderLog();renderDJAnalytics();renderTFDJFavs();}
@@ -3115,6 +3323,7 @@ function toggleBankItem(id){
   if(el) el.classList.toggle('open');
 }
 function addFromBankById(type,bankId){
+  if(requireLogin('Sign in to add dances to your list')) return;
   const d=bank.find(x=>x.id===bankId);if(!d)return;
   const name=d.name;
   const other=type==='know'?'learn':'know';
@@ -3125,12 +3334,14 @@ function addFromBankById(type,bankId){
   if(bankFavFilterActive) renderBank();
 }
 function addFromBank(type,name){
+  if(requireLogin('Sign in to add dances to your list')) return;
   const other=type==='know'?'learn':'know';
   state[other]=state[other].filter(d=>d.name.toLowerCase()!==name.toLowerCase());
   if(!isInList(name,type)) state[type].push({id:Date.now()+'',name,added:new Date().toISOString()});
   renderBank();renderList('know');renderList('learn');scheduleSave();syncMyCard();
 }
 function removeFromList(type,name){
+  if(requireLogin('Sign in to manage your dance list')) return;
   state[type]=state[type].filter(d=>d.name.toLowerCase()!==name.toLowerCase());
   renderBank();renderList('know');renderList('learn');scheduleSave();syncMyCard();
 }
@@ -3184,11 +3395,60 @@ function renderAdminDJList(){
   if(!el)return;
   const sorted=[...djList].sort((a,b)=>a.localeCompare(b));
   if(!sorted.length){el.innerHTML=`<div class="empty" style="padding:.75rem 0">No DJs added yet.</div>`;return;}
-  el.innerHTML=sorted.map(dj=>`
-    <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg);border:0.5px solid var(--amber-border);border-radius:var(--radius-md);">
-      <span style="flex:1;font-size:13px;font-weight:500;">${esc(dj)}</span>
-      <button class="btn xs danger" onclick="adminRemoveDJ('${escA(dj)}')">Remove</button>
-    </div>`).join('');
+  el.innerHTML=sorted.map(dj=>{
+    const color=djColors[dj]||DEFAULT_NIGHT_GRAD;
+    const swatches=GRADIENTS.map((g,i)=>`<div class="nlc-color-swatch${g===color?' active':''}" style="background:${g};width:22px;height:22px;border-radius:5px;cursor:pointer;flex-shrink:0;border:2px solid ${g===color?'var(--t1)':'transparent'};transition:border-color 0.12s;" onclick="adminSetDJColor('${escA(dj)}','${g}',this)" title="${g}"></div>`).join('');
+    return `
+    <div style="border:0.5px solid var(--amber-border);border-radius:var(--radius-md);background:var(--bg);overflow:hidden;">
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;">
+        <div style="width:28px;height:28px;border-radius:6px;flex-shrink:0;border:0.5px solid var(--b3);" id="dj-color-preview-${cssId(dj)}" style="background:${color};"></div>
+        <span style="flex:1;font-size:13px;font-weight:500;">${esc(dj)}</span>
+        <button class="btn xs" style="font-size:11px;padding:3px 8px;" onclick="toggleDJColorPicker('${escA(dj)}')">Color</button>
+        <button class="btn xs danger" onclick="adminRemoveDJ('${escA(dj)}')">Remove</button>
+      </div>
+      <div id="dj-color-picker-${cssId(dj)}" style="display:none;padding:8px 12px;border-top:0.5px solid var(--amber-border);background:var(--bg2);">
+        <div style="font-size:11px;font-weight:500;color:var(--t2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Default night color for ${esc(dj)}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;">${swatches}</div>
+        <button class="btn xs" style="font-size:11px;" onclick="adminResetDJColor('${escA(dj)}')">Clear (use default)</button>
+      </div>
+    </div>`;
+  }).join('');
+  // Apply preview backgrounds after render
+  sorted.forEach(dj=>{
+    const prev=document.getElementById('dj-color-preview-'+cssId(dj));
+    if(prev) prev.style.background=djColors[dj]||DEFAULT_NIGHT_GRAD;
+  });
+}
+
+function toggleDJColorPicker(dj){
+  const el=document.getElementById('dj-color-picker-'+cssId(dj));
+  if(!el)return;
+  el.style.display=el.style.display==='none'?'':'none';
+}
+
+function adminSetDJColor(dj,grad,swatchEl){
+  djColors[dj]=grad;
+  // Update swatch active states in this picker
+  const picker=document.getElementById('dj-color-picker-'+cssId(dj));
+  if(picker){
+    picker.querySelectorAll('.nlc-color-swatch').forEach(s=>{
+      const active=s.style.background===grad;
+      s.classList.toggle('active',active);
+      s.style.border=active?'2px solid var(--t1)':'2px solid transparent';
+    });
+  }
+  // Update preview
+  const prev=document.getElementById('dj-color-preview-'+cssId(dj));
+  if(prev) prev.style.background=grad;
+  saveDJListToCloud();
+  renderLog(); // Re-render night cards with new default colors
+}
+
+function adminResetDJColor(dj){
+  delete djColors[dj];
+  renderAdminDJList();
+  saveDJListToCloud();
+  renderLog();
 }
 
 // ---- Admin bank ----
@@ -3578,6 +3838,7 @@ function syncMyCard(){
   saveFriendCardsToCloud();
 }
 async function addDance(type){
+  if(requireLogin('Sign in to add dances to your list')) return;
   const inp=document.getElementById(type+'-input');
   const name=inp.value.trim();if(!name)return;
   const newDance={id:Date.now()+'',name,added:new Date().toISOString()};
@@ -3602,6 +3863,7 @@ async function addDance(type){
   }
 }
 async function removeDance(type,id){
+  if(requireLogin('Sign in to manage your dance list')) return;
   state[type]=state[type].filter(d=>d.id!==id);
   if(type==='know') state.favorites=(state.favorites||[]).filter(f=>f!==id);
   renderList(type);renderBank();
@@ -3609,6 +3871,7 @@ async function removeDance(type,id){
   if(ok) syncMyCard();
 }
 async function moveToKnow(id){
+  if(requireLogin('Sign in to track your progress')) return;
   const d=state.learn.find(x=>x.id===id);if(!d)return;
   state.learn=state.learn.filter(x=>x.id!==id);state.know.push({...d});
   renderList('learn');renderList('know');renderBank();
@@ -3616,6 +3879,7 @@ async function moveToKnow(id){
   if(ok) syncMyCard();
 }
 async function toggleFav(id){
+  if(requireLogin('Sign in to save your favorites')) return;
   if(!state.favorites) state.favorites=[];
   if(isFav(id)) state.favorites=state.favorites.filter(f=>f!==id);
   else state.favorites.push(id);
@@ -3719,6 +3983,7 @@ function renderDidList(){
   el.innerHTML=dances.map(d=>`<div class="did-item">${esc(d.name)}<button class="remove" onclick="togglePick('${d.id}')" title="Remove">&#215;</button></div>`).join('');
 }
 async function togglePick(id){
+  if(requireLogin('Sign in to log your night')) return;
   if(nightSelections[id]){
     delete nightSelections[id];
     if(state.danceLog){
@@ -3772,12 +4037,14 @@ async function commitNightSave(){
   else showNightSaveSuccess();
 }
 function scheduleNightSave(){
+  if(isGuest) return; // guest — no-op, picks are blocked at togglePick level
   clearTimeout(nightSaveTimeout);
   nightSaveTimeout=setTimeout(commitNightSave,200);
 }
 
 // ---- Highlights ----
 function openHighlightsModal(){
+  if(requireLogin('Sign in to save your night highlights')) return;
   const dances=state.know.filter(d=>nightSelections[d.id]);
   if(!dances.length){alert('Select some dances for tonight first!');return;}
   document.getElementById('highlights-modal-date').textContent=formatDate(selectedDate);
@@ -4096,7 +4363,7 @@ function renderHistoryStats(){
       hourLabel=suffix;
     }
     const topCount=topEntry?topEntry[1]:0;
-    busiestHourHTML=`<div class="stat-card"><div class="stat-label">Busiest Hour</div><div class="stat-value" style="font-size:22px">${hourLabel}</div><div class="stat-sub">${topCount} dance${topCount!==1?'s':''} avg this month</div></div>`;
+    busiestHourHTML=`<div class="stat-card"><div class="stat-label">Busiest Hour</div><div class="stat-value" style="font-size:22px">${hourLabel}`;
   }
   el.innerHTML=`
     <div class="stat-card"><div class="stat-label">Dances This Month</div><div class="stat-value">${monthCount}</div></div>
@@ -4132,60 +4399,73 @@ function deleteNight(date,e){
   scheduleSave();renderHistoryStats();renderTop5();renderLog();
   if(isAdmin) renderDJAnalytics();
 }
+// Pick a consistent gradient per date string
+const DEFAULT_NIGHT_GRAD='linear-gradient(135deg,#e0c3fc,#8ec5fc)';
+function _nightGrad(date){
+  if(state.nightColors&&state.nightColors[date]) return state.nightColors[date];
+  // Fall back to admin-set DJ preset color if this night has a known DJ
+  const nd=state.nights&&state.nights[date];
+  if(nd){
+    const dj=(Array.isArray(nd)?'':nd.dj)||'';
+    if(dj&&djColors&&djColors[dj]) return djColors[dj];
+  }
+  return DEFAULT_NIGHT_GRAD;
+}
+
 function renderLog(){
   const el=document.getElementById('log-list');
   const nights=Object.entries(state.nights).sort((a,b)=>b[0].localeCompare(a[0]));
   if(!nights.length){el.innerHTML=`<div class="empty">No nights logged yet. Go dance!</div>`;return;}
 
-  // Build all-time dance totals + last danced date
+  // All-time dance totals
   const allCounts=getAllDanceCounts();
   const lastDanced={};
   Object.entries(state.nights).forEach(([date,val])=>{
     const nd=Array.isArray(val)?{dances:val}:val;
-    (nd.dances||[]).forEach(id=>{
-      if(!lastDanced[id]||date>lastDanced[id]) lastDanced[id]=date;
-    });
+    (nd.dances||[]).forEach(id=>{if(!lastDanced[id]||date>lastDanced[id])lastDanced[id]=date;});
   });
-  function fmtLastDanced(dateStr){
-    if(!dateStr)return'';
-    const parts=dateStr.split('-');
-    return parts[1]+'/'+parts[2]+'/'+parts[0];
-  }
+  function fmtLastDanced(d){if(!d)return'';const p=d.split('-');return p[1]+'/'+p[2]+'/'+p[0];}
   const totalsRows=Object.entries(allCounts)
     .map(([id,count])=>({dance:state.know.find(d=>d.id===id),count,last:lastDanced[id]||''}))
-    .filter(x=>x.dance)
-    .sort((a,b)=>a.dance.name.localeCompare(b.dance.name))
-    .map(x=>`
-      <div class="all-dance-row">
+    .filter(x=>x.dance).sort((a,b)=>a.dance.name.localeCompare(b.dance.name))
+    .map(x=>`<div class="all-dance-row">
         <span class="all-dance-name">${esc(x.dance.name)}</span>
         ${x.last?`<span class="all-dance-last">Last Danced on ${fmtLastDanced(x.last)}</span>`:''}
         <span class="all-dance-count">${x.count} time${x.count!==1?'s':''}</span>
       </div>`).join('');
 
-  // Build individual night rows (nested inside the outer accordion)
-  const nightRows=nights.map(([date,val])=>{
-    const nd=Array.isArray(val)?{dances:val,dj:''}:val;
+  function fmt12(t){if(!t)return'';const[hh,mm]=t.split(':').map(Number);const ap=hh<12?'AM':'PM';const h=hh%12||12;return`${h}:${String(mm).padStart(2,'0')} ${ap}`;}
+
+  // Night cards
+  const cards=nights.map(([date,val])=>{
+    const nd=Array.isArray(val)?{dances:val,dj:'',highlights:null,arriveTime:'',leaveTime:''}:{highlights:null,arriveTime:'',leaveTime:'',...val};
     const dances=(nd.dances||[]).map(id=>state.know.find(d=>d.id===id)).filter(Boolean);
-    const pills=dances.map(d=>`<span class="log-pill">${esc(d.name)}</span>`).join('');
-    const djLabel=nd.dj?`<span class="dj-name">DJ: ${esc(nd.dj)}</span>`:'';
-    function fmt12(t){if(!t)return'?';const[hh,mm]=t.split(':').map(Number);const ampm=hh<12?'AM':'PM';const h=hh%12||12;return`${h}:${String(mm).padStart(2,'0')} ${ampm}`;}
-    const palaceLabel=(nd.arriveTime||nd.leaveTime)?`<span class="dj-name" style="color:var(--purple-text)">${fmt12(nd.arriveTime)} – ${fmt12(nd.leaveTime)}</span>`:'';
-    return `
-      <div class="day-log" onclick="this.classList.toggle('open')">
-        <div class="day-log-head">
-          <span class="date">${formatDate(date)}</span>
-          ${djLabel}
-          ${palaceLabel}
-          <span class="count">${dances.length} dance${dances.length!==1?'s':''}</span>
-          <span class="caret">&#9660;</span>
-        </div>
-        <div class="day-log-body">
-          ${pills||'<span style="font-size:13px;color:var(--t3)">No dances recorded</span>'}
-          <div style="width:100%;border-top:0.5px solid var(--b3);padding-top:10px;margin-top:4px;display:flex;justify-content:flex-end">
-            <button class="btn xs danger" onclick="deleteNight('${date}',event)" title="Delete this night">Delete night</button>
-          </div>
-        </div>
-      </div>`;
+    const grad=_nightGrad(date);
+    const timePart=(nd.arriveTime||nd.leaveTime)?`${fmt12(nd.arriveTime)||'?'}\u2013${fmt12(nd.leaveTime)||'?'}`:'';
+    const metaParts=[nd.dj?`DJ: ${esc(nd.dj)}`:'',timePart,`${dances.length} dance${dances.length!==1?'s':''}`].filter(Boolean);
+
+    let bodyHTML='';
+    if(nd.highlights&&nd.highlights.some(Boolean)){
+      const labels=['1st','2nd','3rd'];
+      const rows=nd.highlights.map((id,i)=>{
+        if(!id)return'';
+        const name=state.know.find(d=>d.id===id)?.name||'';
+        return `<div class="nlc-hl-row"><span class="nlc-hl-num">${i+1}</span><span class="nlc-hl-name">${esc(name)}</span><span class="nlc-hl-label">${labels[i]}</span></div>`;
+      }).join('');
+      bodyHTML=`<div class="nlc-hl-list">${rows}</div>`;
+    } else {
+      const show=dances.slice(0,6);
+      const more=dances.length-show.length;
+      bodyHTML=`<div class="nlc-pills">${show.map(d=>`<span class="nlc-pill">${esc(d.name)}</span>`).join('')}${more?`<span class="nlc-more">+${more} more</span>`:''}</div>`;
+    }
+
+    return `<div class="nlc" onclick="openNightModal('${date}')">
+      <div class="nlc-head" style="background:${grad};">
+        <div class="nlc-date">${formatDate(date)}</div>
+        <div class="nlc-meta">${metaParts.join(' \xb7 ')}</div>
+      </div>
+      <div class="nlc-body">${bodyHTML}</div>
+    </div>`;
   }).join('');
 
   el.innerHTML=`
@@ -4195,9 +4475,40 @@ function renderLog(){
         <span class="caret">&#9660;</span>
       </div>
       <div class="accordion-body">
-        <div style="margin-bottom:1rem">
-          <div style="font-size:11px;font-weight:500;color:var(--t2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px">Individual nights</div>
-          ${nightRows}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;">
+          <div>
+            <input id="nights-song-search" type="text" placeholder="Songs\u2026" autocomplete="off"
+              oninput="applyNightSearch()"
+              style="width:100%;padding:8px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;"
+              onfocus="this.style.borderColor='var(--b1)'" onblur="this.style.borderColor='var(--b2)'">
+          </div>
+          <div>
+            <input id="nights-dj-search" type="text" placeholder="DJs\u2026" autocomplete="off"
+              oninput="applyNightSearch()"
+              style="width:100%;padding:8px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;"
+              onfocus="this.style.borderColor='var(--b1)'" onblur="this.style.borderColor='var(--b2)'">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;align-items:center;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:11px;color:var(--t3);white-space:nowrap;">Songs match:</span>
+            <button id="song-logic-or" onclick="setNightLogic('song','or')" style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;border:1.5px solid var(--blue-border);background:var(--blue-bg);color:var(--blue-text);cursor:pointer;font-family:'DM Sans',sans-serif;">OR</button>
+            <button id="song-logic-and" onclick="setNightLogic('song','and')" style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;border:1.5px solid var(--b3);background:var(--bg2);color:var(--t3);cursor:pointer;font-family:'DM Sans',sans-serif;">AND</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:11px;color:var(--t3);white-space:nowrap;">DJs match:</span>
+            <button id="dj-logic-or" onclick="setNightLogic('dj','or')" style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;border:1.5px solid var(--blue-border);background:var(--blue-bg);color:var(--blue-text);cursor:pointer;font-family:'DM Sans',sans-serif;">OR</button>
+            <button id="dj-logic-and" onclick="setNightLogic('dj','and')" style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;border:1.5px solid var(--b3);background:var(--bg2);color:var(--t3);cursor:pointer;font-family:'DM Sans',sans-serif;">AND</button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+          <span style="font-size:11px;color:var(--t3);white-space:nowrap;">Between song &amp; DJ:</span>
+          <button id="fields-logic-and" onclick="setNightLogic('fields','and')" style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;border:1.5px solid var(--blue-border);background:var(--blue-bg);color:var(--blue-text);cursor:pointer;font-family:'DM Sans',sans-serif;">AND</button>
+          <button id="fields-logic-or" onclick="setNightLogic('fields','or')" style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;border:1.5px solid var(--b3);background:var(--bg2);color:var(--t3);cursor:pointer;font-family:'DM Sans',sans-serif;">OR</button>
+        </div>
+        <div id="nights-search-status" style="display:none;font-size:12px;color:var(--t2);margin-bottom:10px;"></div>
+        <div style="margin-bottom:1.25rem;">
+          <div class="nights-grid" id="nights-grid-inner">${cards}</div>
         </div>
         <div style="border-top:0.5px solid var(--b3);padding-top:1rem">
           <div style="font-size:11px;font-weight:500;color:var(--t2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px">All-time dance totals</div>
@@ -4205,6 +4516,280 @@ function renderLog(){
         </div>
       </div>
     </div>`;
+}
+
+// Tracks current logic mode for each field and between fields
+const _nightSearchLogic={song:'or',dj:'or',fields:'and'};
+
+function setNightLogic(field, mode){
+  _nightSearchLogic[field]=mode;
+  // Update button styles
+  ['or','and'].forEach(m=>{
+    const btn=document.getElementById(`${field}-logic-${m}`);
+    if(!btn) return;
+    const active=m===mode;
+    btn.style.background=active?'var(--blue-bg)':'var(--bg2)';
+    btn.style.color=active?'var(--blue-text)':'var(--t3)';
+    btn.style.borderColor=active?'var(--blue-border)':'var(--b3)';
+  });
+  applyNightSearch();
+}
+
+function applyNightSearch(){
+  function parseTerms(raw){
+    return raw.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+  }
+  const djTerms=parseTerms(document.getElementById('nights-dj-search')?.value||'');
+  const songTerms=parseTerms(document.getElementById('nights-song-search')?.value||'');
+  const grid=document.getElementById('nights-grid-inner');
+  const status=document.getElementById('nights-search-status');
+  if(!grid) return;
+
+  const hasFilter=djTerms.length>0||songTerms.length>0;
+
+  if(hasFilter){
+    const acc=document.getElementById('all-nights-accordion');
+    if(acc&&!acc.classList.contains('open')) acc.classList.add('open');
+  }
+
+  const songLogic=_nightSearchLogic.song;
+  const djLogic=_nightSearchLogic.dj;
+  const fieldsLogic=_nightSearchLogic.fields;
+
+  let shown=0, total=0;
+  Array.from(grid.querySelectorAll('.nlc')).forEach(card=>{
+    total++;
+    const onclickVal=card.getAttribute('onclick')||'';
+    const dateMatch=onclickVal.match(/openNightModal\('([^']+)'\)/);
+    if(!dateMatch){card.style.display='';shown++;return;}
+    const date=dateMatch[1];
+    const val=state.nights[date];
+    if(!val){card.style.display='';shown++;return;}
+    const nd=Array.isArray(val)?{dances:val,dj:''}:{dj:'',...val};
+    const djName=(nd.dj||'').toLowerCase();
+    const dances=(nd.dances||[]).map(id=>state.know.find(d=>d.id===id)).filter(Boolean);
+
+    // Evaluate DJ terms
+    let djOk=true;
+    if(djTerms.length>0){
+      if(djLogic==='or') djOk=djTerms.some(t=>djName.includes(t));
+      else djOk=djTerms.every(t=>djName.includes(t));
+    }
+
+    // Evaluate song terms — AND means night must have ALL listed songs
+    let songOk=true;
+    if(songTerms.length>0){
+      if(songLogic==='or') songOk=songTerms.some(t=>dances.some(d=>(d.name||'').toLowerCase().includes(t)));
+      else songOk=songTerms.every(t=>dances.some(d=>(d.name||'').toLowerCase().includes(t)));
+    }
+
+    // Combine fields
+    let match;
+    if(djTerms.length===0) match=songOk;
+    else if(songTerms.length===0) match=djOk;
+    else if(fieldsLogic==='and') match=djOk&&songOk;
+    else match=djOk||songOk;
+
+    if(match){card.style.display='';shown++;}
+    else{card.style.display='none';}
+  });
+
+  if(!hasFilter){
+    if(status){status.style.display='none';status.textContent='';}
+    return;
+  }
+
+  if(status){
+    status.style.display='';
+    const parts=[];
+    if(djTerms.length) parts.push(`DJ ${djTerms.map(t=>`"${t}"`).join(` ${djLogic.toUpperCase()} `)}`);
+    if(songTerms.length) parts.push(`song ${songTerms.map(t=>`"${t}"`).join(` ${songLogic.toUpperCase()} `)}`);
+    const connector=djTerms.length&&songTerms.length?` ${fieldsLogic.toUpperCase()} `:'';
+    const filterDesc=parts.join(connector);
+    if(shown===0){
+      status.textContent=`No nights found matching ${filterDesc}`;
+      status.style.color='var(--t3)';
+    } else {
+      status.textContent=`${shown} of ${total} night${total!==1?'s':''} \u2014 ${filterDesc}`;
+      status.style.color='var(--t2)';
+    }
+  }
+}
+
+function openNightModal(date){
+  const val=state.nights[date];
+  if(!val)return;
+  const nd=Array.isArray(val)?{dances:val,dj:'',highlights:null,arriveTime:'',leaveTime:''}:{highlights:null,arriveTime:'',leaveTime:'',...val};
+  const dances=(nd.dances||[]).map(id=>state.know.find(d=>d.id===id)).filter(Boolean);
+  const grad=_nightGrad(date);
+  function fmt12(t){if(!t)return'';const[hh,mm]=t.split(':').map(Number);const ap=hh<12?'AM':'PM';const h=hh%12||12;return`${h}:${String(mm).padStart(2,'0')} ${ap}`;}
+  const timePart=(nd.arriveTime||nd.leaveTime)?`${fmt12(nd.arriveTime)||'?'}\u2013${fmt12(nd.leaveTime)||'?'}`:'';
+  const metaParts=[nd.dj?`DJ: ${esc(nd.dj)}`:'',timePart].filter(Boolean);
+
+  let hlSection='';
+  if(nd.highlights&&nd.highlights.some(Boolean)){
+    const labels=['1st favorite','2nd favorite','3rd favorite'];
+    const rcls=['r1','r2','r3'];
+    const items=nd.highlights.map((id,i)=>{
+      if(!id)return'';
+      const name=state.know.find(d=>d.id===id)?.name||'';
+      return `<div class="ndm-hlitem ${rcls[i]}">
+        <span class="ndm-hlnum">${i+1}</span>
+        <div><div class="ndm-hlname">${esc(name)}</div><div class="ndm-hllabel">${labels[i]}</div></div>
+      </div>`;
+    }).join('');
+    hlSection=`<div class="ndm-slabel">Night Highlights</div><div class="ndm-hllist">${items}</div><hr style="border:none;border-top:0.5px solid var(--b3);margin:.75rem 0 1rem;">`;
+  }
+
+  const danceSection=dances.length
+    ? `<div class="ndm-slabel">${dances.length} Dance${dances.length!==1?'s':''} this night</div><div class="ndm-dpills">${dances.map(d=>`<span class="ndm-dpill">${esc(d.name)}</span>`).join('')}</div>`
+    : `<div style="font-size:13px;color:var(--t3);">No dances recorded for this night.</div>`;
+
+  const html=`<div class="ndm-overlay" id="ndm-overlay" onclick="if(event.target===this)closeNightModal()">
+    <div class="ndm-modal" id="ndm-modal-card">
+      <div class="ndm-mhead" style="background:${grad};">
+        <button class="ndm-close ndm-ui-only" onclick="closeNightModal()">&#215;</button>
+        <div class="ndm-mdate">${formatDate(date)}</div>
+        ${metaParts.length?`<div class="ndm-mmeta">${metaParts.join(' \xb7 ')}</div>`:''}
+      </div>
+      <div class="ndm-mbody">
+        ${hlSection}
+        ${danceSection}
+        <div class="ndm-delrow ndm-ui-only">
+          <button class="btn xs" style="background:var(--bg2);border:0.5px solid var(--b2);color:var(--t2);" onclick="openNightColorPicker('${date}',this)">🎨 Card Color</button>
+          <button class="btn xs" style="background:var(--bg2);border:0.5px solid var(--b2);color:var(--t2);" onclick="saveNightCardPng('${date}')">💾 Save PNG</button>
+          <button class="btn xs danger" onclick="deleteNight('${date}',event);closeNightModal();">Delete night</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function closeNightModal(){const e=document.getElementById('ndm-overlay');if(e)e.remove();}
+
+let _nightColorPopupDate=null;
+function closeNightColorPopup(){const p=document.getElementById('nlc-color-popup');if(p)p.remove();_nightColorPopupDate=null;}
+
+function openNightColorPicker(date, btn){
+  closeNightColorPopup();
+  _nightColorPopupDate=date;
+  const currentGrad=_nightGrad(date);
+  const hasPersonal=state.nightColors&&state.nightColors[date];
+  const nd=state.nights&&state.nights[date];
+  const dj=nd&&!Array.isArray(nd)?(nd.dj||''):'';
+  const djPreset=dj&&djColors&&djColors[dj];
+  const swatches=GRADIENTS.map((g,i)=>`<div class="nlc-color-swatch${g===currentGrad?' active':''}" style="background:${g}" onclick="applyNightColor('${date}','${g}')" title="${g}"></div>`).join('');
+  const popup=document.createElement('div');
+  popup.id='nlc-color-popup';
+  popup.className='nlc-color-popup';
+  const djNote=(!hasPersonal&&djPreset)?`<div style="font-size:11px;color:var(--t2);margin-bottom:6px;padding:4px 8px;background:var(--bg2);border-radius:4px;">Using <strong>${esc(dj)}</strong>'s default color</div>`:'';
+  popup.innerHTML=`<div class="nlc-color-popup-title">Card Color</div>${djNote}<div class="nlc-color-swatches">${swatches}</div><div class="nlc-color-popup-footer"><button class="nlc-color-reset" onclick="resetNightColor('${date}')">${hasPersonal?'Reset to DJ Default':'Reset Default'}</button></div>`;
+  document.body.appendChild(popup);
+  const rect=btn.getBoundingClientRect();
+  const pw=220, ph=220;
+  let top=rect.bottom+6, left=rect.left;
+  if(left+pw>window.innerWidth-8) left=window.innerWidth-pw-8;
+  if(left<8) left=8;
+  if(top+ph>window.innerHeight-8) top=rect.top-ph-6;
+  popup.style.top=top+'px';
+  popup.style.left=left+'px';
+  setTimeout(()=>document.addEventListener('click',_nightColorOutside,{once:true,capture:true}),10);
+}
+
+function _nightColorOutside(e){
+  const p=document.getElementById('nlc-color-popup');
+  if(p&&!p.contains(e.target)) closeNightColorPopup();
+}
+
+async function applyNightColor(date, grad){
+  if(!state.nightColors) state.nightColors={};
+  state.nightColors[date]=grad;
+  closeNightColorPopup();
+  // Update the modal header live
+  const mhead=document.querySelector('#ndm-modal-card .ndm-mhead');
+  if(mhead) mhead.style.background=grad;
+  await scheduleSave();
+  renderLog();
+}
+
+async function resetNightColor(date){
+  if(state.nightColors) delete state.nightColors[date];
+  closeNightColorPopup();
+  const fallback=_nightGrad(date); // now uses DJ color if set
+  const mhead=document.querySelector('#ndm-modal-card .ndm-mhead');
+  if(mhead) mhead.style.background=fallback;
+  await scheduleSave();
+  renderLog();
+}
+
+async function saveNightCardPng(date){
+  const modal=document.getElementById('ndm-modal-card');
+  if(!modal) return;
+  // Hide UI-only elements
+  const uiEls=modal.querySelectorAll('.ndm-ui-only');
+  uiEls.forEach(el=>el.style.visibility='hidden');
+  // Suppress the ::before pseudo-element circle that bleeds outside ndm-mhead bounds
+  const styleTag=document.createElement('style');
+  styleTag.id='_png-hide-before';
+  styleTag.textContent='#ndm-modal-card .ndm-mhead::before{display:none!important;}';
+  document.head.appendChild(styleTag);
+  // Temporarily remove max-height/overflow so full content is captured
+  const prevMaxHeight=modal.style.maxHeight;
+  const prevOverflow=modal.style.overflowY;
+  modal.style.maxHeight='none';
+  modal.style.overflowY='visible';
+  try{
+    if(!window.html2canvas){
+      await new Promise((res,rej)=>{
+        const s=document.createElement('script');
+        s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        s.onload=res; s.onerror=rej;
+        document.head.appendChild(s);
+      });
+    }
+    const scale=2;
+    const rawCanvas=await html2canvas(modal,{
+      backgroundColor:null,
+      scale,
+      useCORS:true,
+      logging:false,
+      width:modal.scrollWidth,
+      height:modal.scrollHeight,
+      windowWidth:document.documentElement.scrollWidth,
+      windowHeight:document.documentElement.scrollHeight
+    });
+    // Apply rounded corners via canvas clipping (--radius-lg = 12px)
+    const radius=12*scale;
+    const w=rawCanvas.width, h=rawCanvas.height;
+    const out=document.createElement('canvas');
+    out.width=w; out.height=h;
+    const ctx=out.getContext('2d');
+    ctx.beginPath();
+    ctx.moveTo(radius,0);
+    ctx.lineTo(w-radius,0);
+    ctx.quadraticCurveTo(w,0,w,radius);
+    ctx.lineTo(w,h-radius);
+    ctx.quadraticCurveTo(w,h,w-radius,h);
+    ctx.lineTo(radius,h);
+    ctx.quadraticCurveTo(0,h,0,h-radius);
+    ctx.lineTo(0,radius);
+    ctx.quadraticCurveTo(0,0,radius,0);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(rawCanvas,0,0);
+    const link=document.createElement('a');
+    link.download=`night-${date}.png`;
+    link.href=out.toDataURL('image/png');
+    link.click();
+  } catch(e){
+    alert('Could not save PNG. Please try again.');
+  } finally {
+    uiEls.forEach(el=>el.style.visibility='');
+    modal.style.maxHeight=prevMaxHeight;
+    modal.style.overflowY=prevOverflow;
+    const st=document.getElementById('_png-hide-before');
+    if(st) st.remove();
+  }
 }
 
 // ---- DJ Freestyle (manual entry) ----
@@ -4464,6 +5049,7 @@ let friendsFavFilterActive=false; // whether to show only favorited friends
 function myCard(){return friendCards.find(c=>c.username===currentUser)||null;}
 
 function openFriendSetup(editMode=false){
+  if(requireLogin('Sign in to create your friend card')) return;
   const card=myCard();
   document.getElementById('fc-display-name').value=card?card.displayName:'';
   fcPickSelections=card?[...card.favs]:[];
@@ -4546,6 +5132,7 @@ function toggleFcPick(id){
   renderFcPickList();
 }
 function saveFriendCard(){
+  if(requireLogin('Sign in to create your friend card')) return;
   const displayName=document.getElementById('fc-display-name').value.trim();
   if(!displayName){alert('Please enter a display name.');return;}
   // Store both the id (for drag-reorder ownership) and the resolved name
@@ -4802,6 +5389,7 @@ function openSuggestModal(){
 }
 function closeSuggestModal(){document.getElementById('suggest-modal').style.display='none';}
 function submitSuggestion(){
+  if(requireLogin('Sign in to suggest a dance')) return;
   const name=document.getElementById('suggest-name').value.trim();
   const notes=document.getElementById('suggest-notes').value.trim();
   const errEl=document.getElementById('suggest-error');
@@ -4830,6 +5418,7 @@ function openAppSuggestionModal(){
 }
 function closeAppSuggestionModal(){document.getElementById('app-suggestion-modal').style.display='none';}
 function submitAppSuggestion(){
+  if(requireLogin('Sign in to submit a suggestion')) return;
   const title=document.getElementById('app-suggestion-title').value.trim();
   const desc=document.getElementById('app-suggestion-desc').value.trim();
   const errEl=document.getElementById('app-suggestion-error');
@@ -4854,6 +5443,7 @@ function openBugModal(){
 }
 function closeBugModal(){document.getElementById('bug-modal').style.display='none';}
 function submitBugReport(){
+  if(requireLogin('Sign in to report a bug')) return;
   const title=document.getElementById('bug-title').value.trim();
   const desc=document.getElementById('bug-desc').value.trim();
   const errEl=document.getElementById('bug-error');
@@ -5491,7 +6081,437 @@ function nvHideTip(){const t=document.getElementById('nv-tip');if(t)t.textConten
 // =====================================================================
 // TEST FEATURES — Extra Analytics
 // =====================================================================
+// ---- Drew's Song Time Heatmap ----
+async function renderDrewSongHeatmap() {
+  const el = document.getElementById('tf-song-heatmap');
+  if (!el) return;
+  el.innerHTML = `<div class="empty" style="padding:1rem">Loading song data…</div>`;
+
+  const drewData = await loadDrewFullData();
+  const log = (drewData.danceLog || []).filter(e =>
+    e.timestamp && e.danceName && e.type !== 'palace_times'
+  );
+
+  if (!log.length) {
+    el.innerHTML = `<div class="empty">No timestamped song data found for Drew.</div>`;
+    return;
+  }
+
+  // Convert timestamps to minutes-since-midnight (local time),
+  // filter to 7:30pm (19*60+30=1170) through 1:30am (1*60+30=90 next day → store as 90+1440=1530)
+  const START_MIN = 19 * 60 + 30; // 1170  = 7:30 PM
+  const END_MIN   = 25 * 60 + 30; // 1530  = 1:30 AM (next day, as 24h+1h30m)
+
+  // Group: songName -> list of {mins, notPerformed}
+  const songTimes = {};
+
+  log.forEach(entry => {
+    const t = new Date(entry.timestamp);
+    let mins = t.getHours() * 60 + t.getMinutes();
+    // Treat early-morning times (0:00-1:30) as past-midnight (add 1440)
+    if (mins < 6 * 60) mins += 1440;
+    if (mins < START_MIN || mins > END_MIN) return;
+    const name = entry.danceName.trim();
+    if (!songTimes[name]) songTimes[name] = [];
+    songTimes[name].push({ mins, notPerformed: entry.type === 'not_performed' });
+  });
+
+  if (!Object.keys(songTimes).length) {
+    el.innerHTML = `<div class="empty">No songs found in the 7:30 PM - 1:30 AM window.</div>`;
+    return;
+  }
+
+  // Outlier removal: for each song, if it appears multiple times,
+  // remove any time point that is >1 hour (60 min) away from all other points of that song.
+  const cleanedSongTimes = {};
+  Object.entries(songTimes).forEach(([song, pts]) => {
+    if (pts.length <= 1) {
+      cleanedSongTimes[song] = [...pts];
+      return;
+    }
+    const kept = pts.filter(pt => {
+      // Keep if at least one OTHER point is within 60 min
+      return pts.some(other => other !== pt && Math.abs(other.mins - pt.mins) <= 60);
+    });
+    if (kept.length > 0) cleanedSongTimes[song] = kept;
+    else cleanedSongTimes[song] = [pts[0]]; // fallback: keep earliest
+  });
+
+  // Build 15-minute interval buckets (7:30 PM to 1:30 AM)
+  // Only performed songs count toward "most common" ranking
+  const INTERVAL = 15;
+  const buckets = {}; // key: slot start (mins), value: {songName: performedCount}
+  for (let m = START_MIN; m < END_MIN; m += INTERVAL) {
+    buckets[m] = {};
+  }
+
+  // All data points for rendering
+  const allPoints = []; // {song, mins, slotKey, notPerformed}
+  Object.entries(cleanedSongTimes).forEach(([song, pts]) => {
+    pts.forEach(pt => {
+      const slotKey = Math.floor((pt.mins - START_MIN) / INTERVAL) * INTERVAL + START_MIN;
+      if (buckets[slotKey] !== undefined) {
+        buckets[slotKey][song] = (buckets[slotKey][song] || 0) + 1;
+        allPoints.push({ song, mins: pt.mins, slotKey, notPerformed: pt.notPerformed });
+      }
+    });
+  });
+
+  // For each slot, find the most common song
+  const slotTopSong = {};
+  Object.entries(buckets).forEach(([slot, songMap]) => {
+    const entries = Object.entries(songMap);
+    if (!entries.length) { slotTopSong[slot] = null; return; }
+    entries.sort((a, b) => b[1] - a[1]);
+    slotTopSong[slot] = entries[0][0];
+  });
+
+  // Y axis: unique songs sorted by earliest average appearance
+  const songList = Object.keys(cleanedSongTimes).sort((a, b) => {
+    const avgA = cleanedSongTimes[a].reduce((s, v) => s + v.mins, 0) / cleanedSongTimes[a].length;
+    const avgB = cleanedSongTimes[b].reduce((s, v) => s + v.mins, 0) / cleanedSongTimes[b].length;
+    return avgA - avgB;
+  });
+
+  const songIndex = {};
+  songList.forEach((s, i) => { songIndex[s] = i; });
+
+  // Chart dimensions
+  const LABEL_W  = 140;
+  const COL_W    = 28;
+  const ROW_H    = 22;
+  const TITLE_H  = 30;   // space for "Dance Time Map" title
+  const TOP_PAD  = TITLE_H + 48;
+  const X_LABEL_H = 24;  // space for "Time" x-axis label
+  const RIGHT_PAD = 12;
+  const slotKeys = Object.keys(buckets).map(Number).sort((a, b) => a - b);
+  const dataW    = slotKeys.length * COL_W;
+  const chartW   = LABEL_W + dataW + RIGHT_PAD;
+  const chartH   = TOP_PAD + songList.length * ROW_H + X_LABEL_H + 16;
+
+  function minsToLabel(m) {
+    const real = m >= 1440 ? m - 1440 : m;
+    const h = Math.floor(real / 60);
+    const mm = String(real % 60).padStart(2, '0');
+    return `${h % 12 || 12}:${mm}${h < 12 ? 'AM' : 'PM'}`;
+  }
+
+  // Color scale: light blue -> deep blue (more occurrences = darker)
+  const maxCount = Math.max(...allPoints.map(p => buckets[p.slotKey][p.song] || 1), 1);
+  function pointColor(count) {
+    const t = Math.min(count / maxCount, 1);
+    // #bfdbfe (blue-200) -> #1e40af (blue-800)
+    const r = Math.round(191 - t * 161);
+    const g = Math.round(219 - t * 155);
+    const b = Math.round(254 - t * 79);
+    return `rgb(${r},${g},${b})`;
+  }
+
+  // Build tooltip content (hidden divs)
+  const tooltips = [];
+  const dots = allPoints.map((pt, i) => {
+    const cx = LABEL_W + slotKeys.indexOf(pt.slotKey) * COL_W + COL_W / 2;
+    const cy = TOP_PAD + songIndex[pt.song] * ROW_H + ROW_H / 2;
+    const performedCount = buckets[pt.slotKey][pt.song] || 0;
+    const count = performedCount || 1;
+    const isTop = slotTopSong[pt.slotKey] === pt.song;
+    const tooltipId = `shtt-${i}`;
+    tooltips.push({ id: tooltipId, song: pt.song, time: minsToLabel(pt.mins), slot: minsToLabel(pt.slotKey), count: performedCount, isTop });
+    const color = pointColor(count);
+    const radius = 5 + Math.min(count - 1, 3) * 1.5;
+    return `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="${color}" fill-opacity="0.85"
+      stroke="${isTop ? 'var(--t1)' : color}" stroke-width="${isTop ? 1.5 : 0}"
+      style="cursor:pointer;transition:r 0.12s,fill-opacity 0.12s;"
+      onmouseenter="drewHeatmapShow(event,'${tooltipId}')"
+      onmouseleave="drewHeatmapHide()"
+      onclick="drewHeatmapPin(event,'${tooltipId}')"
+      data-ttid="${tooltipId}" />`;
+  }).join('');
+
+  // Time axis labels (every 30 min)
+  const timeLabels = slotKeys.filter((_, i) => i % 2 === 0).map(slot => {
+    const cx = LABEL_W + slotKeys.indexOf(slot) * COL_W + COL_W / 2;
+    return `<text x="${cx}" y="${TOP_PAD - 10}" text-anchor="middle" font-size="9" fill="var(--t3)" font-family="DM Sans,sans-serif">${minsToLabel(slot)}</text>`;
+  }).join('');
+
+  // Slot column highlight lines (every 30 min)
+  const colLines = slotKeys.filter((_, i) => i % 2 === 0).map(slot => {
+    const cx = LABEL_W + slotKeys.indexOf(slot) * COL_W + COL_W / 2;
+    return `<line x1="${cx}" y1="${TOP_PAD - 4}" x2="${cx}" y2="${TOP_PAD + songList.length * ROW_H}" stroke="var(--b3)" stroke-width="1" stroke-dasharray="2,3"/>`;
+  }).join('');
+
+  // Song labels on Y axis
+  const yLabels = songList.map((song, i) => {
+    const cy = TOP_PAD + i * ROW_H + ROW_H / 2 + 4;
+    const short = song.length > 16 ? song.slice(0, 15) + '…' : song;
+    return `<text x="${LABEL_W - 8}" y="${cy}" text-anchor="end" font-size="10" fill="var(--t2)" font-family="DM Sans,sans-serif">${short}</text>`;
+  }).join('');
+
+  // Row zebra stripes
+  const stripes = songList.map((_, i) => {
+    if (i % 2 !== 0) return '';
+    return `<rect x="${LABEL_W}" y="${TOP_PAD + i * ROW_H}" width="${slotKeys.length * COL_W}" height="${ROW_H}" fill="var(--bg2)" rx="2"/>`;
+  }).join('');
+
+  // Tooltip data map stored in window
+  const ttMap = {};
+  tooltips.forEach(tt => { ttMap[tt.id] = tt; });
+
+  // Build slot summary (top song per slot)
+  const slotSummaryRows = slotKeys.map(slot => {
+    const songMap = buckets[slot];
+    const top = Object.entries(songMap).sort((a, b) => b[1] - a[1]).slice(0, 2);
+    if (!top.length) return `<div style="display:flex;gap:6px;align-items:center;padding:4px 0;border-bottom:0.5px solid var(--b3);"><span style="font-size:11px;color:var(--t3);min-width:56px;">${minsToLabel(slot)}</span><span style="font-size:11px;color:var(--t3);">—</span></div>`;
+    return `<div style="display:flex;gap:6px;align-items:flex-start;padding:4px 0;border-bottom:0.5px solid var(--b3);">
+      <span style="font-size:11px;color:var(--t2);min-width:56px;flex-shrink:0;">${minsToLabel(slot)}</span>
+      <div>${top.map(([ song, cnt ], idx) => `<div style="font-size:11px;color:${idx===0?'var(--t1)':'var(--t3)'};">${idx===0?'★ ':''}${song}${cnt>1?` ×${cnt}`:''}</div>`).join('')}</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+  <div style="background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;position:relative;">
+    <div id="drew-song-tooltip" style="display:none;position:fixed;z-index:9000;background:var(--bg);border:0.5px solid var(--b2);border-radius:8px;padding:10px 14px;box-shadow:0 4px 18px rgba(0,0,0,0.18);font-family:'DM Sans',sans-serif;min-width:160px;max-width:240px;pointer-events:none;"></div>
+    <div id="drew-heatmap-scroll"
+      style="overflow:auto;cursor:grab;user-select:none;-webkit-overflow-scrolling:touch;border-radius:6px;max-height:520px;position:relative;"
+      onmousedown="drewHeatmapDragStart(event)"
+      onmousemove="drewHeatmapDragMove(event)"
+      onmouseup="drewHeatmapDragEnd(event)"
+      onmouseleave="drewHeatmapDragEnd(event)">
+      <svg id="drew-song-svg" width="${chartW}" height="${chartH}" style="overflow:visible;min-width:${chartW}px;display:block;">
+        ${stripes}
+        ${colLines}
+        ${yLabels}
+        ${timeLabels}
+        ${dots}
+        <!-- Border rect enclosing data area -->
+        <rect x="${LABEL_W}" y="${TOP_PAD}" width="${dataW}" height="${songList.length * ROW_H}" fill="none" stroke="var(--b2)" stroke-width="1"/>
+        <!-- Chart title -->
+        <text x="${Math.round(LABEL_W + dataW / 2)}" y="${Math.round(TITLE_H / 2 + 4)}" text-anchor="middle" font-size="14" font-weight="600" fill="var(--t1)" font-family="DM Sans,sans-serif">Dance Time Map</text>
+        <!-- X-axis label -->
+        <text x="${Math.round(LABEL_W + dataW / 2)}" y="${TOP_PAD + songList.length * ROW_H + X_LABEL_H - 2}" text-anchor="middle" font-size="11" fill="var(--t2)" font-family="DM Sans,sans-serif">Time</text>
+      </svg>
+    </div>
+    <div style="margin-top:1rem;display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:var(--t3);align-items:center;">
+      <span>Dot size = times in slot</span>
+      <span>★ outlined = most common this interval</span>
+      <span>Click a dot to pin tooltip</span>
+      <button onclick="drewHeatmapExport()" style="margin-left:auto;padding:5px 13px;font-size:11px;font-weight:500;font-family:'DM Sans',sans-serif;background:var(--bg2);color:var(--t2);border:0.5px solid var(--b2);border-radius:var(--radius-md);cursor:pointer;" title="Export heatmap as PNG">⬇ Export PNG</button>
+    </div>
+    <details style="margin-top:1rem;">
+      <summary style="font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;padding:6px 0;">Top song per 15-min interval ▾</summary>
+      <div style="margin-top:8px;max-height:260px;overflow-y:auto;border:0.5px solid var(--b3);border-radius:var(--radius-md);padding:6px 12px;">${slotSummaryRows}</div>
+    </details>
+    <div style="margin-top:1.25rem;border-top:0.5px solid var(--b3);padding-top:1.25rem;">
+      <div style="font-size:12px;font-weight:500;color:var(--t2);margin-bottom:8px;">Search songs — average play time</div>
+      <input id="drew-song-search" type="text" placeholder="Type a song name..." autocomplete="off"
+        style="width:100%;max-width:340px;padding:8px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;margin-bottom:10px;"
+        oninput="drewSongSearch(this.value)">
+      <div id="drew-song-search-results" style="display:flex;flex-direction:column;gap:4px;"></div>
+    </div>
+  </div>`;
+
+  // Build per-song average time data for search
+  const songAvgData = {};
+  Object.entries(cleanedSongTimes).forEach(([song, pts]) => {
+    const allMins = pts.map(p => p.mins);
+    const avg = Math.round(allMins.reduce((s, v) => s + v, 0) / allMins.length);
+    songAvgData[song] = { avg, count: allMins.length };
+  });
+  window._drewSongAvgData = songAvgData;
+
+  // Store tooltip map on window for event handlers
+  window._drewHeatmapTT = ttMap;
+  window._drewHeatmapPinned = null;
+}
+
+// ---- Heatmap drag-to-scroll (mouse) ----
+(function() {
+  let dragging = false, startX = 0, startY = 0, scrollLeft = 0, scrollTop = 0, moved = false;
+  window.drewHeatmapDragStart = function(e) {
+    const el = document.getElementById('drew-heatmap-scroll');
+    if (!el) return;
+    dragging = true; moved = false;
+    startX = e.pageX - el.getBoundingClientRect().left + el.scrollLeft;
+    startY = e.pageY - el.getBoundingClientRect().top  + el.scrollTop;
+    scrollLeft = el.scrollLeft; scrollTop = el.scrollTop;
+    el.style.cursor = 'grabbing';
+  };
+  window.drewHeatmapDragMove = function(e) {
+    if (!dragging) return;
+    e.preventDefault();
+    const el = document.getElementById('drew-heatmap-scroll');
+    if (!el) return;
+    const x = e.pageX - el.getBoundingClientRect().left + el.scrollLeft;
+    const y = e.pageY - el.getBoundingClientRect().top  + el.scrollTop;
+    const dx = x - startX, dy = y - startY;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
+    el.scrollLeft = scrollLeft - dx;
+    el.scrollTop  = scrollTop  - dy;
+  };
+  window.drewHeatmapDragEnd = function(e) {
+    if (!dragging) return;
+    dragging = false;
+    const el = document.getElementById('drew-heatmap-scroll');
+    if (el) el.style.cursor = 'grab';
+    // If the mouse barely moved, allow click events to propagate (for tooltip pins)
+    if (!moved && e && e.target && e.target.hasAttribute('data-ttid')) {
+      const id = e.target.getAttribute('data-ttid');
+      drewHeatmapPin(e, id);
+    }
+  };
+})();
+
+// ---- Heatmap export as PNG ----
+window.drewHeatmapExport = function() {
+  const svg = document.getElementById('drew-song-svg');
+  if (!svg) return;
+
+  // Resolve CSS variables to concrete values for the export
+  const cs = getComputedStyle(document.documentElement);
+  const resolve = s => {
+    // Replace var(--xxx) with computed value
+    return s.replace(/var\(--([^)]+)\)/g, (_, name) => cs.getPropertyValue('--' + name.trim()).trim() || '#888');
+  };
+
+  const svgClone = svg.cloneNode(true);
+  // Walk all elements and inline computed fill/stroke that reference CSS vars
+  svgClone.querySelectorAll('*').forEach(el => {
+    ['fill','stroke','color'].forEach(attr => {
+      const val = el.getAttribute(attr);
+      if (val && val.includes('var(')) el.setAttribute(attr, resolve(val));
+    });
+    // Also handle style attribute
+    if (el.getAttribute('style')) {
+      el.setAttribute('style', resolve(el.getAttribute('style')));
+    }
+  });
+
+  // Background rect
+  const bg = cs.getPropertyValue('--bg').trim() || '#ffffff';
+  const bgRect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  bgRect.setAttribute('x', '0'); bgRect.setAttribute('y', '0');
+  bgRect.setAttribute('width', svg.getAttribute('width'));
+  bgRect.setAttribute('height', svg.getAttribute('height'));
+  bgRect.setAttribute('fill', bg);
+  svgClone.insertBefore(bgRect, svgClone.firstChild);
+
+  const w = parseInt(svg.getAttribute('width'));
+  const h = parseInt(svg.getAttribute('height'));
+  const svgStr = new XMLSerializer().serializeToString(svgClone);
+  const blob = new Blob([svgStr], {type:'image/svg+xml'});
+  const url = URL.createObjectURL(blob);
+
+  const img = new Image();
+  img.onload = function() {
+    const canvas = document.createElement('canvas');
+    const scale = 2; // retina
+    canvas.width  = w * scale;
+    canvas.height = h * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(scale, scale);
+    ctx.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+    const a = document.createElement('a');
+    a.download = 'song-heatmap.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  };
+  img.src = url;
+};
+
+window.drewHeatmapShow = function(e, id) {
+  if (window._drewHeatmapPinned && window._drewHeatmapPinned !== id) return;
+  drewHeatmapRender(e, id);
+};
+window.drewHeatmapHide = function() {
+  if (window._drewHeatmapPinned) return;
+  const tt = document.getElementById('drew-song-tooltip');
+  if (tt) tt.style.display = 'none';
+};
+window.drewHeatmapPin = function(e, id) {
+  e.stopPropagation();
+  if (window._drewHeatmapPinned === id) {
+    window._drewHeatmapPinned = null;
+    const tt = document.getElementById('drew-song-tooltip');
+    if (tt) tt.style.display = 'none';
+  } else {
+    window._drewHeatmapPinned = id;
+    drewHeatmapRender(e, id);
+  }
+};
+function drewHeatmapRender(e, id) {
+  const tt = document.getElementById('drew-song-tooltip');
+  if (!tt) return;
+  const data = window._drewHeatmapTT && window._drewHeatmapTT[id];
+  if (!data) return;
+  tt.innerHTML = `
+    <div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:4px;">${data.song}</div>
+    <div style="font-size:11px;color:var(--t2);">Logged at: <strong>${data.time}</strong></div>
+    <div style="font-size:11px;color:var(--t2);">Interval: <strong>${data.slot}</strong></div>
+    ${data.count > 0 ? `<div style="font-size:11px;color:var(--t2);">Times in this slot: <strong>${data.count}</strong></div>` : ''}
+    ${data.isTop ? `<div style="margin-top:4px;font-size:11px;font-weight:600;color:var(--amber-text);">★ Most common this interval</div>` : ''}
+    <div style="margin-top:4px;font-size:10px;color:var(--t3);">Click to ${window._drewHeatmapPinned===id?'unpin':'pin'}</div>`;
+  tt.style.display = 'block';
+  // Measure tooltip size after making it visible
+  const ttW = tt.offsetWidth || 200;
+  const ttH = tt.offsetHeight || 130;
+  const pad = 10;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  // Prefer placing to the left of the cursor; fall back to right if not enough room
+  let left, top;
+  if (e.clientX - ttW - pad >= 0) {
+    left = e.clientX - ttW - pad;
+  } else {
+    left = e.clientX + pad;
+  }
+  top = e.clientY - Math.round(ttH / 2);
+  if (top + ttH > vh - 8) top = vh - ttH - 8;
+  if (top < 8) top = 8;
+  tt.style.left = left + 'px';
+  tt.style.top  = top + 'px';
+}
+window.drewSongSearch = function(query) {
+  const el = document.getElementById('drew-song-search-results');
+  if (!el) return;
+  const data = window._drewSongAvgData || {};
+  const q = query.trim().toLowerCase();
+  if (!q) { el.innerHTML = ''; return; }
+
+  function minsToLabel(m) {
+    const real = m >= 1440 ? m - 1440 : m;
+    const h = Math.floor(real / 60);
+    const mm = String(real % 60).padStart(2, '0');
+    return `${h % 12 || 12}:${mm} ${h < 12 ? 'AM' : 'PM'}`;
+  }
+
+  const matches = Object.entries(data)
+    .filter(([song]) => song.toLowerCase().includes(q))
+    .sort((a, b) => a[1].avg - b[1].avg);
+
+  if (!matches.length) {
+    el.innerHTML = `<div style="font-size:13px;color:var(--t3);padding:6px 0;">No songs found matching "${query}"</div>`;
+    return;
+  }
+
+  el.innerHTML = matches.map(([song, info]) => `
+    <div style="display:flex;align-items:center;gap:12px;padding:7px 12px;border-radius:var(--radius-md);background:var(--bg2);border:0.5px solid var(--b3);">
+      <span style="flex:1;font-size:13px;font-weight:500;color:var(--t1);">${song}</span>
+      <span style="font-size:12px;color:var(--t2);">avg <strong style="color:var(--t1);">${minsToLabel(info.avg)}</strong></span>
+      <span style="font-size:11px;color:var(--t3);">${info.count} data point${info.count !== 1 ? 's' : ''}</span>
+    </div>`).join('');
+};
+
+// Dismiss pinned tooltip on outside click
+document.addEventListener('click', function(e) {
+  if (window._drewHeatmapPinned && !e.target.closest('#drew-song-tooltip') && !e.target.hasAttribute('data-ttid')) {
+    window._drewHeatmapPinned = null;
+    const tt = document.getElementById('drew-song-tooltip');
+    if (tt) tt.style.display = 'none';
+  }
+});
+
 function renderTFAnalytics(){
+  renderDrewSongHeatmap();
   renderTFPersonalStats();
   renderTFRepertoire();
   renderTFHeatmap();
@@ -6771,6 +7791,8 @@ async function debugDeleteNight(date){
 
   document.addEventListener('touchstart',function(e){
     if(anyModalOpen()){swiping=false;return;}
+    // Disable swipe gestures when touching inside any heatmap container
+    if(e.target.closest('#tf-heatmap,#tf-song-heatmap,#drew-heatmap-scroll,[id*="heatmap"]')){swiping=false;return;}
     const t=e.touches[0];
     tx0=t.clientX; ty0=t.clientY; swiping=true;
     // Show edge indicator when touch starts near left edge
@@ -7165,6 +8187,7 @@ function recShowEmpty(msg) {
 }
 
 function recAddToLearn() {
+  if(requireLogin('Sign in to add dances to your learn list')) return;
   if (!recCurrentResult) return;
   const name = recCurrentResult.b.name;
   const already = (state.learn || []).some(d => d.name.toLowerCase() === name.toLowerCase());
