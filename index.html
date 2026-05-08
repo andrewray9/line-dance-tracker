@@ -2014,6 +2014,8 @@ async function saveToCloud(){
   if(!currentUser) return false;
   setSyncStatus('syncing','Syncing...');
   if(isAdmin) drewDJFreestyles=state.djFreestyles||{};
+  // Stamp joinedAt once on the very first save — never overwrite it
+  if(!state.joinedAt) state.joinedAt = new Date().toISOString();
   try{
     const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(currentUser)}`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:state,updated_at:new Date().toISOString()})});
     if(r.ok){
@@ -2738,7 +2740,7 @@ async function authSubmit() {
     if (r.ok && r.data && r.data.length > 0) {
       state = r.data[0].data || {know:[], learn:[], nights:{}, djFreestyles:{}, favorites:[]};
     } else {
-      state = {know:[], learn:[], nights:{}, djFreestyles:{}, favorites:[]};
+      state = {know:[], learn:[], nights:{}, djFreestyles:{}, favorites:[], joinedAt: new Date().toISOString()};
     }
     
     if (!state.djFreestyles) state.djFreestyles = {};
@@ -2974,6 +2976,8 @@ async function tryAutoLogin() {
       if (!state.favoriteFriends) state.favoriteFriends = [];
       if (!state.drewsNights) state.drewsNights = {};
       state.__cloudUpdatedAt = r.data[0].updated_at || null;
+      _lastActiveAt = Date.now();
+      localStorage.setItem('ld_last_active', String(_lastActiveAt));
       await loadSubmissions();
       await loadModList();
       enterApp(user);
@@ -3003,8 +3007,14 @@ async function tryAutoLogin() {
     return;
   }
 
-  // A saved session exists — keep the splash up a little longer so the home tab
-  // doesn't flash before we restore the user's last tab.
+  // A saved session exists — always refresh the token first on page load
+  // so we never try to fetch data with a stale/expired token.
+  try {
+    await tryRefreshToken();
+  } catch(e) {
+    console.warn('Token pre-refresh error:', e);
+  }
+
   try {
     const ok = await finishLogin(savedUser);
     if (ok) return;
@@ -8442,12 +8452,14 @@ tryAutoLogin();
 
 // ---- Session keep-alive & stale-tab recovery ----
 // Track when the app was last active so we can detect long absences.
-let _lastActiveAt = Date.now();
+// Persisted to localStorage so a browser close+reopen is treated as a long absence.
+let _lastActiveAt = parseInt(localStorage.getItem('ld_last_active') || '0') || Date.now();
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
     _onAppResume();
   } else {
     _lastActiveAt = Date.now();
+    localStorage.setItem('ld_last_active', String(_lastActiveAt));
   }
 });
 
@@ -8458,8 +8470,10 @@ window.addEventListener('pageshow', (e) => {
 });
 
 async function _onAppResume() {
-  const awayMs = Date.now() - _lastActiveAt;
-  _lastActiveAt = Date.now();
+  const now = Date.now();
+  const awayMs = now - _lastActiveAt;
+  _lastActiveAt = now;
+  localStorage.setItem('ld_last_active', String(now));
 
   // Always reload public data (bank, friend cards, home config) so
   // any admin changes made while away show up immediately.
@@ -8544,7 +8558,8 @@ async function _onAppResume() {
 setInterval(async()=>{
   if(!currentUser) return;
   await tryRefreshToken();
-  _lastActiveAt = Date.now(); // reset the stale timer after a successful background refresh
+  _lastActiveAt = Date.now();
+  localStorage.setItem('ld_last_active', String(_lastActiveAt)); // reset the stale timer after a successful background refresh
 }, 45 * 60 * 1000);
 
 // ---- CHANGELOG ----
@@ -8744,14 +8759,40 @@ async function renderAdminAnalytics() {
     Object.keys(nights).forEach(date => {
       nightDateCounts[date] = (nightDateCounts[date] || 0) + 1;
     });
+    // Find the most recently added dance in know list
+    const lastKnowAdded = know.reduce((latest, dk) => {
+      const t = dk.added || null;
+      if (!t) return latest;
+      return (!latest || t > latest) ? t : latest;
+    }, null);
+    // Find the most recently added dance in learn list
+    const lastLearnAdded = learn.reduce((latest, dl) => {
+      const t = dl.added || null;
+      if (!t) return latest;
+      return (!latest || t > latest) ? t : latest;
+    }, null);
+    // New user = joinedAt within last 3 days.
+    // joinedAt is stamped permanently on a user's first ever save and never overwritten.
+    const createdAt = d.joinedAt || null;
+    const isNewUser = createdAt && (Date.now() - new Date(createdAt).getTime()) < 3 * 24 * 60 * 60 * 1000;
     userRows.push({
       username: u.username,
       know: know.length,
       learn: learn.length,
       nights: nightCount,
-      lastActive: u.updated_at ? u.updated_at.slice(0, 10) : null,
+      lastActive: u.updated_at || null,
+      lastKnowAdded: lastKnowAdded,
+      lastLearnAdded: lastLearnAdded,
+      createdAt: createdAt,
+      isNewUser: isNewUser,
       isMod: modList.includes(u.username),
       isAdmin: u.username === ADMIN_USER,
+      rawKnow: know,
+      rawLearn: learn,
+      rawNights: nights,
+      rawFavorites: d.favorites || [],
+      rawDanceLog: d.danceLog || [],
+      rawJoinedAt: d.joinedAt || null,
     });
   });
 
@@ -8760,11 +8801,13 @@ async function renderAdminAnalytics() {
 
   const avgKnow = totalUsers ? (totalKnow / totalUsers).toFixed(1) : 0;
   const avgLearn = totalUsers ? (totalLearn / totalUsers).toFixed(1) : 0;
+  const newUserCount = userRows.filter(u => u.isNewUser).length;
 
   // ---- Overview stat cards ----
   const statsGrid = document.getElementById('aa-stats-grid');
   const stats = [
     { label: 'Registered Users', value: totalUsers, sub: `${totalMods} mod${totalMods !== 1 ? 's' : ''}` },
+    { label: 'New Users (3 days)', value: newUserCount, sub: 'joined recently', highlight: newUserCount > 0 },
     { label: 'Dances in Bank', value: bankSize, sub: 'total available' },
     { label: 'Avg Dances Known', value: avgKnow, sub: 'per user' },
     { label: 'Avg Want to Learn', value: avgLearn, sub: 'per user' },
@@ -8772,9 +8815,9 @@ async function renderAdminAnalytics() {
     { label: 'Unique Nights', value: Object.keys(nightDateCounts).length, sub: 'distinct dates' },
   ];
   statsGrid.innerHTML = stats.map(s => `
-    <div class="stat-card">
-      <div class="stat-label">${s.label}</div>
-      <div class="stat-value">${s.value}</div>
+    <div class="stat-card" style="${s.highlight ? 'border-color:var(--blue-border);background:var(--blue-bg);' : ''}">
+      <div class="stat-label" style="${s.highlight ? 'color:var(--blue-text);' : ''}">${s.label}</div>
+      <div class="stat-value" style="${s.highlight ? 'color:var(--blue-text);' : ''}">${s.value}</div>
       <div class="stat-sub">${s.sub}</div>
     </div>`).join('');
 
@@ -8784,11 +8827,20 @@ async function renderAdminAnalytics() {
     const safeId = 'aa_u_' + u.username.replace(/[^a-zA-Z0-9]/g, '_');
     const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `<span style="color:var(--t3);font-size:13px;min-width:24px;display:inline-block;text-align:center">${i + 1}</span>`;
     const pctKnow = bankSize ? Math.round((u.know / bankSize) * 100) : 0;
+    // Format a full datetime nicely
+    const fmtDt = iso => {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) + ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+    };
     return `
-    <div style="border:0.5px solid var(--b3);border-radius:var(--radius-lg);background:var(--bg);margin-bottom:6px;overflow:hidden;">
+    <div style="border:0.5px solid ${u.isNewUser ? 'var(--blue-border)' : 'var(--b3)'};border-radius:var(--radius-lg);background:var(--bg);margin-bottom:6px;overflow:hidden;">
       <div style="display:flex;align-items:center;gap:10px;padding:10px 15px;cursor:pointer;transition:background 0.1s;" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background=''" onclick="document.getElementById('${safeId}').style.display=document.getElementById('${safeId}').style.display==='none'?'block':'none'">
         <span style="font-size:16px;min-width:28px;text-align:center">${medal}</span>
-        <span style="flex:1;font-size:14px;font-weight:500">${esc(u.username)}</span>
+        <span style="flex:1;font-size:14px;font-weight:500;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          ${esc(u.username)}
+          ${u.isNewUser ? '<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--blue-bg);border:0.5px solid var(--blue-border);color:var(--blue-text);letter-spacing:0.3px;">✨ New</span>' : ''}
+        </span>
         ${u.isAdmin ? '<span class="admin-badge">Admin</span>' : ''}
         ${u.isMod && !u.isAdmin ? '<span class="mod-badge">Mod</span>' : ''}
         <span style="display:flex;gap:4px;flex-shrink:0;">
@@ -8796,19 +8848,109 @@ async function renderAdminAnalytics() {
           <span style="font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--purple-bg);border:0.5px solid var(--purple-border);color:var(--purple-text)">${u.learn} learning</span>
           <span style="font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--bg2);border:0.5px solid var(--b3);color:var(--t2)">${u.nights} nights</span>
         </span>
-        <span style="font-size:11px;color:var(--t3);flex-shrink:0">${u.lastActive ? formatDate(u.lastActive) : '—'}</span>
+        <span style="font-size:11px;color:var(--t3);flex-shrink:0">${u.lastActive ? formatDate(u.lastActive.slice(0,10)) : '—'}</span>
       </div>
-      <div id="${safeId}" style="display:none;padding:10px 15px;border-top:0.5px solid var(--b3);background:var(--bg2);">
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <div style="flex:1;">
-            <div style="font-size:11px;color:var(--t2);margin-bottom:5px;">Bank coverage</div>
-            <div style="background:var(--bg3);border-radius:20px;height:8px;overflow:hidden;min-width:120px;">
-              <div style="height:100%;width:${pctKnow}%;background:var(--green-dark);border-radius:20px;transition:width 0.4s;"></div>
+      <div id="${safeId}" style="display:none;border-top:0.5px solid var(--b3);background:var(--bg2);">
+        ${(() => {
+          const favSet = new Set(u.rawFavorites);
+          // ---- Activity row ----
+          const activityHtml = `
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;padding:12px 15px;border-bottom:0.5px solid var(--b3);">
+            <div style="padding:8px 12px;border-radius:var(--radius-md);background:var(--bg);border:0.5px solid var(--b3);">
+              <div style="font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Last Online</div>
+              <div style="font-size:12px;color:var(--t1);font-weight:500;">${u.lastActive ? fmtDt(u.lastActive) : '—'}</div>
             </div>
-            <div style="font-size:11px;color:var(--t3);margin-top:3px">${pctKnow}% of bank known</div>
-          </div>
-          <div style="font-size:12px;color:var(--t2)">Last active: <strong style="color:var(--t1)">${u.lastActive ? formatDate(u.lastActive) : 'Unknown'}</strong></div>
-        </div>
+            ${u.rawJoinedAt || u.isNewUser ? `<div style="padding:8px 12px;border-radius:var(--radius-md);background:var(--blue-bg);border:0.5px solid var(--blue-border);">
+              <div style="font-size:10px;font-weight:600;color:var(--blue-text);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Joined</div>
+              <div style="font-size:12px;color:var(--t1);font-weight:500;">${fmtDt(u.rawJoinedAt || u.createdAt)}</div>
+            </div>` : ''}
+            <div style="padding:8px 12px;border-radius:var(--radius-md);background:var(--green-bg);border:0.5px solid var(--green-border);">
+              <div style="font-size:10px;font-weight:600;color:var(--green-text);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Last Added to Know</div>
+              <div style="font-size:12px;color:var(--t1);font-weight:500;">${u.lastKnowAdded ? fmtDt(u.lastKnowAdded) : '—'}</div>
+            </div>
+            <div style="padding:8px 12px;border-radius:var(--radius-md);background:var(--purple-bg);border:0.5px solid var(--purple-border);">
+              <div style="font-size:10px;font-weight:600;color:var(--purple-text);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Last Added to Learn</div>
+              <div style="font-size:12px;color:var(--t1);font-weight:500;">${u.lastLearnAdded ? fmtDt(u.lastLearnAdded) : '—'}</div>
+            </div>
+            <div style="padding:8px 12px;border-radius:var(--radius-md);background:var(--bg);border:0.5px solid var(--b3);">
+              <div style="font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Bank Coverage</div>
+              <div style="margin-top:4px;background:var(--bg3);border-radius:20px;height:6px;overflow:hidden;">
+                <div style="height:100%;width:${pctKnow}%;background:var(--green-dark);border-radius:20px;"></div>
+              </div>
+              <div style="font-size:11px;color:var(--t3);margin-top:3px">${pctKnow}% (${u.know} / ${bankSize})</div>
+            </div>
+            <div style="padding:8px 12px;border-radius:var(--radius-md);background:var(--amber-bg);border:0.5px solid var(--amber-border);">
+              <div style="font-size:10px;font-weight:600;color:var(--amber-text);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Favorites</div>
+              <div style="font-size:12px;color:var(--t1);font-weight:500;">${u.rawFavorites.length} dance${u.rawFavorites.length !== 1 ? 's' : ''}</div>
+            </div>
+          </div>`;
+
+          // ---- Dances I Know ----
+          const knowSorted = u.rawKnow.slice().sort((a,b) => (a.name||a).localeCompare(b.name||b));
+          const knowHtml = knowSorted.length ? knowSorted.map(dk => {
+            const name = dk.name || dk;
+            const isFav = favSet.has(dk.id);
+            const addedStr = dk.added ? fmtDt(dk.added) : null;
+            return `<div style="display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:6px;background:var(--bg);border:0.5px solid var(--green-border);margin-bottom:4px;">
+              ${isFav ? '<span style="font-size:13px;flex-shrink:0;">⭐</span>' : ''}
+              <span style="flex:1;font-size:13px;font-weight:500;color:var(--t1);">${esc(name)}</span>
+              ${addedStr ? `<span style="font-size:11px;color:var(--t3);flex-shrink:0;">${addedStr}</span>` : ''}
+            </div>`;
+          }).join('') : '<div style="font-size:12px;color:var(--t3);padding:6px 0;">No dances yet.</div>';
+
+          // ---- Want to Learn ----
+          const learnSorted = u.rawLearn.slice().sort((a,b) => (a.name||a).localeCompare(b.name||b));
+          const learnHtml = learnSorted.length ? learnSorted.map(dl => {
+            const name = dl.name || dl;
+            const addedStr = dl.added ? fmtDt(dl.added) : null;
+            return `<div style="display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:6px;background:var(--bg);border:0.5px solid var(--purple-border);margin-bottom:4px;">
+              <span style="flex:1;font-size:13px;font-weight:500;color:var(--t1);">${esc(name)}</span>
+              ${addedStr ? `<span style="font-size:11px;color:var(--t3);flex-shrink:0;">${addedStr}</span>` : ''}
+            </div>`;
+          }).join('') : '<div style="font-size:12px;color:var(--t3);padding:6px 0;">No dances yet.</div>';
+
+          // ---- Nights ----
+          const nightDates = Object.keys(u.rawNights).sort((a,b) => b.localeCompare(a));
+          const nightsHtml = nightDates.length ? nightDates.map(date => {
+            const nd = u.rawNights[date];
+            const nightData = Array.isArray(nd) ? {dances: nd} : (nd || {});
+            const danceIds = nightData.dances || [];
+            const danceNames = danceIds.map(id => {
+              const match = u.rawKnow.find(d => d.id === id);
+              return match ? match.name : id;
+            }).filter(Boolean);
+            const highlights = (nightData.highlights || []).filter(Boolean).map(id => {
+              const match = u.rawKnow.find(d => d.id === id);
+              return match ? match.name : id;
+            });
+            const dj = nightData.dj || '';
+            const arrive = nightData.arriveTime || '';
+            const leave = nightData.leaveTime || '';
+            const timeStr = arrive || leave ? `${arrive || '?'} – ${leave || '?'}` : '';
+            return `<div style="padding:8px 12px;border-radius:var(--radius-md);background:var(--bg);border:0.5px solid var(--b3);margin-bottom:6px;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+                <span style="font-size:13px;font-weight:600;color:var(--t1);">${formatDate(date)}</span>
+                ${dj ? `<span style="font-size:11px;padding:1px 7px;border-radius:20px;background:var(--pink-bg);border:0.5px solid var(--pink-border);color:var(--pink-text);">DJ: ${esc(dj)}</span>` : ''}
+                ${timeStr ? `<span style="font-size:11px;color:var(--t3);">⏱ ${esc(timeStr)}</span>` : ''}
+                <span style="font-size:11px;color:var(--t3);margin-left:auto;">${danceNames.length} dance${danceNames.length !== 1 ? 's' : ''}</span>
+              </div>
+              ${highlights.length ? `<div style="margin-bottom:5px;display:flex;flex-wrap:wrap;gap:4px;">${highlights.map(n=>`<span style="font-size:11px;padding:1px 7px;border-radius:20px;background:var(--amber-bg);border:0.5px solid var(--amber-border);color:var(--amber-text);">⭐ ${esc(n)}</span>`).join('')}</div>` : ''}
+              ${danceNames.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;">${danceNames.map(n=>`<span style="font-size:11px;padding:1px 7px;border-radius:20px;background:var(--bg2);border:0.5px solid var(--b3);color:var(--t2);">${esc(n)}</span>`).join('')}</div>` : ''}
+            </div>`;
+          }).join('') : '<div style="font-size:12px;color:var(--t3);padding:6px 0;">No nights logged.</div>';
+
+          // ---- Section helper ----
+          const section = (title, color, bg, border, content) => `
+          <div style="padding:12px 15px;border-bottom:0.5px solid var(--b3);">
+            <div style="font-size:11px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">${title}</div>
+            <div style="max-height:260px;overflow-y:auto;padding-right:2px;">${content}</div>
+          </div>`;
+
+          return activityHtml
+            + section('Dances I Know (' + knowSorted.length + ')', 'var(--green-text)', 'var(--green-bg)', 'var(--green-border)', knowHtml)
+            + section('Want to Learn (' + learnSorted.length + ')', 'var(--purple-text)', 'var(--purple-bg)', 'var(--purple-border)', learnHtml)
+            + section('Nights Attended (' + nightDates.length + ')', 'var(--pink-text)', 'var(--pink-bg)', 'var(--pink-border)', nightsHtml);
+        })()}
       </div>
     </div>`;
   }).join('') || '<div class="empty">No users yet.</div>';
