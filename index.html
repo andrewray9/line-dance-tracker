@@ -2986,6 +2986,19 @@ async function tryAutoLogin() {
     return false;
   }
 
+  // If there's a saved session, refresh the token BEFORE loading any data.
+  // The access token expires after ~1 hour; if it's stale, all Supabase fetches
+  // (including the public loadBank / loadHomeConfig calls below) will silently
+  // return empty results — making the dance bank blank and home card colors
+  // reset to defaults until the user manually refreshes.
+  if (savedUser && token) {
+    try {
+      await tryRefreshToken();
+    } catch(e) {
+      console.warn('Token pre-refresh error:', e);
+    }
+  }
+
   // Always load public data first so the app is usable as a guest.
   // Wrapped in try/catch so a network error never leaves the splash stuck.
   try {
@@ -3005,14 +3018,6 @@ async function tryAutoLogin() {
   if (!savedUser || !token) {
     enterGuestMode();
     return;
-  }
-
-  // A saved session exists — always refresh the token first on page load
-  // so we never try to fetch data with a stale/expired token.
-  try {
-    await tryRefreshToken();
-  } catch(e) {
-    console.warn('Token pre-refresh error:', e);
   }
 
   try {
