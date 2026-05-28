@@ -1,0 +1,27 @@
+{
+  "name": "Line Dance Tracker",
+  "short_name": "Line Dance",
+  "description": "Track your line dances, dance nights, and progress.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#1a1a18",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "https://i.imgur.com/WDByZ1N.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://i.imgur.com/WDByZ1N.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["lifestyle", "utilities"],
+  "screenshots": []
+}
