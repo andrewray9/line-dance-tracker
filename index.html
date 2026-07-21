@@ -669,6 +669,7 @@
     .friend-modal label{display:block;font-size:12px;font-weight:500;color:var(--t2);margin-bottom:5px;}
     .friend-modal input[type=text]{width:100%;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;margin-bottom:1rem;}
     .friend-modal input[type=text]:focus{outline:none;border-color:var(--b1);}
+    .dj-grad-select{padding:5px 8px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;}
     .fav-pick-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;margin-bottom:1.25rem;}
     .fav-pick-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border:0.5px solid var(--b3);border-radius:var(--radius-md);cursor:pointer;transition:background 0.1s;background:var(--bg);user-select:none;}
     .fav-pick-item:hover{background:var(--bg2);}
@@ -836,11 +837,68 @@
   </div>
 </div>
 
+<!-- VENUE SETUP MODAL (shown first time a user opens My Night) -->
+<div class="modal-overlay" id="venue-setup-modal" style="display:none">
+  <div class="modal-card" style="max-width:420px;">
+    <h2>Set Up My Night</h2>
+    <div class="modal-date" style="margin-bottom:1rem;">Where do you dance? If it's the Nashville Palace, just type that in and you'll use the main DJ list automatically. Otherwise, add your own venue and DJs — only you will see them.</div>
+    <div class="field">
+      <label>Venue Name</label>
+      <input type="text" id="venue-setup-name" placeholder="e.g. The Nashville Palace, or your local bar" oninput="updateVenueSetupPalaceNote()">
+    </div>
+    <div id="venue-setup-palace-note" style="display:none;font-size:12px;color:var(--t2);background:var(--bg2);border-radius:6px;padding:8px 10px;margin-bottom:14px;">You'll see the main Nashville Palace DJ list too — it can't be edited here, but you can still add your own DJs below.</div>
+    <div id="venue-setup-dj-section">
+      <div class="field">
+        <label>Your DJs (optional)</label>
+        <div style="display:flex;gap:6px;margin-bottom:8px;">
+          <input type="text" id="venue-setup-dj-input" placeholder="DJ name" style="flex:1;">
+          <button class="btn" onclick="venueSetupAddDJ()">Add</button>
+        </div>
+        <div id="venue-setup-dj-list"></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeVenueSetupModal(true)">Skip for now</button>
+      <button class="btn primary" onclick="saveVenueSetup()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- VENUE / DJ SETTINGS MODAL (footer) -->
+<div class="modal-overlay" id="night-settings-modal" style="display:none">
+  <div class="modal-card" style="max-width:420px;">
+    <h2>My Venue &amp; DJs</h2>
+    <div class="modal-date" style="margin-bottom:1rem;">Set your home dance venue and add/edit your DJs</div>
+    <div class="field">
+      <label>Venue Name</label>
+      <input type="text" id="night-settings-venue" placeholder="e.g. The Nashville Palace, or your local bar" oninput="nightSettingsVenueChanged()">
+    </div>
+    <div id="night-settings-palace-note" style="display:none;font-size:12px;color:var(--t2);background:var(--bg2);border-radius:6px;padding:8px 10px;margin-bottom:14px;">You're using the main Nashville Palace DJ list. You can also add other DJs from separate venues as well.</div>
+    <div id="night-settings-global-dj-wrap" style="display:none;margin-bottom:1rem;">
+      <label style="display:block;font-size:12px;font-weight:500;color:var(--t2);margin-bottom:5px;">Main DJ List (Nashville Palace)</label>
+      <div id="night-settings-global-dj-list"></div>
+    </div>
+    <div id="night-settings-dj-section">
+      <div class="field">
+        <label>Your DJs</label>
+        <div style="display:flex;gap:6px;margin-bottom:8px;">
+          <input type="text" id="night-settings-dj-input" placeholder="DJ name" style="flex:1;">
+          <button class="btn" onclick="nightSettingsAddDJ()">Add</button>
+        </div>
+        <div id="night-settings-dj-list"></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeNightSettingsModal()">Cancel</button>
+      <button class="btn primary" onclick="saveNightSettings()">Save</button>
+    </div>
+  </div>
+</div>
+
 <!-- FRIEND SETUP MODAL -->
 <div class="friend-modal-overlay" id="friend-setup-modal" style="display:none">
   <div class="friend-modal">
     <h2>Create your card</h2>
-    <p class="sub">This is your public dance card — visible to everyone in the group!</p>
     <label>Your display name</label>
     <input type="text" id="fc-display-name" placeholder="e.g. Sarah J.">
     <label>Pick your top 5 favorite dances <span id="fc-pick-count" style="color:var(--t2)">(0 of 5)</span></label>
@@ -851,6 +909,34 @@
     </div>
     <label style="margin-bottom:8px">Choose a card gradient</label>
     <div class="gradient-picker" id="fc-grad-picker"></div>
+    <div id="fc-venue-section" style="margin-bottom:1.25rem">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:0;">
+        <input type="checkbox" id="fc-show-venue" style="width:auto;margin:0;" onchange="renderFcVenuePreview()">
+        <span>Show my home venue on my card</span>
+      </label>
+      <div id="fc-venue-preview" style="font-size:12px;color:var(--t2);margin-top:6px;"></div>
+    </div>
+    <div style="margin-bottom:1.25rem">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:0;">
+        <input type="checkbox" id="fc-hide-username" style="width:auto;margin:0;">
+        <span>Hide my @username on my card (in case you used your email as your username)</span>
+      </label>
+    </div>
+    <label style="margin-bottom:8px">Social links <span style="color:var(--t2);font-weight:400;">(just your username, don't post a link)</span></label>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.25rem;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:13px;color:var(--t2);min-width:70px;">Instagram</span>
+        <input type="text" id="fc-instagram" placeholder="username" style="flex:1;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:13px;color:var(--t2);min-width:70px;">TikTok</span>
+        <input type="text" id="fc-tiktok" placeholder="username" style="flex:1;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:13px;color:var(--t2);min-width:70px;">YouTube</span>
+        <input type="text" id="fc-youtube" placeholder="username" style="flex:1;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;">
+      </div>
+    </div>
     <div class="fm-actions">
       <button class="btn" onclick="closeFriendSetup()">Cancel</button>
       <button class="btn primary" onclick="saveFriendCard()">Save card</button>
@@ -929,7 +1015,7 @@
     
     <div class="field" id="field-username" style="display:none;">
       <label>Username</label>
-      <input type="text" id="auth-username" placeholder="e.g. mama_jones" autocomplete="username">
+      <input type="text" id="auth-username" placeholder="e.g. mama_jones" autocomplete="username" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')">
     </div>
     
     <div class="field">
@@ -1209,10 +1295,10 @@
       </select>
     </div>
     <div class="night-top" style="margin-bottom:1.25rem;">
-      <label style="white-space:nowrap;">Arrived at Palace:</label>
-      <input type="time" id="night-arrive" style="padding:8px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;" onchange="scheduleNightSave()" title="Optional — time you arrived at Palace">
-      <label style="white-space:nowrap;">Left Palace:</label>
-      <input type="time" id="night-leave" style="padding:8px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;" onchange="scheduleNightSave()" title="Optional — time you left Palace">
+      <label style="white-space:nowrap;">Arrival Time:</label>
+      <input type="time" id="night-arrive" style="padding:8px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;" onchange="scheduleNightSave()" title="Optional — time you arrived">
+      <label style="white-space:nowrap;">Departure Time:</label>
+      <input type="time" id="night-leave" style="padding:8px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;" onchange="scheduleNightSave()" title="Optional — time you left">
     </div>
     <div class="night-grid">
       <div class="night-panel">
@@ -1414,7 +1500,7 @@
       <div class="section-title" style="margin:0" id="friends-list-title">Everyone's cards</div>
     </div>
     <div style="margin-bottom:.75rem;">
-      <input type="text" id="friends-search" placeholder="Search friends by name or username..." oninput="renderFriendsTab()" style="width:100%;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;">
+      <input type="text" id="friends-search" placeholder="Search friends by name, username, or venue..." oninput="renderFriendsTab()" style="width:100%;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;">
     </div>
     <div style="margin-bottom:1rem;">
       <button id="friends-fav-filter-btn" class="sort-btn" onclick="toggleFriendsFavFilter()" style="font-size:12px;">&#9733; Show only favorites</button>
@@ -1763,6 +1849,7 @@
 <footer class="app-footer" id="app-footer" style="display:none;">
   <span class="footer-brand">Line Dance Tracker</span>
   <div class="footer-links">
+    <button class="footer-link" onclick="openNightSettingsModal()">My Venue &amp; DJs</button>
     <button class="footer-link" onclick="switchTab('feedback')">Suggestions &amp; Bugs</button>
     <button class="footer-link" onclick="switchTab('changelog')" id="footer-version-btn">v1.0</button>
   </div>
@@ -1815,7 +1902,7 @@ const SUPABASE_KEY='sb_publishable_1k44O83Uhj5OABd-VB_wLQ_fFJb1woU';
 const ADMIN_USER='drew';
 
 let currentUser=null,isAdmin=false,isMod=false,isGuest=true;
-let state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[],favoriteFriends:[],nightColors:{}};
+let state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[],favoriteFriends:[],nightColors:{},venue:'',venueConfigured:false,customDJs:[],customDjColors:{}};
 let drewDJFreestyles={}; // Drew's DJ freestyle data, loaded for all users
 let bank=[];
 let drewPicks=[];
@@ -1979,6 +2066,10 @@ async function refreshFromCloud(){
       if(!state.favoriteFriends) state.favoriteFriends=[];
       if(!state.drewsNights) state.drewsNights={};
       if(!state.nightColors) state.nightColors={};
+      if(!state.customDJs) state.customDJs=[];
+      if(!state.customDjColors) state.customDjColors={};
+      if(typeof state.venue==='undefined') state.venue='';
+      if(typeof state.venueConfigured==='undefined') state.venueConfigured=false;
       if(isAdmin) drewDJFreestyles=state.djFreestyles||{};
       // Re-render everything that could have changed on another device
       renderBank();renderList('know');renderList('learn');renderDJRecords();renderPicks();
@@ -2683,6 +2774,10 @@ async function authSubmit() {
     showAuthError('Please enter an email, username, and password.');
     return;
   }
+  if (isSignUp && !/^[a-z0-9_]+$/.test(username)) {
+    showAuthError('Username can only contain letters, numbers, and underscores (no spaces or symbols).');
+    return;
+  }
   if (!isSignUp && (!email || !password)) {
     showAuthError('Please enter your email and password.');
     return;
@@ -2756,6 +2851,10 @@ async function authSubmit() {
     if (!state.favoriteFriends) state.favoriteFriends = [];
     if (!state.drewsNights) state.drewsNights = {};
     if (!state.nightColors) state.nightColors = {};
+    if (!state.customDJs) state.customDJs = [];
+    if (!state.customDjColors) state.customDjColors = {};
+    if (typeof state.venue==='undefined') state.venue = '';
+    if (typeof state.venueConfigured==='undefined') state.venueConfigured = false;
 
     // Load any data not already fetched in guest mode
     await loadSubmissions();
@@ -2906,7 +3005,7 @@ function logout() {
   if(localStorage.getItem('ld_remember_me')!=='1'){
     localStorage.removeItem('ld_remembered_email');
   }
-  state = {know:[], learn:[], nights:{}, djFreestyles:{}, favorites:[], favoriteFriends:[]};
+  state = {know:[], learn:[], nights:{}, djFreestyles:{}, favorites:[], favoriteFriends:[], venue:'', venueConfigured:false, customDJs:[], customDjColors:{}};
   bank = []; drewPicks = []; submissions = []; friendCards = []; favoriteFriends = [];
   friendsFavFilterActive = false;
   
@@ -2982,6 +3081,10 @@ async function tryAutoLogin() {
       if (!state.danceLog) state.danceLog = [];
       if (!state.favoriteFriends) state.favoriteFriends = [];
       if (!state.drewsNights) state.drewsNights = {};
+      if (!state.customDJs) state.customDJs = [];
+      if (!state.customDjColors) state.customDjColors = {};
+      if (typeof state.venue==='undefined') state.venue = '';
+      if (typeof state.venueConfigured==='undefined') state.venueConfigured = false;
       state.__cloudUpdatedAt = r.data[0].updated_at || null;
       _lastActiveAt = Date.now();
       localStorage.setItem('ld_last_active', String(_lastActiveAt));
@@ -3117,7 +3220,10 @@ function switchTab(tab,_fromSwipe=false,_noSave=false){
     requestAnimationFrame(()=>{ el.classList.add('visible'); });
   });
   if(!_noSave) localStorage.setItem('ld_active_tab', tab);
-  if(tab==='night') renderNight();
+  if(tab==='night'){
+    renderNight();
+    if(!isGuest && !state.venueConfigured) openVenueSetupModal();
+  }
   if(tab==='drewsnight') renderDrewsNight();
   if(tab==='log'){renderHistoryStats();renderTop5();renderLog();renderDJAnalytics();renderTFDJFavs();}
   if(tab==='admin'){
@@ -3485,18 +3591,212 @@ function removeFromList(type,name){
   renderBank();renderList('know');renderList('learn');scheduleSave();syncMyCard();
 }
 
+// ---- My Night: personal venue & DJ list ----
+// Users can set their own venue and DJ roster for "My Night". If their venue
+// matches the Nashville Palace (in any common form), they use the shared
+// global DJ list/colors instead of a personal one.
+function normalizeVenueName(v){
+  return String(v||'').trim().toLowerCase().replace(/^the\s+/,'').replace(/\s+/g,' ');
+}
+function isPalaceVenueName(v){
+  const n=normalizeVenueName(v);
+  return n==='nashville palace'||n==='palace';
+}
+function usingGlobalDJList(){
+  return !state.venue || isPalaceVenueName(state.venue);
+}
+function getMyDJList(){
+  const custom=state.customDJs||[];
+  if(usingGlobalDJList()){
+    // Palace: global roster plus the user's own DJs, deduped (case-insensitive)
+    const lowerGlobal=new Set(djList.map(d=>d.toLowerCase()));
+    const extra=custom.filter(d=>!lowerGlobal.has(d.toLowerCase()));
+    return [...djList, ...extra];
+  }
+  return custom;
+}
+function getMyDJColors(){
+  if(usingGlobalDJList()){
+    // Global colors first, then the user's own custom colors layered on top
+    return {...djColors, ...(state.customDjColors||{})};
+  }
+  return state.customDjColors||{};
+}
+
+// ---- Venue setup modal (shown on first visit to My Night) ----
+let _venueSetupDJs=[];
+function openVenueSetupModal(){
+  _venueSetupDJs=(state.customDJs||[]).slice();
+  const nameEl=document.getElementById('venue-setup-name');
+  if(nameEl) nameEl.value=state.venue||'';
+  renderVenueSetupDJList();
+  updateVenueSetupPalaceNote();
+  const m=document.getElementById('venue-setup-modal');
+  if(m) m.style.display='flex';
+}
+function closeVenueSetupModal(skip){
+  if(skip){
+    state.venueConfigured=true;
+    scheduleSave();
+  }
+  const m=document.getElementById('venue-setup-modal');
+  if(m) m.style.display='none';
+}
+function updateVenueSetupPalaceNote(){
+  const name=document.getElementById('venue-setup-name')?.value||'';
+  const palace=isPalaceVenueName(name);
+  const note=document.getElementById('venue-setup-palace-note');
+  if(note) note.style.display=palace?'':'none';
+}
+function venueSetupAddDJ(){
+  const inp=document.getElementById('venue-setup-dj-input');
+  const name=inp.value.trim();
+  if(!name){alert('Please enter a DJ name.');return;}
+  if(djList.some(d=>d.toLowerCase()===name.toLowerCase())){alert('That DJ is already on the main list.');return;}
+  if(_venueSetupDJs.some(d=>d.toLowerCase()===name.toLowerCase())){alert('That DJ is already in your list.');return;}
+  _venueSetupDJs.push(name);
+  inp.value='';
+  renderVenueSetupDJList();
+}
+function venueSetupRemoveDJ(name){
+  _venueSetupDJs=_venueSetupDJs.filter(d=>d!==name);
+  renderVenueSetupDJList();
+}
+function renderVenueSetupDJList(){
+  const list=document.getElementById('venue-setup-dj-list');
+  if(!list) return;
+  if(!_venueSetupDJs.length){list.innerHTML='<div class="empty" style="padding:.5rem 0;font-size:12px;">No DJs added yet.</div>';return;}
+  list.innerHTML=_venueSetupDJs.map(dj=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border:0.5px solid var(--b3);border-radius:var(--radius-md);margin-bottom:6px;">
+      <span style="flex:1;font-size:13px;">${esc(dj)}</span>
+      <button class="btn xs danger" onclick="venueSetupRemoveDJ('${escA(dj)}')">Remove</button>
+    </div>`).join('');
+}
+function saveVenueSetup(){
+  const name=document.getElementById('venue-setup-name').value.trim();
+  state.venue=name;
+  state.venueConfigured=true;
+  state.customDJs=_venueSetupDJs.slice();
+  closeVenueSetupModal(false);
+  renderDJDropdown();renderNight();
+  scheduleSave();
+  if(currentUser) syncMyCard();
+}
+
+// ---- Venue/DJ settings modal (footer) ----
+function openNightSettingsModal(){
+  if(requireLogin('Sign in to manage your venue and DJs')) return;
+  const nameEl=document.getElementById('night-settings-venue');
+  if(nameEl) nameEl.value=state.venue||'';
+  renderNightSettingsDJs();
+  const m=document.getElementById('night-settings-modal');
+  if(m) m.style.display='flex';
+}
+function closeNightSettingsModal(){
+  const m=document.getElementById('night-settings-modal');
+  if(m) m.style.display='none';
+}
+function nightSettingsVenueChanged(){ renderNightSettingsDJs(); }
+function renderNightSettingsDJs(){
+  const venueVal=document.getElementById('night-settings-venue')?.value||'';
+  const palace=isPalaceVenueName(venueVal);
+  const note=document.getElementById('night-settings-palace-note');
+  if(note) note.style.display=palace?'':'none';
+
+  const globalWrap=document.getElementById('night-settings-global-dj-wrap');
+  const globalList=document.getElementById('night-settings-global-dj-list');
+  if(globalWrap) globalWrap.style.display=palace?'':'none';
+  if(palace && globalList){
+    const sortedGlobal=[...djList].sort((a,b)=>a.localeCompare(b));
+    globalList.innerHTML=sortedGlobal.length
+      ? sortedGlobal.map(dj=>{
+          const color=djColors[dj]||DEFAULT_NIGHT_GRAD;
+          return `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border:0.5px solid var(--b3);border-radius:var(--radius-md);margin-bottom:6px;opacity:0.85;">
+            <div style="width:18px;height:18px;border-radius:5px;flex-shrink:0;background:${color};border:0.5px solid var(--b3);"></div>
+            <span style="flex:1;font-size:13px;">${esc(dj)}</span>
+            <span style="font-size:11px;color:var(--t3);"></span>
+          </div>`;
+        }).join('')
+      : '<div class="empty" style="padding:.5rem 0">No DJs on the main list yet.</div>';
+  }
+
+  const list=document.getElementById('night-settings-dj-list');
+  if(!list) return;
+  const djs=(state.customDJs||[]).slice().sort((a,b)=>a.localeCompare(b));
+  if(!djs.length){list.innerHTML='<div class="empty" style="padding:.5rem 0">No DJs added yet.</div>';return;}
+  list.innerHTML=djs.map(dj=>{
+    const color=(state.customDjColors&&state.customDjColors[dj])||DEFAULT_NIGHT_GRAD;
+    const swatches=GRADIENTS.map(g=>`<div class="nlc-color-swatch${g===color?' active':''}" style="background:${g};width:24px;height:24px;border-radius:5px;cursor:pointer;flex-shrink:0;border:2px solid ${g===color?'var(--t1)':'transparent'};transition:border-color 0.12s;" onclick="nightSettingsSetDJColor('${escA(dj)}','${g}',this)" title="${g}"></div>`).join('');
+    return `
+    <div style="border:0.5px solid var(--b3);border-radius:var(--radius-md);padding:8px 10px;margin-bottom:8px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:22px;height:22px;border-radius:5px;flex-shrink:0;background:${color};border:0.5px solid var(--b3);" id="ns-dj-color-preview-${cssId(dj)}"></div>
+        <span style="flex:1;font-size:13px;font-weight:500;">${esc(dj)}</span>
+        <button class="btn xs" style="font-size:11px;padding:3px 8px;" onclick="toggleNightSettingsDJColorPicker('${escA(dj)}')">Edit</button>
+        <button class="btn xs danger" onclick="nightSettingsRemoveDJ('${escA(dj)}')">Remove</button>
+      </div>
+      <div id="ns-dj-color-picker-${cssId(dj)}" style="display:none;flex-wrap:wrap;gap:5px;margin-top:8px;">${swatches}</div>
+    </div>`;
+  }).join('');
+}
+function toggleNightSettingsDJColorPicker(dj){
+  const el=document.getElementById('ns-dj-color-picker-'+cssId(dj));
+  if(!el)return;
+  el.style.display=el.style.display==='none'?'flex':'none';
+}
+function nightSettingsAddDJ(){
+  const inp=document.getElementById('night-settings-dj-input');
+  const name=inp.value.trim();
+  if(!name){alert('Please enter a DJ name.');return;}
+  if(djList.some(d=>d.toLowerCase()===name.toLowerCase())){alert('That DJ is already on the main list.');return;}
+  if(!state.customDJs) state.customDJs=[];
+  if(state.customDJs.some(d=>d.toLowerCase()===name.toLowerCase())){alert('That DJ is already in your list.');return;}
+  state.customDJs.push(name);
+  inp.value='';
+  renderNightSettingsDJs();
+}
+function nightSettingsRemoveDJ(name){
+  state.customDJs=(state.customDJs||[]).filter(d=>d!==name);
+  if(state.customDjColors) delete state.customDjColors[name];
+  renderNightSettingsDJs();
+}
+function nightSettingsSetDJColor(name,grad){
+  if(!state.customDjColors) state.customDjColors={};
+  state.customDjColors[name]=grad;
+  const prev=document.getElementById('ns-dj-color-preview-'+cssId(name));
+  if(prev) prev.style.background=grad;
+  const picker=document.getElementById('ns-dj-color-picker-'+cssId(name));
+  if(picker){
+    picker.querySelectorAll('.nlc-color-swatch').forEach(s=>{
+      const active=s.style.background===grad;
+      s.classList.toggle('active',active);
+      s.style.border=active?'2px solid var(--t1)':'2px solid transparent';
+    });
+  }
+}
+function saveNightSettings(){
+  const name=document.getElementById('night-settings-venue').value.trim();
+  state.venue=name;
+  state.venueConfigured=true;
+  closeNightSettingsModal();
+  renderDJDropdown();renderNight();renderLog();
+  scheduleSave();
+  if(currentUser) syncMyCard();
+}
+
 // ---- DJ List (admin managed) ----
 function renderDJDropdown(){
   const sorted=[...djList].sort((a,b)=>a.localeCompare(b));
+  const mySorted=[...getMyDJList()].sort((a,b)=>a.localeCompare(b));
 
-  function _populate(sel, placeholder, getStateValue){
+  function _populate(sel, placeholder, getStateValue, listOverride){
     if(!sel) return;
     // Capture whatever is currently displayed; fall back to reading from state
     // so a saved DJ is always restored even on first render.
     let current=sel.value;
     if(!current && typeof getStateValue==='function') current=getStateValue()||'';
     sel.innerHTML='<option value="">'+placeholder+'</option>';
-    sorted.forEach(function(dj){
+    (listOverride||sorted).forEach(function(dj){
       var opt=document.createElement('option');
       opt.value=dj; opt.textContent=dj;
       sel.appendChild(opt);
@@ -3514,7 +3814,8 @@ function renderDJDropdown(){
       var nd=state.nights&&state.nights[selectedDate];
       if(!nd) return '';
       return Array.isArray(nd)?'':(nd.dj||'');
-    }
+    },
+    mySorted
   );
 
   _populate(
@@ -3553,7 +3854,7 @@ function renderAdminDJList(){
   if(!sorted.length){el.innerHTML=`<div class="empty" style="padding:.75rem 0">No DJs added yet.</div>`;return;}
   el.innerHTML=sorted.map(dj=>{
     const color=djColors[dj]||DEFAULT_NIGHT_GRAD;
-    const swatches=GRADIENTS.map((g,i)=>`<div class="nlc-color-swatch${g===color?' active':''}" style="background:${g};width:22px;height:22px;border-radius:5px;cursor:pointer;flex-shrink:0;border:2px solid ${g===color?'var(--t1)':'transparent'};transition:border-color 0.12s;" onclick="adminSetDJColor('${escA(dj)}','${g}',this)" title="${g}"></div>`).join('');
+    const swatches=GRADIENTS.map(g=>`<div class="nlc-color-swatch${g===color?' active':''}" style="background:${g};width:24px;height:24px;border-radius:5px;cursor:pointer;flex-shrink:0;border:2px solid ${g===color?'var(--t1)':'transparent'};transition:border-color 0.12s;" onclick="adminSetDJColor('${escA(dj)}','${g}')" title="${g}"></div>`).join('');
     return `
     <div style="border:0.5px solid var(--amber-border);border-radius:var(--radius-md);background:var(--bg);overflow:hidden;">
       <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;">
@@ -3565,7 +3866,9 @@ function renderAdminDJList(){
       <div id="dj-color-picker-${cssId(dj)}" style="display:none;padding:8px 12px;border-top:0.5px solid var(--amber-border);background:var(--bg2);">
         <div style="font-size:11px;font-weight:500;color:var(--t2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Default night color for ${esc(dj)}</div>
         <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;">${swatches}</div>
-        <button class="btn xs" style="font-size:11px;" onclick="adminResetDJColor('${escA(dj)}')">Clear (use default)</button>
+        <div>
+          <button class="btn xs" style="font-size:11px;" onclick="adminResetDJColor('${escA(dj)}')">Clear (use default)</button>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -3582,17 +3885,8 @@ function toggleDJColorPicker(dj){
   el.style.display=el.style.display==='none'?'':'none';
 }
 
-function adminSetDJColor(dj,grad,swatchEl){
+function adminSetDJColor(dj,grad){
   djColors[dj]=grad;
-  // Update swatch active states in this picker
-  const picker=document.getElementById('dj-color-picker-'+cssId(dj));
-  if(picker){
-    picker.querySelectorAll('.nlc-color-swatch').forEach(s=>{
-      const active=s.style.background===grad;
-      s.classList.toggle('active',active);
-      s.style.border=active?'2px solid var(--t1)':'2px solid transparent';
-    });
-  }
   // Update preview
   const prev=document.getElementById('dj-color-preview-'+cssId(dj));
   if(prev) prev.style.background=grad;
@@ -3998,6 +4292,7 @@ function syncMyCard(){
   const bankIds=new Set(bank.map(d=>d.id));
   friendCards[idx].favs=friendCards[idx].favs.filter(id=>knowIds.has(id)||bankIds.has(id));
   friendCards[idx].favNames=friendCards[idx].favs.map(id=>state.know.find(d=>d.id===id)?.name||bank.find(d=>d.id===id)?.name||'').filter(Boolean);
+  if(friendCards[idx].showVenue) friendCards[idx].venue=state.venue||'';
   friendCards[idx].updatedAt=new Date().toISOString();
   saveFriendCardsToCloud();
 }
@@ -4129,7 +4424,7 @@ function loadNightDJ(){
   const nd=getNightData(selectedDate);
   const djEl=document.getElementById('night-dj');
   // If dropdown has no DJ options yet (race on first load), populate it now
-  if(djEl && djEl.options.length<=1 && djList.length>0) renderDJDropdown();
+  if(djEl && djEl.options.length<=1 && getMyDJList().length>0) renderDJDropdown();
   if(djEl) djEl.value=nd.dj||'';
   const arrEl=document.getElementById('night-arrive');
   const lvEl=document.getElementById('night-leave');
@@ -4595,7 +4890,10 @@ function _nightGrad(date){
   const nd=state.nights&&state.nights[date];
   if(nd){
     const dj=(Array.isArray(nd)?'':nd.dj)||'';
-    if(dj&&djColors&&djColors[dj]) return djColors[dj];
+    if(dj){
+      const myColors=getMyDJColors();
+      if(myColors&&myColors[dj]) return myColors[dj];
+    }
   }
   return DEFAULT_NIGHT_GRAD;
 }
@@ -4865,7 +5163,7 @@ function openNightColorPicker(date, btn){
   const hasPersonal=state.nightColors&&state.nightColors[date];
   const nd=state.nights&&state.nights[date];
   const dj=nd&&!Array.isArray(nd)?(nd.dj||''):'';
-  const djPreset=dj&&djColors&&djColors[dj];
+  const djPreset=dj&&getMyDJColors()&&getMyDJColors()[dj];
   const swatches=GRADIENTS.map((g,i)=>`<div class="nlc-color-swatch${g===currentGrad?' active':''}" style="background:${g}" onclick="applyNightColor('${date}','${g}')" title="${g}"></div>`).join('');
   const popup=document.createElement('div');
   popup.id='nlc-color-popup';
@@ -5247,7 +5545,27 @@ function openFriendSetup(editMode=false){
   picker.innerHTML=GRADIENTS.map((g,i)=>`<div class="grad-swatch ${i===fcSelectedGrad?'active':''}" style="background:${g}" onclick="selectGrad(${i})" title="Gradient ${i+1}"></div>`).join('');
   // Build pick list
   renderFcPickList();
+  const showVenueEl=document.getElementById('fc-show-venue');
+  if(showVenueEl) showVenueEl.checked=card?!!card.showVenue:false;
+  renderFcVenuePreview();
+  const hideUserEl=document.getElementById('fc-hide-username');
+  if(hideUserEl) hideUserEl.checked=card?!!card.hideUsername:false;
+  const igEl=document.getElementById('fc-instagram');
+  if(igEl) igEl.value=card?(card.instagram||''):'';
+  const ttEl=document.getElementById('fc-tiktok');
+  if(ttEl) ttEl.value=card?(card.tiktok||''):'';
+  const ytEl=document.getElementById('fc-youtube');
+  if(ytEl) ytEl.value=card?(card.youtube||''):'';
   document.getElementById('friend-setup-modal').style.display='flex';
+}
+function renderFcVenuePreview(){
+  const el=document.getElementById('fc-venue-preview');
+  if(!el) return;
+  const checked=document.getElementById('fc-show-venue')?.checked;
+  if(!checked){el.textContent='';return;}
+  el.textContent=state.venue
+    ? `Will show: "${state.venue}"`
+    : 'You haven\'t set a home venue yet — set one in "My Venue & DJs" first.';
 }
 function closeFriendSetup(){document.getElementById('friend-setup-modal').style.display='none';}
 function selectGrad(i){
@@ -5319,6 +5637,23 @@ function toggleFcPick(id){
   else{alert('You can only pick 5 favorites. Remove one first.');return;}
   renderFcPickList();
 }
+function parseSocialHandle(raw){
+  if(!raw) return '';
+  let v=String(raw).trim();
+  if(!v) return '';
+  // If a full URL was pasted, pull the last path segment out of it
+  if(/^https?:\/\//i.test(v)){
+    try{
+      const u=new URL(v);
+      const parts=u.pathname.split('/').filter(Boolean);
+      v=parts.length?parts[parts.length-1]:v;
+    }catch(e){/* leave v as-is */}
+  }
+  v=v.trim().replace(/^@/,'');           // drop leading @
+  v=v.split('?')[0].split('#')[0];        // drop query/hash if any slipped through
+  v=v.replace(/[^a-zA-Z0-9._-]/g,'');     // keep only characters valid in handles
+  return v.slice(0,30);
+}
 function saveFriendCard(){
   if(requireLogin('Sign in to create your friend card')) return;
   const displayName=document.getElementById('fc-display-name').value.trim();
@@ -5328,6 +5663,11 @@ function saveFriendCard(){
     const d=state.know.find(x=>x.id===id);
     return{id,name:d?d.name:''};
   }).filter(f=>f.name);
+  const showVenue=!!document.getElementById('fc-show-venue')?.checked;
+  const hideUsername=!!document.getElementById('fc-hide-username')?.checked;
+  const instagram=parseSocialHandle(document.getElementById('fc-instagram')?.value);
+  const tiktok=parseSocialHandle(document.getElementById('fc-tiktok')?.value);
+  const youtube=parseSocialHandle(document.getElementById('fc-youtube')?.value);
   const card={
     username:currentUser,
     displayName,
@@ -5336,6 +5676,12 @@ function saveFriendCard(){
     know:state.know.map(d=>d.name),
     learn:state.learn.map(d=>d.name),
     grad:fcSelectedGrad,
+    venue:state.venue||'',
+    showVenue:showVenue,
+    hideUsername:hideUsername,
+    instagram,
+    tiktok,
+    youtube,
     updatedAt:new Date().toISOString()
   };
   const idx=friendCards.findIndex(c=>c.username===currentUser);
@@ -5377,7 +5723,8 @@ function renderFriendsTab(){
   if(searchVal){
     others=others.filter(c=>
       (c.displayName||'').toLowerCase().includes(searchVal)||
-      (c.username||'').toLowerCase().includes(searchVal)
+      (c.username||'').toLowerCase().includes(searchVal)||
+      (c.showVenue && c.venue ? c.venue : '').toLowerCase().includes(searchVal)
     );
   }
   const favSet=new Set(favoriteFriends);
@@ -5398,6 +5745,22 @@ function renderFriendsTab(){
   }
 }
 
+const SOCIAL_ICONS={
+  instagram:'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.3" cy="6.7" r="0.6" fill="currentColor" stroke="none"/></svg>',
+  tiktok:'<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M16.7 3h-3.2v12.6a2.8 2.8 0 1 1-2-2.68V9.7a6 6 0 1 0 5.2 5.95V9.4a7.9 7.9 0 0 0 4.4 1.34V7.5a4.7 4.7 0 0 1-4.4-4.5z"/></svg>',
+  youtube:'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9.5 15.5 12 10 14.5V9.5z" fill="currentColor" stroke="none"/></svg>'
+};
+function buildSocialLinksHTML(card,light){
+  const links=[];
+  if(card.instagram) links.push({label:'Instagram',icon:SOCIAL_ICONS.instagram,url:`https://instagram.com/${card.instagram}`});
+  if(card.tiktok) links.push({label:'TikTok',icon:SOCIAL_ICONS.tiktok,url:`https://tiktok.com/@${card.tiktok}`});
+  if(card.youtube) links.push({label:'YouTube',icon:SOCIAL_ICONS.youtube,url:`https://youtube.com/@${card.youtube}`});
+  if(!links.length) return '';
+  const bg=light?'rgba(255,255,255,0.22)':'var(--bg2)';
+  const color=light?'#fff':'var(--t2)';
+  const border=light?'none':'0.5px solid var(--b3)';
+  return `<div style="display:flex;gap:6px;margin-top:8px;" onclick="event.stopPropagation()">${links.map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer" title="${esc(l.label)}" style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:${bg};color:${color};border:${border};text-decoration:none;">${l.icon}</a>`).join('')}</div>`;
+}
 function buildCardHTML(card,isMe){
   const grad=GRADIENTS[card.grad||0];
   // For the card owner, resolve from local state (most up-to-date). For others use stored favNames.
@@ -5422,10 +5785,14 @@ function buildCardHTML(card,isMe){
   const editBtn=isMe?`<button onclick="event.stopPropagation();openFriendSetup(true)" style="position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.22);border:none;border-radius:20px;color:#fff;font-size:11px;font-weight:500;padding:4px 10px;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:.01em;backdrop-filter:blur(4px)">Edit</button>`:'';
   const isFaved=favoriteFriends.includes(card.username);
   const starBtn=!isMe?`<button onclick="event.stopPropagation();toggleFriendFavorite('${escA(card.username)}')" title="${isFaved?'Remove from favorites':'Add to favorites'}" style="position:absolute;top:8px;right:8px;background:${isFaved?'rgba(255,255,255,0.35)':'rgba(0,0,0,0.18)'};border:none;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:${isFaved?'#FFD700':'rgba(255,255,255,0.7)'};transition:all 0.15s;backdrop-filter:blur(4px)" onmouseover="this.style.background='rgba(255,255,255,0.35)';this.style.color='#FFD700'" onmouseout="this.style.background='${isFaved?'rgba(255,255,255,0.35)':'rgba(0,0,0,0.18)'}';this.style.color='${isFaved?'#FFD700':'rgba(255,255,255,0.7)'}'">&#9733;</button>`:'';
+  const venueHTML=(card.showVenue&&card.venue)?`<div style="font-size:11px;color:rgba(255,255,255,0.85);margin-top:2px;display:flex;align-items:center;gap:4px;">&#128205; ${esc(card.venue)}</div>`:'';
+  const socialHTML=buildSocialLinksHTML(card,true);
   return `<div class="friend-card" ${clickAttr}>
     <div class="fc-header" style="background:${grad};position:relative">
       <div class="fc-name">${esc(card.displayName)}</div>
-      <div class="fc-username">@${esc(card.username)}</div>
+      <div class="fc-username">${card.hideUsername?'':'@'+esc(card.username)}</div>
+      ${venueHTML}
+      ${socialHTML}
       ${editBtn}${starBtn}
       ${isFaved&&!isMe?`<div style="position:absolute;bottom:8px;right:10px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.85);letter-spacing:.04em;text-transform:uppercase;text-shadow:0 1px 2px rgba(0,0,0,0.3)">&#9733; Favorite</div>`:''}
     </div>
@@ -5535,7 +5902,9 @@ function openFriendDetail(username){
   document.getElementById('friend-detail-content').innerHTML=`
     <div style="background:${grad};border-radius:12px;padding:1.5rem;margin:-2rem -2rem 1.5rem;position:relative;">
       <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3)">${esc(card.displayName)}</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px">@${esc(card.username)}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px">${card.hideUsername?'':'@'+esc(card.username)}</div>
+      ${(card.showVenue&&card.venue)?`<div style="font-size:12px;color:rgba(255,255,255,0.85);margin-top:6px;display:flex;align-items:center;gap:4px;">&#128205; ${esc(card.venue)}</div>`:''}
+      ${buildSocialLinksHTML(card,true)}
       <button onclick="closeFriendDetail()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:28px;height:28px;color:#fff;font-size:16px;cursor:pointer;line-height:1">&#215;</button>
     </div>
     ${favNames.length?`<div class="section-title" style="margin-top:0">Top favorites</div><div style="display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem">${favNames.map((n,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:0.5px solid var(--b3);border-radius:var(--radius-md);background:var(--bg2)"><span style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--t3);min-width:20px">${i+1}</span><span style="font-size:14px;font-weight:500">${esc(n)}</span></div>`).join('')}</div>`:''}
@@ -5557,7 +5926,9 @@ function openMyCardDetail(){
   document.getElementById('friend-detail-content').innerHTML=`
     <div style="background:${grad};border-radius:12px;padding:1.5rem;margin:-2rem -2rem 1.5rem;position:relative;">
       <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3)">${esc(card.displayName)}</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px">@${esc(card.username)}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:2px">${card.hideUsername?'':'@'+esc(card.username)}</div>
+      ${(card.showVenue&&card.venue)?`<div style="font-size:12px;color:rgba(255,255,255,0.85);margin-top:6px;display:flex;align-items:center;gap:4px;">&#128205; ${esc(card.venue)}</div>`:''}
+      ${buildSocialLinksHTML(card,true)}
       <button onclick="closeFriendDetail()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:28px;height:28px;color:#fff;font-size:16px;cursor:pointer;line-height:1">&#215;</button>
     </div>
     ${favNames.length?`<div class="section-title" style="margin-top:0">Top favorites</div><div style="display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem">${favNames.map((n,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:0.5px solid var(--b3);border-radius:var(--radius-md);background:var(--bg2)"><span style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--t3);min-width:20px">${i+1}</span><span style="font-size:14px;font-weight:500">${esc(n)}</span></div>`).join('')}</div>`:''}
@@ -8871,6 +9242,10 @@ async function _onAppResume() {
       if (!state.favoriteFriends) state.favoriteFriends = [];
       if (!state.drewsNights)     state.drewsNights = {};
       if (!state.nightColors)     state.nightColors = {};
+      if (!state.customDJs)       state.customDJs = [];
+      if (!state.customDjColors)  state.customDjColors = {};
+      if (typeof state.venue==='undefined') state.venue = '';
+      if (typeof state.venueConfigured==='undefined') state.venueConfigured = false;
     }
 
     // Re-load submissions / mod list (small payloads, always refresh)
