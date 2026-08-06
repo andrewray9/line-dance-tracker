@@ -1022,7 +1022,11 @@
       <label>Password</label>
       <input type="password" id="auth-password" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')authSubmit()">
     </div>
-    
+
+    <div style="text-align:right;margin:-8px 0 12px;" id="forgot-password-row">
+      <span onclick="openForgotPassword()" style="font-size:12px;color:var(--t2);cursor:pointer;text-decoration:underline;">Forgot password?</span>
+    </div>
+
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;" id="remember-me-row">
       <input type="checkbox" id="remember-me" style="width:16px;height:16px;accent-color:var(--t1);cursor:pointer;flex-shrink:0;">
       <label for="remember-me" style="font-size:13px;color:var(--t2);cursor:pointer;margin:0;">Remember me</label>
@@ -1032,6 +1036,50 @@
     <div style="text-align:center;margin-top:1rem;" id="auth-dismiss-row">
       <button onclick="dismissAuthModal()" style="background:none;border:none;font-size:13px;color:var(--t2);cursor:pointer;text-decoration:underline;font-family:'DM Sans',sans-serif;">Continue browsing as guest</button>
     </div>
+  </div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div class="auth-modal-overlay" id="forgot-password-wrap" style="display:none">
+  <div class="auth-modal-wrap">
+  <div class="auth-card">
+    <h1>Reset Password</h1>
+    <p class="sub">Enter your account email and we'll send you a link to reset your password.</p>
+    <div class="auth-error" id="forgot-password-error"></div>
+    <div class="auth-error" id="forgot-password-success" style="color:var(--green-text);background:var(--green-bg);border-color:var(--green-border);"></div>
+
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="forgot-password-email" placeholder="you@example.com" autocomplete="email" onkeydown="if(event.key==='Enter')sendPasswordResetEmail()">
+    </div>
+
+    <button class="auth-btn" id="forgot-password-btn" onclick="sendPasswordResetEmail()">Send reset link</button>
+    <div style="text-align:center;margin-top:1rem;">
+      <button onclick="closeForgotPassword()" style="background:none;border:none;font-size:13px;color:var(--t2);cursor:pointer;text-decoration:underline;font-family:'DM Sans',sans-serif;">Back to sign in</button>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- SET NEW PASSWORD MODAL (shown when the user arrives via the emailed reset link) -->
+<div class="auth-modal-overlay" id="reset-password-wrap" style="display:none">
+  <div class="auth-modal-wrap">
+  <div class="auth-card">
+    <h1>Set New Password</h1>
+    <p class="sub">Choose a new password for your account.</p>
+    <div class="auth-error" id="reset-password-error"></div>
+
+    <div class="field">
+      <label>New Password</label>
+      <input type="password" id="reset-password-new" placeholder="New password" autocomplete="new-password" onkeydown="if(event.key==='Enter')submitNewPassword()">
+    </div>
+    <div class="field">
+      <label>Confirm Password</label>
+      <input type="password" id="reset-password-confirm" placeholder="Confirm new password" autocomplete="new-password" onkeydown="if(event.key==='Enter')submitNewPassword()">
+    </div>
+
+    <button class="auth-btn" id="reset-password-btn" onclick="submitNewPassword()">Update password</button>
   </div>
   </div>
 </div>
@@ -1234,6 +1282,7 @@
         <span class="filter-pill" onclick="setBankFilter('Intermediate',this)">Intermediate</span>
         <span class="filter-pill" onclick="setBankFilter('Advanced',this)">Advanced</span>
         <button class="sort-btn active" id="bank-sort-btn" onclick="toggleSort('bank')">A–Z</button>
+        <button class="sort-btn" id="bank-sort-new-btn" onclick="toggleBankSortNewest()">Newly Added</button>
         <button class="sort-btn" id="bank-fav-btn" onclick="toggleBankFavFilter()"><svg class="fav-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg> Favorites</button>
       </div>
       <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center;">
@@ -1944,6 +1993,7 @@ let bankView='all'; // 'all' | 'know' | 'learn' | 'new' | 'custom:{id}'
 let sortState={bank:true,know:true,learn:true,pick:true};
 let favFilterActive=false;
 let bankFavFilterActive=false;
+let bankSortNewest=false;
 
 // ---- Supabase ----
 async function sbFetch(path, options={}) {
@@ -2757,6 +2807,8 @@ function toggleAuthMode() {
   document.getElementById('remember-me-row').style.display = isSignUp ? 'none' : 'flex';
   // Show username field only during sign up
   document.getElementById('field-username').style.display = isSignUp ? 'block' : 'none';
+  // Forgot-password only makes sense when signing in
+  document.getElementById('forgot-password-row').style.display = isSignUp ? 'none' : 'block';
 }
 
 function showAuthError(msg) {
@@ -2908,6 +2960,156 @@ function openAuthModal(mode){
 
 function dismissAuthModal(){
   document.getElementById('auth-wrap').style.display='none';
+}
+
+// ---- Forgot password ----
+function openForgotPassword(){
+  document.getElementById('forgot-password-email').value = document.getElementById('auth-email').value.trim();
+  document.getElementById('forgot-password-error').style.display='none';
+  document.getElementById('forgot-password-success').style.display='none';
+  document.getElementById('auth-wrap').style.display='none';
+  document.getElementById('forgot-password-wrap').style.display='flex';
+}
+
+function closeForgotPassword(){
+  document.getElementById('forgot-password-wrap').style.display='none';
+  document.getElementById('auth-wrap').style.display='flex';
+}
+
+async function sendPasswordResetEmail(){
+  const email = document.getElementById('forgot-password-email').value.trim();
+  const errEl = document.getElementById('forgot-password-error');
+  const okEl = document.getElementById('forgot-password-success');
+  errEl.style.display='none';
+  okEl.style.display='none';
+
+  if(!email){
+    errEl.textContent='Please enter your email address.';
+    errEl.style.display='block';
+    return;
+  }
+
+  const btn = document.getElementById('forgot-password-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  try {
+    // Supabase will email a link back to this same page with a recovery
+    // token in the URL fragment (#access_token=...&type=recovery)
+    const redirectTo = window.location.origin + window.location.pathname;
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/recover?redirect_to=${encodeURIComponent(redirectTo)}`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(()=>({}));
+      throw new Error(data.error_description || data.msg || data.message || 'Could not send reset email.');
+    }
+    okEl.textContent = 'Check your email for a link to reset your password.';
+    okEl.style.display = 'block';
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Send reset link';
+  }
+}
+
+// ---- Set new password (user arrives via the emailed recovery link) ----
+let recoveryAccessToken = null;
+
+// Call this once on page load, before tryAutoLogin(). Returns true if a
+// recovery link was detected, in which case the "set new password" modal
+// takes over the screen.
+function checkForPasswordRecovery(){
+  const hash = window.location.hash;
+  if (!hash || hash.indexOf('type=recovery') === -1) return false;
+
+  const params = new URLSearchParams(hash.substring(1));
+  const accessToken = params.get('access_token');
+  if (!accessToken) return false;
+
+  recoveryAccessToken = accessToken;
+  // Strip the token out of the address bar so it isn't left visible/bookmarked
+  history.replaceState(null, '', window.location.pathname + window.location.search);
+
+  document.getElementById('reset-password-error').style.display = 'none';
+  document.getElementById('reset-password-new').value = '';
+  document.getElementById('reset-password-confirm').value = '';
+  document.getElementById('reset-password-wrap').style.display = 'flex';
+  hideSplash();
+
+  // We're intentionally skipping tryAutoLogin() during recovery (there's no
+  // session to restore yet), but tryAutoLogin() is also the thing that loads
+  // all the shared/public cloud data (dance bank, home card colors, DJ list,
+  // custom lists, etc). Without it, the app has nothing to show once the
+  // person signs back in below — so load that data here instead.
+  (async () => {
+    try {
+      await loadBank();
+      await loadPicks();
+      await loadFriendCards();
+      await loadDJList();
+      await loadHomeConfig();
+      await loadCustomLists();
+      await loadDrewDJFreestyles();
+      await clLoad();
+    } catch (e) {
+      console.warn('Public data load error during password recovery:', e);
+    }
+  })();
+  return true;
+}
+
+async function submitNewPassword(){
+  const pw = document.getElementById('reset-password-new').value;
+  const pw2 = document.getElementById('reset-password-confirm').value;
+  const errEl = document.getElementById('reset-password-error');
+  errEl.style.display = 'none';
+
+  if (!pw || pw.length < 6) {
+    errEl.textContent = 'Password must be at least 6 characters.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (pw !== pw2) {
+    errEl.textContent = 'Passwords do not match.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (!recoveryAccessToken) {
+    errEl.textContent = 'This reset link has expired. Please request a new one.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('reset-password-btn');
+  btn.disabled = true;
+  btn.textContent = 'Updating...';
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      method: 'PUT',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${recoveryAccessToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw })
+    });
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data.error_description || data.msg || data.message || 'Could not update password.');
+
+    recoveryAccessToken = null;
+    document.getElementById('reset-password-wrap').style.display = 'none';
+    openAuthModal('signin');
+    const sub = document.getElementById('auth-sub');
+    if (sub) sub.textContent = 'Password updated! Please sign in with your new password.';
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Update password';
+  }
 }
 
 // Call this whenever a guest tries to do something that requires being logged in
@@ -3253,10 +3455,32 @@ function toggleSort(key){
   sortState[key]=!sortState[key];
   const btn=document.getElementById(key+'-sort-btn');
   if(btn) btn.classList.toggle('active',sortState[key]);
-  if(key==='bank') renderBank();
+  if(key==='bank'){
+    if(sortState.bank&&bankSortNewest){
+      bankSortNewest=false;
+      const nb=document.getElementById('bank-sort-new-btn');
+      if(nb) nb.classList.remove('active');
+    }
+    renderBank();
+  }
   else if(key==='know') renderList('know');
   else if(key==='learn') renderList('learn');
   else if(key==='pick') renderPickList();
+}
+// ---- Newly Added helpers ----
+function isNewlyAdded(d){
+  return !!(d&&d.added&&(Date.now()-new Date(d.added).getTime())<7*24*60*60*1000);
+}
+function toggleBankSortNewest(){
+  bankSortNewest=!bankSortNewest;
+  const btn=document.getElementById('bank-sort-new-btn');
+  if(btn) btn.classList.toggle('active',bankSortNewest);
+  if(bankSortNewest&&sortState.bank){
+    sortState.bank=false;
+    const azBtn=document.getElementById('bank-sort-btn');
+    if(azBtn) azBtn.classList.remove('active');
+  }
+  renderBank();
 }
 function applySortAndSearch(items,searchVal,sorted){
   let result=[...items];
@@ -3332,9 +3556,12 @@ function renderBank(){
     let items=list.danceIds.map(id=>bank.find(d=>d.id===id)).filter(Boolean);
     if(q) items=items.filter(d=>danceMatchesQuery(d, q));
     if(bankFilter!=='all') items=items.filter(d=>d.difficulty===bankFilter);
-    if(sortState.bank) items.sort((a,b)=>a.name.localeCompare(b.name));
+    if(bankSortNewest){
+      items=items.filter(d=>isNewlyAdded(d));
+      items.sort((a,b)=>new Date(b.added||0)-new Date(a.added||0));
+    } else if(sortState.bank) items.sort((a,b)=>a.name.localeCompare(b.name));
     if(!items.length){
-      el.innerHTML=`<div class="empty">${q?'No dances match your search.':'No dances in this list yet.'}</div>`;
+      el.innerHTML=`<div class="empty">${bankSortNewest?'No dances added in the past week.':q?'No dances match your search.':'No dances in this list yet.'}</div>`;
       return;
     }
     el.innerHTML=items.map(d=>{
@@ -3374,9 +3601,12 @@ function renderBank(){
     let items=bank.filter(d=>!isInList(d.name,'know')&&!isInList(d.name,'learn'));
     if(q) items=items.filter(d=>danceMatchesQuery(d, q));
     if(bankFilter!=='all') items=items.filter(d=>d.difficulty===bankFilter);
-    if(sortState.bank) items.sort((a,b)=>a.name.localeCompare(b.name));
+    if(bankSortNewest){
+      items=items.filter(d=>isNewlyAdded(d));
+      items.sort((a,b)=>new Date(b.added||0)-new Date(a.added||0));
+    } else if(sortState.bank) items.sort((a,b)=>a.name.localeCompare(b.name));
     if(!items.length){
-      el.innerHTML=`<div class="empty">${bank.length===0?'No dances in the bank yet.':(q?'No new dances match your search.':"You've added every dance to your lists — nice work!")}</div>`;
+      el.innerHTML=`<div class="empty">${bankSortNewest?'No dances added in the past week.':bank.length===0?'No dances in the bank yet.':(q?'No new dances match your search.':"You've added every dance to your lists — nice work!")}</div>`;
       return;
     }
     el.innerHTML=items.map(d=>{
@@ -3424,10 +3654,20 @@ function renderBank(){
     if(bankView==='know'&&bankFavFilterActive){
       filtered=filtered.filter(d=>isFav(d.id));
     }
-    if(sortState.bank) filtered.sort((a,b)=>a.name.localeCompare(b.name));
+    if(bankSortNewest){
+      filtered=filtered.filter(d=>{
+        const be=bank.find(x=>x.name.toLowerCase()===d.name.toLowerCase());
+        return isNewlyAdded(be);
+      });
+      filtered.sort((a,b)=>{
+        const ba=bank.find(x=>x.name.toLowerCase()===a.name.toLowerCase());
+        const bb=bank.find(x=>x.name.toLowerCase()===b.name.toLowerCase());
+        return new Date(bb?.added||0)-new Date(ba?.added||0);
+      });
+    } else if(sortState.bank) filtered.sort((a,b)=>a.name.localeCompare(b.name));
     if(!filtered.length){
       const label=bankView==='know'?'Dances I Know':'Want to Learn';
-      el.innerHTML=`<div class="empty">No dances in your "${label}" list yet${q?' matching your search':bankView==='know'&&bankFavFilterActive?' — heart some dances to see them here':'.'}</div>`;
+      el.innerHTML=`<div class="empty">${bankSortNewest?'No dances added in the past week.':`No dances in your "${label}" list yet${q?' matching your search':bankView==='know'&&bankFavFilterActive?' — heart some dances to see them here':'.'}`}</div>`;
       return;
     }
     const headerColor=bankView==='know'?'var(--green-text)':'var(--blue-text)';
@@ -3477,8 +3717,11 @@ function renderBank(){
       return isFav(knowEntry?knowEntry.id:d.id);
     });
   }
-  if(sortState.bank) items.sort((a,b)=>a.name.localeCompare(b.name));
-  if(!items.length){el.innerHTML=`<div class="empty">${bankFavFilterActive?'No favorite dances yet — heart any dance in the bank!':bank.length===0?'No dances in the bank yet.':'No dances match your search.'}</div>`;return;}
+  if(bankSortNewest){
+    items=items.filter(d=>isNewlyAdded(d));
+    items.sort((a,b)=>new Date(b.added||0)-new Date(a.added||0));
+  } else if(sortState.bank) items.sort((a,b)=>a.name.localeCompare(b.name));
+  if(!items.length){el.innerHTML=`<div class="empty">${bankSortNewest?'No dances added in the past week.':bankFavFilterActive?'No favorite dances yet — heart any dance in the bank!':bank.length===0?'No dances in the bank yet.':'No dances match your search.'}</div>`;return;}
   el.innerHTML=items.map(d=>{
     const inKnow=isInList(d.name,'know'),inLearn=isInList(d.name,'learn');
     const knowEntry=state.know.find(k=>k.name.toLowerCase()===d.name.toLowerCase());
@@ -9163,7 +9406,9 @@ function recAddToLearn() {
 window.recAddToLearn = recAddToLearn;
 window.recRefresh = recRefresh;
 
-tryAutoLogin();
+if (!checkForPasswordRecovery()) {
+  tryAutoLogin();
+}
 
 // ---- Session keep-alive & stale-tab recovery ----
 // Track when the app was last active so we can detect long absences.
