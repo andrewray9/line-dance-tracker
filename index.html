@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Line Dance Tracker</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/x-icon" href="https://i.imgur.com/WDByZ1N.png">
+  <link rel="icon" type="image/x-icon" href="https://i.imgur.com/rPssxgh.png">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1a1a18" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Line Dance">
-  <link rel="apple-touch-icon" href="https://i.imgur.com/WDByZ1N.png">
+  <link rel="apple-touch-icon" href="https://i.imgur.com/rPssxgh.png">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     :root{
@@ -42,7 +42,10 @@
         --pink-bg:#2a1020;--pink-border:#8a2050;--pink-text:#f07ab0;
       }
     }
-    html,body{min-height:100vh;background:var(--bg3);color:var(--t1);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
+    html,body{min-height:100vh;min-height:100dvh;color:var(--t1);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
+    html{background:var(--bg3);}
+    body{background:transparent;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);}
+    #bg-layer{position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;z-index:-1;pointer-events:none;background:var(--bg3);}
     @media(max-width:640px){
       input,select,textarea{font-size:16px!important;}
       .app{padding:1rem 1rem 5rem;}
@@ -91,6 +94,7 @@
     .tab[data-tab="know"].active{background:#EAF3DE;color:#27500A;border-color:#C0DD97;}
     .tab[data-tab="learn"].active{background:#EEEDFE;color:#3C3489;border-color:#AFA9EC;}
     .tab[data-tab="night"].active{background:#FBEAF0;color:#72243E;border-color:#ED93B1;}
+    .tab[data-tab="learning"].active{background:#F3E8FF;color:#6B21A8;border-color:#D8B4FE;}
     .tab[data-tab="log"].active{background:#FAEEDA;color:#633806;border-color:#FAC775;}
     .tab[data-tab="friends"].active{background:#E0F5FF;color:#0369a1;border-color:#7dd3fc;}
     .tab[data-tab="dj"].active{background:#F0FDF4;color:#166534;border-color:#86efac;}
@@ -170,6 +174,7 @@
       .tab[data-tab="bank"].active{background:#0e1e2e;color:#6ab4f5;border-color:#1a5a9e;}
       .tab[data-tab="know"].active{background:#1a2e10;color:#9fd870;border-color:#3B6D11;}
       .tab[data-tab="learn"].active{background:#1a1830;color:#a09cf5;border-color:#4e46a0;}
+      .tab[data-tab="learning"].active{background:#241a38;color:#c4a6f5;border-color:#6b3fa8;}
       .tab[data-tab="night"].active{background:#2a1020;color:#f07ab0;border-color:#8a2050;}
       .tab[data-tab="log"].active{background:#2a1d08;color:#f0a840;border-color:#7a4a0a;}
       .tab[data-tab="friends"].active{background:#0a1e2e;color:#38bdf8;border-color:#0284c7;}
@@ -205,6 +210,7 @@
     .hc-blue{background:linear-gradient(135deg,#667eea,#764ba2);}
     .hc-green{background:linear-gradient(135deg,#43e97b,#38f9d7);}
     .hc-purple{background:linear-gradient(135deg,#8e2de2,#4a00e0);}
+    .hc-orchid{background:linear-gradient(135deg,#a18cd1,#fbc2eb);}
     .hc-pink{background:linear-gradient(135deg,#f093fb,#f5576c);}
     .hc-amber{background:linear-gradient(135deg,#f7971e,#ffd200);}
     .hc-sky{background:linear-gradient(135deg,#4facfe,#00f2fe);}
@@ -229,13 +235,14 @@
     .home-card:nth-child(9){animation-delay:0.45s;}
 
     /* HAMBURGER MENU */
-    .hamburger-btn{display:none;background:none;border:1.5px solid var(--b2);border-radius:var(--radius-md);padding:7px 10px;cursor:pointer;flex-direction:column;gap:4px;align-items:center;justify-content:center;}
+    .hamburger-btn{display:none;background:var(--bg2);border:0.5px solid var(--b3);border-radius:50%;width:34px;height:34px;padding:0;color:var(--t1);cursor:pointer;flex-direction:column;gap:4px;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.15s;}
+    .hamburger-btn:hover{background:var(--bg3);}
     .hamburger-btn span{display:block;width:18px;height:2px;background:var(--t1);border-radius:2px;transition:all 0.2s;}
     .hamburger-btn.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
     .hamburger-btn.open span:nth-child(2){opacity:0;}
     .hamburger-btn.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
     .mobile-menu-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.3);}
-    .mobile-menu{position:fixed;top:0;right:0;bottom:0;width:260px;background:var(--bg);border-left:0.5px solid var(--b3);z-index:201;padding:1.25rem 1rem;display:flex;flex-direction:column;gap:4px;overflow-y:auto;transform:translateX(100%);transition:transform 0.22s cubic-bezier(.4,0,.2,1);box-shadow:-4px 0 24px rgba(0,0,0,0.12);}
+    .mobile-menu{position:fixed;top:0;right:0;bottom:0;width:260px;background:var(--bg);border-left:0.5px solid var(--b3);z-index:201;padding:calc(1.25rem + env(safe-area-inset-top)) 1rem calc(1.25rem + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:4px;overflow-y:auto;transform:translateX(100%);transition:transform 0.22s cubic-bezier(.4,0,.2,1);box-shadow:-4px 0 24px rgba(0,0,0,0.12);}
     .mobile-menu.open{transform:translateX(0);}
     .mobile-menu-header{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-bottom:.75rem;padding-bottom:.75rem;border-bottom:0.5px solid var(--b3);display:flex;align-items:center;justify-content:space-between;}
     .mobile-menu-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--t2);line-height:1;padding:0;}
@@ -247,6 +254,7 @@
     .mobile-tab[data-tab="bank"] .mtab-dot{background:#3b82f6;}
     .mobile-tab[data-tab="know"] .mtab-dot{background:#22c55e;}
     .mobile-tab[data-tab="learn"] .mtab-dot{background:#8b5cf6;}
+    .mobile-tab[data-tab="learning"] .mtab-dot{background:#c084fc;}
     .mobile-tab[data-tab="night"] .mtab-dot{background:#ec4899;}
     .mobile-tab[data-tab="log"] .mtab-dot{background:#f59e0b;}
     .mobile-tab[data-tab="friends"] .mtab-dot{background:#0ea5e9;}
@@ -269,6 +277,7 @@
     button.btn.success{color:var(--green-text);border-color:var(--green-border);}button.btn.success:hover{background:var(--green-bg);}
     button.btn.info{color:var(--blue-text);border-color:var(--blue-border);}button.btn.info:hover{background:var(--blue-bg);}
     button.btn.amber{background:#BA7517;color:#fff;border-color:#BA7517;}button.btn.amber:hover{opacity:0.85;}
+    button.btn.purple{color:var(--purple-text);border-color:var(--purple-border);}button.btn.purple:hover{background:var(--purple-bg);}
     button.btn.pink{background:var(--pink-text);color:#fff;border-color:var(--pink-text);}button.btn.pink:hover{opacity:0.85;}
 
     /* INPUTS */
@@ -356,6 +365,7 @@
     .sp-sel-btn:hover{background:var(--bg3);}
     .sp-sel-btn.know{background:var(--green-bg);color:var(--green-text);border-color:var(--green-border);}
     .sp-sel-btn.learn{background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue-border);}
+    .sp-sel-btn.learning{background:var(--purple-bg);color:var(--purple-text);border-color:var(--purple-border);}
     .sp-sel-btn.all{background:var(--t1);color:var(--bg);border-color:var(--t1);}
     .sp-modal-search{padding:.6rem 1.5rem;border-bottom:0.5px solid var(--b3);flex-shrink:0;}
     .sp-modal-search input{width:100%;padding:7px 11px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg2);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;}
@@ -372,6 +382,7 @@
     .sp-dance-tag{font-size:11px;padding:2px 7px;border-radius:20px;white-space:nowrap;}
     .sp-tag-know{background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border);}
     .sp-tag-learn{background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border);}
+    .sp-tag-learning{background:var(--purple-bg);color:var(--purple-text);border:0.5px solid var(--purple-border);}
     .sp-empty{font-size:13px;color:var(--t3);text-align:center;padding:2rem 1rem;}
     .sp-modal-footer{padding:1rem 1.5rem;border-top:0.5px solid var(--b3);display:flex;flex-direction:column;gap:10px;flex-shrink:0;}
     .sp-playlist-name-row{display:flex;gap:8px;align-items:center;}
@@ -776,6 +787,61 @@
       z-index:9998;
     }
     #swipe-edge-indicator.show{opacity:1;}
+
+    /* ===== SETTINGS & HOME CUSTOMIZER ===== */
+    :root{--page-t1:var(--t1);--page-t2:var(--t2);--page-t3:var(--t3);}
+    .app-header h1,.home-greeting{color:var(--page-t1);}
+    .subtitle,.sync-bar{color:var(--page-t2);}
+    .sync-bar button{color:var(--page-t1)!important;}
+    .app-footer .footer-brand{color:var(--page-t2);}
+    .app-footer .footer-version,.app-footer .footer-link{color:var(--page-t3);}
+    .app-footer .footer-version:hover,.app-footer .footer-link:hover{color:var(--page-t1);}
+    .settings-btn{background:var(--bg2);border:0.5px solid var(--b3);border-radius:50%;width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t1);padding:0;transition:background 0.15s,transform 0.25s;flex-shrink:0;}
+    .settings-btn:hover{background:var(--bg3);transform:rotate(45deg);}
+    .settings-btn svg{width:18px;height:18px;display:block;}
+    .set-section{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);margin:1.25rem 0 .5rem;}
+    .set-section:first-of-type{margin-top:.25rem;}
+    .set-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border:0.5px solid var(--b3);border-radius:var(--radius-md);background:var(--bg2);margin-bottom:8px;}
+    .set-row-text{flex:1;min-width:0;}
+    .set-title{font-size:14px;font-weight:500;color:var(--t1);}
+    .set-desc{font-size:12px;color:var(--t2);margin-top:2px;line-height:1.4;}
+    .switch{position:relative;display:inline-block;width:44px;height:25px;flex-shrink:0;}
+    .switch input{opacity:0;width:0;height:0;position:absolute;}
+    .switch .slider{position:absolute;inset:0;background:var(--b3);border-radius:999px;cursor:pointer;transition:background 0.2s;}
+    .switch .slider::before{content:'';position:absolute;width:19px;height:19px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.25);}
+    .switch input:checked + .slider{background:var(--green-dark);}
+    .switch input:checked + .slider::before{transform:translateX(19px);}
+    #settings-modal{z-index:1200;}
+    #home-editor-modal{z-index:1300;}
+    #home-editor-modal .modal-card{max-width:900px;}
+    .he-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:.5rem;}
+    .he-tile{border-radius:18px;padding:1.4rem 1.2rem;min-height:130px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;font-family:'Playfair Display',serif;user-select:none;-webkit-user-select:none;transition:opacity .15s,box-shadow .15s,transform .15s,filter .15s;}
+    .he-tile::before{content:'';position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.12);top:-20px;right:-20px;pointer-events:none;}
+    .he-tile::after{content:'';position:absolute;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,0.08);bottom:10px;left:-10px;pointer-events:none;}
+    .he-tile-title{font-size:clamp(16px,3.5vw,22px);font-weight:700;line-height:1.2;width:100%;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);position:relative;z-index:1;}
+    .he-tile.is-hidden{opacity:0.45;filter:grayscale(0.7);}
+    .he-tile.dragging{transform:scale(1.05);box-shadow:0 14px 36px rgba(0,0,0,0.35);z-index:5;}
+    .he-handle{position:absolute;top:8px;left:8px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.3);color:#fff;display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;font-size:17px;z-index:2;font-family:'DM Sans',sans-serif;}
+    .he-handle:active{cursor:grabbing;}
+    .he-eye{position:absolute;top:8px;right:8px;z-index:2;font-size:11px;font-weight:600;padding:6px 12px;border-radius:20px;border:none;background:rgba(0,0,0,0.3);color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;}
+    @media(max-width:480px){
+      .he-list{grid-template-columns:1fr 1fr;gap:10px;}
+      .he-list .he-tile:last-child:nth-child(odd){grid-column:1 / -1;max-width:calc(50% - 5px);margin:0 auto;width:100%;}
+    }
+    @media(max-width:640px){
+      #home-editor-modal{padding:0;}
+      #home-editor-modal .modal-card{padding:1.25rem 1rem;border-radius:0;max-height:100vh;min-height:100vh;}
+    }
+    .he-tile{flex-direction:column;}
+    .he-actions{position:absolute;bottom:8px;right:8px;z-index:2;display:flex;gap:6px;}
+    .he-icon-btn{position:static;z-index:2;min-width:34px;height:34px;padding:0 10px;border-radius:20px;border:none;background:rgba(0,0,0,0.3);color:#fff;cursor:pointer;font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;}
+    #color-picker-modal,#bg-picker-modal{z-index:1400;}
+    .bgp-tab{flex:1;padding:7px 10px;border-radius:999px;border:0.5px solid var(--b3);background:var(--bg2);color:var(--t2);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;}
+    .bgp-tab.active{background:var(--t1);color:var(--bg);border-color:var(--t1);}
+    .bgp-color{width:40px;height:34px;border:none;background:none;padding:0;cursor:pointer;}
+    .cp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:8px;max-height:42vh;overflow-y:auto;}
+    .cp-cell{height:44px;border-radius:10px;border:2px solid transparent;cursor:pointer;padding:0;}
+    .cp-cell.active{border-color:var(--t1);}
   </style>
 </head>
 <body>
@@ -1040,6 +1106,19 @@
   </div>
 </div>
 
+<!-- CONNECTION POPUP -->
+<div class="modal-overlay" id="conn-popup" style="display:none;z-index:3500;">
+  <div class="modal-card" style="max-width:380px;text-align:center;">
+    <div id="conn-popup-icon" style="font-size:36px;margin-bottom:6px;"></div>
+    <h2 id="conn-popup-title">Connection lost</h2>
+    <div id="conn-popup-msg" style="font-size:14px;color:var(--t2);line-height:1.5;margin-top:8px;"></div>
+    <div class="modal-actions" style="justify-content:center;">
+      <button class="btn" onclick="dismissConnPopup()">Dismiss</button>
+      <button class="btn primary" id="conn-popup-retry" onclick="connPrimary()">Try again</button>
+    </div>
+  </div>
+</div>
+
 <!-- FORGOT PASSWORD MODAL -->
 <div class="auth-modal-overlay" id="forgot-password-wrap" style="display:none">
   <div class="auth-modal-wrap">
@@ -1089,7 +1168,8 @@
   <div class="app-header">
     <h1>Line Dance Tracker</h1>
     <div style="display:flex;align-items:center;gap:8px;">
-      <button class="hamburger-btn" id="hamburger-btn" onclick="switchTab('home');mobileSwitch('home')" aria-label="Home" style="font-size:18px;padding:6px 10px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="display:block;color:var(--t1);"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
+      <button class="hamburger-btn" id="hamburger-btn" onclick="switchTab('home');mobileSwitch('home')" aria-label="Home" title="Home"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:block;color:var(--t1);"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
+      <button class="settings-btn" id="settings-btn" onclick="openSettings()" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       <!-- Guest sign-in button (shown when not logged in) -->
       <button id="guest-signin-btn" onclick="openAuthModal('signin')" style="font-size:13px;font-weight:500;padding:5px 14px;border:1.5px solid var(--b2);border-radius:20px;background:var(--bg2);color:var(--t1);cursor:pointer;font-family:'DM Sans',sans-serif;display:none;">Sign in</button>
       <!-- User pill (shown when logged in) -->
@@ -1116,6 +1196,7 @@
     <button class="mobile-tab" data-tab="know" onclick="mobileSwitch('know')" style="display:none"><span class="mtab-dot"></span>Dances I Know</button>
     <button class="mobile-tab" data-tab="learn" onclick="mobileSwitch('learn')" style="display:none"><span class="mtab-dot"></span>Want to Learn</button>
     <button class="mobile-tab" data-tab="night" onclick="mobileSwitch('night')"><span class="mtab-dot"></span>My Night</button>
+    <button class="mobile-tab" data-tab="learning" onclick="mobileSwitch('learning')" style="display:none"><span class="mtab-dot"></span>Learning</button>
     <button class="mobile-tab" data-tab="log" onclick="mobileSwitch('log')"><span class="mtab-dot"></span>Analytics</button>
     <button class="mobile-tab" data-tab="friends" onclick="mobileSwitch('friends')"><span class="mtab-dot"></span>Friends</button>
     <button class="mobile-tab" data-tab="feedback" onclick="mobileSwitch('feedback')"><span class="mtab-dot"></span>Suggestions &amp; Bugs</button>
@@ -1136,6 +1217,7 @@
     <button class="tab" data-tab="know" onclick="switchTab('know')" style="display:none">Dances I Know</button>
     <button class="tab" data-tab="learn" onclick="switchTab('learn')" style="display:none">Want to Learn</button>
     <button class="tab" data-tab="night" onclick="switchTab('night')">My Night</button>
+    <button class="tab" data-tab="learning" onclick="switchTab('learning')" style="display:none">Learning</button>
     <button class="tab" data-tab="log" onclick="switchTab('log')">Analytics</button>
     <button class="tab" data-tab="drewsnight" id="drewsnight-tab-btn" style="display:none" onclick="switchTab('drewsnight')">Night</button>
     <button class="tab" data-tab="dj" id="dj-tab-btn" style="display:none" onclick="switchTab('dj')">Test Features</button>
@@ -1176,6 +1258,12 @@
         <span class="home-card-icon">🌙</span>
         <span class="home-card-title">My Night</span>
         <span class="home-card-desc">Log tonight's dances as you go</span>
+        <span class="home-card-arrow">→</span>
+      </button>
+      <button class="home-card hc-orchid" id="home-card-learning" onclick="setBankView('learning',document.getElementById('bank-view-learning-pill'));switchTab('bank')">
+        <span class="home-card-icon">🎯</span>
+        <span class="home-card-title">Learning</span>
+        <span class="home-card-desc">Dances you're working on right now</span>
         <span class="home-card-arrow">→</span>
       </button>
       <button class="home-card hc-amber" id="home-card-log" onclick="switchTab('log')">
@@ -1289,6 +1377,7 @@
         <span style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;padding:4px 2px;white-space:nowrap;">My Lists:</span>
         <span class="filter-pill" id="bank-view-all-pill" onclick="setBankView('all',this)" style="background:var(--t1);color:var(--bg);border-color:var(--t1);">All Dances</span>
         <span class="filter-pill" id="bank-view-know-pill" onclick="setBankView('know',this)" style="color:var(--green-text);border-color:var(--green-border);">&#10003; I Know</span>
+        <span class="filter-pill" id="bank-view-learning-pill" onclick="setBankView('learning',this)" style="color:var(--purple-text);border-color:var(--purple-border);">&#9681; Learning</span>
         <span class="filter-pill" id="bank-view-learn-pill" onclick="setBankView('learn',this)" style="color:var(--blue-text);border-color:var(--blue-border);">&#9733; Want to Learn</span>
         <span class="filter-pill" id="bank-view-new-pill" onclick="setBankView('new',this)" style="color:var(--amber-text);border-color:var(--amber-border);"> Other</span>
       </div>
@@ -1315,6 +1404,22 @@
       <span class="filter-pill" onclick="setListFilter('know','Advanced',this)">Advanced</span>
     </div>
     <div id="know-list" class="dance-list"></div>
+  </div>
+
+  <!-- LEARNING -->
+  <div id="tab-learning" class="section">
+    <div class="search-sort-row">
+      <input type="text" id="learning-search" placeholder="Search..." oninput="renderList('learning')">
+      <button class="sort-btn active" id="learning-sort-btn" onclick="toggleSort('learning')">A–Z</button>
+    </div>
+    <div class="bank-filter-row" id="learning-diff-filters" style="margin-bottom:1rem;">
+      <span class="filter-pill active" onclick="setListFilter('learning','all',this)">All</span>
+      <span class="filter-pill" onclick="setListFilter('learning','Beginner',this)">Beginner</span>
+      <span class="filter-pill" onclick="setListFilter('learning','Improver',this)">Improver</span>
+      <span class="filter-pill" onclick="setListFilter('learning','Intermediate',this)">Intermediate</span>
+      <span class="filter-pill" onclick="setListFilter('learning','Advanced',this)">Advanced</span>
+    </div>
+    <div id="learning-list" class="dance-list"></div>
   </div>
 
   <!-- LEARN -->
@@ -1604,6 +1709,13 @@
         <button class="btn success" onclick="epAddDance('know')">Add</button>
       </div>
       <div id="ep-know-list" class="dance-list" style="margin-bottom:1.5rem;"></div>
+      <!-- Learning -->
+      <div class="section-title">Learning</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+        <input type="text" id="ep-learning-input" placeholder="Add dance to learning list..." style="flex:1;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;">
+        <button class="btn purple" onclick="epAddDance('learning')">Add</button>
+      </div>
+      <div id="ep-learning-list" class="dance-list" style="margin-bottom:1.5rem;"></div>
       <!-- Want to Learn -->
       <div class="section-title">Want to Learn</div>
       <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
@@ -1627,6 +1739,30 @@
       <div class="admin-form-body">
         <p style="font-size:13px;color:var(--t2);margin-bottom:1rem;">Customize the gradient for each card on the home screen. Changes are saved instantly and affect all users.</p>
         <div id="admin-home-gradients"></div>
+      </div>
+    </div>
+    <div class="admin-form collapsed" id="admin-default-layout-form">
+      <div class="admin-form-title" onclick="toggleAdminSection('admin-default-layout-form')">&#127968; Default Home Layout <span class="admin-caret">&#9660;</span></div>
+      <div class="admin-form-body">
+        <p style="font-size:13px;color:var(--t2);margin-bottom:1rem;">Set the default order and visibility of the home page buttons. Users who haven't customized their own layout will see this one. Users who have rearranged their home screen keep their own layout until they tap Reset in Settings.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <button class="btn amber" onclick="openHomeEditor('admin')">Edit default layout</button>
+          <button class="btn danger" onclick="clearDefaultHomeLayout()">Clear default</button>
+        </div>
+        <p id="default-layout-status" style="font-size:12px;color:var(--t2);margin-top:10px;"></p>
+      </div>
+    </div>
+    <div class="admin-form collapsed" id="admin-conntest-form">
+      <div class="admin-form-title" onclick="toggleAdminSection('admin-conntest-form')">&#128268; Connection Testing <span class="admin-caret">&#9660;</span></div>
+      <div class="admin-form-body">
+        <p style="font-size:13px;color:var(--t2);margin-bottom:1rem;">Simulate an expired session, then make an edit and save to test the reconnect fix. Only changes this device's stored login; nothing is deleted from the server.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn amber" onclick="connTestExpire('access')">Expire access token (should silently recover)</button>
+          <button class="btn amber" onclick="connTestExpire('both')">Expire login completely (should show "Session expired" popup)</button>
+          <button class="btn amber" onclick="showConnPopup('pending')">Preview popup: pending changes</button>
+          <button class="btn amber" onclick="showConnPopup('offline')">Preview popup: offline</button>
+        </div>
+        <p id="conntest-msg" style="font-size:12px;color:var(--t2);margin-top:10px;"></p>
       </div>
     </div>
     <div class="admin-form collapsed" id="admin-dj-form">
@@ -1807,6 +1943,10 @@
       <div class="section-title" style="margin-top:1.5rem;">Most Known Dances (across all users)</div>
       <div id="aa-top-dances"></div>
 
+      <!-- Most currently learning -->
+      <div class="section-title" style="margin-top:1.5rem;">Most Currently Learning</div>
+      <div id="aa-top-learning"></div>
+
       <!-- Most wanted to learn -->
       <div class="section-title" style="margin-top:1.5rem;">Most Wanted to Learn</div>
       <div id="aa-top-learn"></div>
@@ -1894,10 +2034,120 @@
   </div>
 </div>
 
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settings-modal" style="display:none" onclick="if(event.target===this)closeSettings()">
+  <div class="modal-card" style="max-width:440px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+      <h2 style="margin:0">Settings</h2>
+      <button onclick="closeSettings()" style="background:none;border:none;font-size:24px;line-height:1;cursor:pointer;color:var(--t3);padding:0;" aria-label="Close">&times;</button>
+    </div>
+    <div class="set-section">Home screen</div>
+    <div class="set-row">
+      <div class="set-row-text">
+        <div class="set-title">Rearrange Home Buttons</div>
+        <div class="set-desc">Drag to reorder your home buttons, and hide the ones you don't want/use.</div>
+      </div>
+      <label class="switch"><input type="checkbox" id="set-rearrange-toggle" onchange="settingsRearrangeToggled(this.checked)"><span class="slider"></span></label>
+    </div>
+    <div class="set-row">
+      <div class="set-row-text">
+        <div class="set-title">Reset Home Layout</div>
+        <div class="set-desc">Restore the default order, show all buttons, and remove custom colors and background.</div>
+      </div>
+      <button class="btn sm" onclick="resetHomeLayout()">Reset</button>
+    </div>
+    <div class="set-row">
+      <div class="set-row-text">
+        <div class="set-title">Background</div>
+        <div class="set-desc">Choose a preset, make a gradient, or pick any solid color.</div>
+      </div>
+      <button id="set-bg-swatch" onclick="openBgPicker()" aria-label="Choose background" style="width:40px;height:34px;border-radius:8px;border:1.5px solid var(--b2);cursor:pointer;padding:0;flex-shrink:0;background:var(--bg3);"></button>
+      <button class="btn sm" onclick="resetBgColor()">Default</button>
+    </div>
+    <div class="set-section">Dancing</div>
+    <div class="set-row">
+      <div class="set-row-text">
+        <div class="set-title">My Venue &amp; DJs</div>
+        <div class="set-desc">Set your home venue and the DJs you dance to.</div>
+      </div>
+      <button class="btn sm" onclick="closeSettings();openNightSettingsModal()">Open</button>
+    </div>
+    <div class="set-section">Account</div>
+    <div id="settings-account-body"></div>
+    <div class="modal-actions">
+      <button class="btn primary" onclick="closeSettings()">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOME EDITOR (temporary rearrange window) -->
+<div class="modal-overlay" id="home-editor-modal" style="display:none">
+  <div class="modal-card" style="max-width:440px;">
+    <h2 id="he-title">Rearrange Home</h2>
+    <div class="modal-date" id="he-desc" style="margin-bottom:1rem;">Drag the handle to move a button. Tap Hide to remove a button and its tab, or tap the palette button to change its color. You can bring hidden ones back anytime.</div>
+    <div class="he-list" id="he-list"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeHomeEditor()">Cancel</button>
+      <button class="btn primary" id="he-save-btn" onclick="saveHomeEditor()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- BACKGROUND PICKER -->
+<div class="modal-overlay" id="bg-picker-modal" style="display:none" onclick="if(event.target===this)closeBgPicker()">
+  <div class="modal-card" style="max-width:400px;">
+    <h2 style="font-size:20px;">Page background</h2>
+    <div style="display:flex;gap:6px;margin:1rem 0;">
+      <button class="bgp-tab" id="bgp-tab-presets" onclick="bgpTab('presets')">Presets</button>
+      <button class="bgp-tab" id="bgp-tab-gradient" onclick="bgpTab('gradient')">Gradient</button>
+      <button class="bgp-tab" id="bgp-tab-color" onclick="bgpTab('color')">Color</button>
+    </div>
+    <div id="bgp-pane-presets"><div class="cp-grid" id="bgp-presets"></div></div>
+    <div id="bgp-pane-gradient" style="display:none;">
+      <div id="bgp-preview" style="height:70px;border-radius:10px;border:0.5px solid var(--b3);margin-bottom:12px;"></div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+        <input type="color" id="bgp-c1" value="#667eea" oninput="bgpGradChanged()" class="bgp-color">
+        <input type="color" id="bgp-c2" value="#f093fb" oninput="bgpGradChanged()" class="bgp-color">
+        <input type="color" id="bgp-c3" value="#fbc2eb" oninput="bgpGradChanged()" class="bgp-color" style="display:none;">
+        <label style="font-size:13px;color:var(--t2);display:flex;align-items:center;gap:5px;"><input type="checkbox" id="bgp-use3" onchange="bgpGradChanged()"> 3rd color</label>
+        <select id="bgp-type" onchange="bgpGradChanged()" style="margin-left:auto;padding:6px 8px;border:0.5px solid var(--b2);border-radius:8px;background:var(--bg2);color:var(--t1);font-family:'DM Sans',sans-serif;"><option value="linear">Linear</option><option value="radial">Radial</option></select>
+      </div>
+      <div id="bgp-angle-row" style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--t2);">Angle <input type="range" id="bgp-angle" min="0" max="360" value="135" oninput="bgpGradChanged()" style="flex:1;"><span id="bgp-angle-val" style="width:40px;text-align:right;">135°</span></div>
+    </div>
+    <div id="bgp-pane-color">
+      <div style="display:flex;align-items:center;gap:12px;"><input type="color" id="bgp-solid" value="#eeede9" oninput="setBgColor(this.value)" style="width:80px;height:60px;border:none;background:none;padding:0;cursor:pointer;"><span style="font-size:13px;color:var(--t2);">Pick any solid color. It applies live.</span></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn danger" onclick="resetBgColor()">Default</button>
+      <button class="btn primary" onclick="closeBgPicker()">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- COLOR PICKER -->
+<div class="modal-overlay" id="color-picker-modal" style="display:none" onclick="if(event.target===this)closeColorPicker()">
+  <div class="modal-card" style="max-width:380px;">
+    <h2 style="font-size:20px;">Choose a color</h2>
+    <div class="modal-date" id="color-picker-for" style="margin-bottom:1rem;"></div>
+    <div class="cp-grid" id="cp-grid"></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:1rem;">
+      <span style="font-size:13px;color:var(--t2);flex:1;">Custom Gradient</span>
+      <input type="color" id="cp-c1" value="#667eea" style="width:40px;height:34px;border:none;background:none;padding:0;cursor:pointer;">
+      <input type="color" id="cp-c2" value="#764ba2" style="width:40px;height:34px;border:none;background:none;padding:0;cursor:pointer;">
+      <button class="btn" onclick="hePickCustomColor()">Set</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn danger" onclick="hePickColor(null)">Use default</button>
+      <button class="btn" onclick="closeColorPicker()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <footer class="app-footer" id="app-footer" style="display:none;">
   <span class="footer-brand">Line Dance Tracker</span>
   <div class="footer-links">
+    <button class="footer-link" onclick="openSettings()">Settings</button>
     <button class="footer-link" onclick="openNightSettingsModal()">My Venue &amp; DJs</button>
     <button class="footer-link" onclick="switchTab('feedback')">Suggestions &amp; Bugs</button>
     <button class="footer-link" onclick="switchTab('changelog')" id="footer-version-btn">v1.0</button>
@@ -1912,7 +2162,8 @@
     </div>
     <div class="sp-modal-selectors">
       <button class="sp-sel-btn know" onclick="spSelectGroup('know')">&#10003; Select All I Know</button>
-      <button class="sp-sel-btn learn" onclick="spSelectGroup('learn')">&#9733; Select All Learning</button>
+      <button class="sp-sel-btn learning" onclick="spSelectGroup('learning')">&#9681; Select All Learning</button>
+      <button class="sp-sel-btn learn" onclick="spSelectGroup('learn')">&#9733; Select All Want to Learn</button>
       <button class="sp-sel-btn all" onclick="spSelectGroup('all')">Select All</button>
       <button class="sp-sel-btn" onclick="spSelectGroup('none')">Deselect All</button>
     </div>
@@ -1951,7 +2202,7 @@ const SUPABASE_KEY='sb_publishable_1k44O83Uhj5OABd-VB_wLQ_fFJb1woU';
 const ADMIN_USER='drew';
 
 let currentUser=null,isAdmin=false,isMod=false,isGuest=true;
-let state={know:[],learn:[],nights:{},djFreestyles:{},favorites:[],favoriteFriends:[],nightColors:{},venue:'',venueConfigured:false,customDJs:[],customDjColors:{}};
+let state={know:[],learn:[],learning:[],nights:{},djFreestyles:{},favorites:[],favoriteFriends:[],nightColors:{},venue:'',venueConfigured:false,customDJs:[],customDjColors:{}};
 let drewDJFreestyles={}; // Drew's DJ freestyle data, loaded for all users
 let bank=[];
 let drewPicks=[];
@@ -1960,7 +2211,10 @@ let friendCards=[]; // shared list of friend profile cards
 let djList=[]; // shared list of DJs managed by admin
 let djColors={}; // admin-set default gradient per DJ name
 let modList=[]; // shared list of moderator usernames
+let customGradients=[]; // admin-created gradients shared with everyone
+const hcgDraft={}; // per-card creator drafts
 let homeConfig={}; // admin-configurable home card gradients
+let defaultHomeLayout=null; // admin-set default {order:[],hidden:[]} for the home buttons
 let tabVisibilityConfig={}; // admin-configurable tab visibility per role
 let customLists=[]; // admin-created custom dance lists
 
@@ -1988,25 +2242,51 @@ let drewsNightSaveTimeout=null;
 let drewsNightSortState={pick:true,notperf:true};
 let isSignUp=false,saveTimeout=null,nightSaveTimeout=null;
 let bankFilter='all';
-let listFilter={know:'all',learn:'all'};
-let bankView='all'; // 'all' | 'know' | 'learn' | 'new' | 'custom:{id}'
-let sortState={bank:true,know:true,learn:true,pick:true};
+let listFilter={know:'all',learning:'all',learn:'all'};
+let bankView='all'; // 'all' | 'know' | 'learning' | 'learn' | 'new' | 'custom:{id}'
+let sortState={bank:true,know:true,learning:true,learn:true,pick:true};
 let favFilterActive=false;
 let bankFavFilterActive=false;
 let bankSortNewest=false;
 
 // ---- Supabase ----
-async function sbFetch(path, options={}) {
-  const token = localStorage.getItem('sb_access_token') || SUPABASE_KEY;
+function jwtExpMs(t){
+  try{
+    const p=JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    return p.exp?p.exp*1000:0;
+  }catch(e){return 0;}
+}
+async function sbFetch(path, options={}, _retried) {
+  let token = localStorage.getItem('sb_access_token') || SUPABASE_KEY;
+  const isUserToken = token !== SUPABASE_KEY && !!localStorage.getItem('sb_refresh_token');
+  // Refresh a token that is expired / about to expire BEFORE using it
+  if (isUserToken && !_retried) {
+    const exp = jwtExpMs(token);
+    if (exp && exp - Date.now() < 60000) {
+      if (await tryRefreshToken()) token = localStorage.getItem('sb_access_token') || token;
+    }
+  }
   const headers = {
     'apikey': SUPABASE_KEY,
     'Authorization': 'Bearer ' + token,
     'Content-Type': 'application/json'
   };
   if(options.prefer) headers['Prefer'] = options.prefer;
-  const res = await fetch(SUPABASE_URL + path, { method: options.method || 'GET', headers, body: options.body || undefined });
-  const text = await res.text();
-  return { ok: res.ok, status: res.status, data: text ? JSON.parse(text) : null };
+  // Timeout so a request frozen by the phone sleeping can't hang forever
+  const ctrl = new AbortController();
+  const to = setTimeout(()=>ctrl.abort(), 20000);
+  let res, text;
+  try {
+    res = await fetch(SUPABASE_URL + path, { method: options.method || 'GET', headers, body: options.body || undefined, signal: ctrl.signal });
+    text = await res.text();
+  } finally { clearTimeout(to); }
+  // Expired session -> refresh (or silently re-login) and retry once
+  if (res.status === 401 && !_retried && isUserToken) {
+    if ((await tryRefreshToken()) || (await tryPasswordRelogin())) return sbFetch(path, options, true);
+  }
+  let data = null;
+  if (text) { try { data = JSON.parse(text); } catch(e) { data = null; } }
+  return { ok: res.ok, status: res.status, data };
 }
 
 // ---- Cloud-only save with retry queue ----
@@ -2025,6 +2305,19 @@ function setSyncStatus(t,l){
       lbl.textContent=l;
     }
   }
+  // Show / hide the connection popup
+  if(t==='error' && !isGuest){
+    // Only show the popup once syncing has been failing for 2 seconds
+    if(!window._connPopupTimer){
+      window._connPopupTimer=setTimeout(()=>{
+        window._connPopupTimer=null;
+        if(!isGuest) showConnPopup('pending');
+      },2000);
+    }
+  } else {
+    clearTimeout(window._connPopupTimer);window._connPopupTimer=null;
+    if(t==='synced') hideConnPopup(true);
+  }
   // Start polling when we have pending changes; stop when we don't
   if(t==='error' && retryQueued){
     startPendingPoll();
@@ -2042,35 +2335,27 @@ let retryInProgress = false;
 // Every 300ms we attempt to flush the queue; on success we reload from cloud.
 let pendingPollInterval = null;
 
+let _probing = false;
 function startPendingPoll(){
   if(pendingPollInterval) return; // already running
   pendingPollInterval = setInterval(async()=>{
-    if(!retryQueued || retryInProgress || !currentUser) return;
-    // Try a lightweight connectivity probe before a full flush
+    if(!retryQueued || retryInProgress || _probing || !currentUser) return;
+    _probing = true;
     try{
       const probe = await sbFetch(`/rest/v1/dances?username=eq.${enc(currentUser)}&select=username&limit=1`);
       if(probe.ok){
         stopPendingPoll();
         await flushRetryQueue();
         if(!retryQueued){
-          // Flush succeeded — wait briefly for DB propagation then reload
-          let blocker = document.getElementById('sync-blocker');
-          if(!blocker){
-            blocker = document.createElement('div');
-            blocker.id = 'sync-blocker';
-            blocker.style.cssText = 'position:fixed;inset:0;z-index:9999;cursor:wait;';
-            document.body.appendChild(blocker);
-          }
           await new Promise(res => setTimeout(res, 500));
-          blocker.remove();
           await refreshFromCloud();
         } else {
-          // Still failing — resume polling
           startPendingPoll();
         }
       }
     }catch(e){ /* still offline, keep polling */ }
-  }, 300);
+    _probing = false;
+  }, 2000);
 }
 
 function stopPendingPoll(){
@@ -2109,8 +2394,9 @@ async function refreshFromCloud(){
   try{
     const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(currentUser)}&select=data`);
     if(r.ok && r.data && r.data.length>0){
-      state = r.data[0].data || {know:[],learn:[],nights:{},djFreestyles:{},favorites:[],favoriteFriends:[]};
+      state = r.data[0].data || {know:[],learn:[],learning:[],nights:{},djFreestyles:{},favorites:[],favoriteFriends:[]};
       if(!state.djFreestyles) state.djFreestyles={};
+      if(!state.learning) state.learning=[];
       if(!state.favorites) state.favorites=[];
       if(!state.danceLog) state.danceLog=[];
       if(!state.favoriteFriends) state.favoriteFriends=[];
@@ -2122,7 +2408,7 @@ async function refreshFromCloud(){
       if(typeof state.venueConfigured==='undefined') state.venueConfigured=false;
       if(isAdmin) drewDJFreestyles=state.djFreestyles||{};
       // Re-render everything that could have changed on another device
-      renderBank();renderList('know');renderList('learn');renderDJRecords();renderPicks();
+      renderBank();renderList('know');renderList('learn');renderList('learning');renderDJRecords();renderPicks();
       // Re-render the active tab so its content is up to date
       if(currentTabName) switchTab(currentTabName);
       setSyncStatus('synced','Synced');
@@ -2403,7 +2689,7 @@ function renderCustomListPills(){
 function setBankViewCustom(listId, el){
   bankView='custom:'+listId;
   // Reset all standard pills
-  ['bank-view-all-pill','bank-view-know-pill','bank-view-learn-pill','bank-view-new-pill'].forEach(id=>{
+  ['bank-view-all-pill','bank-view-know-pill','bank-view-learning-pill','bank-view-learn-pill','bank-view-new-pill'].forEach(id=>{
     const p=document.getElementById(id);
     if(!p) return;
     p.style.background='';p.style.color='';p.style.borderColor='';p.classList.remove('active');
@@ -2594,12 +2880,15 @@ async function loadHomeConfig(){
   const data=(r.ok&&r.data&&r.data.length>0)?r.data[0].data:{};
   homeConfig=data.cards||{};
   tabVisibilityConfig=data.tabVisibility||{};
+  customGradients=(Array.isArray(data.customGradients)?data.customGradients:[]).filter(isValidCustomGrad);
+  defaultHomeLayout=(data.defaultLayout&&Array.isArray(data.defaultLayout.order))?data.defaultLayout:null;
   applyHomeCardGradients();
+  try{ applyTabVisibility(); }catch(e){}
 }
 async function saveHomeConfigToCloud(){
   setSyncStatus('syncing','Syncing...');
   const check=await sbFetch(`/rest/v1/dances?username=eq.__homeconfig__&select=username`);
-  const payload={cards:homeConfig,tabVisibility:tabVisibilityConfig};
+  const payload={cards:homeConfig,tabVisibility:tabVisibilityConfig,defaultLayout:defaultHomeLayout,customGradients:customGradients};
   if(check.ok&&check.data&&check.data.length>0){
     await sbFetch(`/rest/v1/dances?username=eq.__homeconfig__`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:payload,updated_at:new Date().toISOString()})});
   } else {
@@ -2613,6 +2902,7 @@ async function saveHomeConfigToCloud(){
 const HOME_CARD_DEFAULTS={
   'home-card-bank':        'linear-gradient(135deg,#667eea,#764ba2)',
   'home-card-know':        'linear-gradient(135deg,#43e97b,#38f9d7)',
+  'home-card-learning':    'linear-gradient(135deg,#a18cd1,#fbc2eb)',
   'home-card-learn':       'linear-gradient(135deg,#8e2de2,#4a00e0)',
   'home-card-night':       'linear-gradient(135deg,#f093fb,#f5576c)',
   'home-card-log':         'linear-gradient(135deg,#f7971e,#ffd200)',
@@ -2628,7 +2918,7 @@ const HOME_CARD_DEFAULTS={
 };
 const HOME_CARD_LABELS={
   'home-card-bank':'Dance Bank','home-card-know':'Dances I Know',
-  'home-card-learn':'Want to Learn','home-card-night':'My Night',
+  'home-card-learning':'Learning','home-card-learn':'Want to Learn','home-card-night':'My Night',
   'home-card-log':'Analytics','home-card-friends':'Friends',
   'home-card-dj':'Test Features','home-card-admin':'Admin',
   'home-card-submissions':'Submissions','home-card-feedback':'Suggestions & Bugs',
@@ -2640,52 +2930,126 @@ function applyHomeCardGradients(){
   Object.keys(HOME_CARD_DEFAULTS).forEach(id=>{
     const el=document.getElementById(id);
     if(!el) return;
-    const grad=homeConfig[id]||HOME_CARD_DEFAULTS[id];
+    let uc=null;
+    try{ uc=getHomeLayout().colors[id]; }catch(e){}
+    const grad=uc||homeConfig[id]||HOME_CARD_DEFAULTS[id];
     el.style.background=grad;
   });
+}
+async function clearDefaultHomeLayout(){
+  if(!isAdmin) return;
+  if(!confirm('Clear the default home layout? Users without a custom layout will go back to the built-in order.')) return;
+  defaultHomeLayout=null;
+  await saveHomeConfigToCloud();
+  applyTabVisibility();
+  updateDefaultLayoutStatus();
+  homeToast('Default layout cleared');
+}
+function updateDefaultLayoutStatus(){
+  const el=document.getElementById('default-layout-status');
+  if(!el) return;
+  if(!defaultHomeLayout){el.textContent='No default set — using the built-in order.';return;}
+  const h=(defaultHomeLayout.hidden||[]).length;
+  el.textContent='Default layout is set'+(h?' ('+h+' button'+(h!==1?'s':'')+' hidden by default).':'.');
+}
+function isValidCustomGrad(g){return typeof g==='string'&&/^linear-gradient\(\d{1,3}deg,#[0-9a-fA-F]{6}(,#[0-9a-fA-F]{6}){1,2}\)$/.test(g);}
+function allHomeGradients(){return GRADIENTS.concat(customGradients.filter(g=>!GRADIENTS.includes(g)));}
+function hcgDraftFor(id){
+  if(!hcgDraft[id]) hcgDraft[id]={c1:'#667eea',c2:'#764ba2',c3:'',angle:135,open:false};
+  return hcgDraft[id];
+}
+function hcgBuild(d){
+  const cols=[d.c1,d.c2].concat(d.c3?[d.c3]:[]);
+  return 'linear-gradient('+d.angle+'deg,'+cols.join(',')+')';
 }
 function renderAdminHomeGradients(){
   const el=document.getElementById('admin-home-gradients');
   if(!el) return;
-  el.innerHTML=Object.keys(HOME_CARD_DEFAULTS).map(id=>{
+  const all=allHomeGradients();
+  const sw=(g,onclick,active,extra)=>`<div class="grad-swatch hcg-swatch" style="background:${g};width:28px;height:28px;border-radius:6px;cursor:pointer;flex-shrink:0;border:2px solid ${active?'var(--t1)':'transparent'};position:relative;" onclick="${onclick}" title="${g}">${extra||''}</div>`;
+  const bank=`<div style="background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:10px;">
+    <div style="font-size:13px;font-weight:500;margin-bottom:4px;">Custom gradient bank</div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:8px;">${customGradients.length?'Gradients you create are saved here and appear as swatches for every card (and in users\' home color picker). Tap &times; to delete.':'No custom gradients yet. Use &ldquo;Create gradient&rdquo; on any card below and choose &ldquo;Save to bank&rdquo;.'}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;">${customGradients.map((g,i)=>sw(g,'',false,`<span onclick="event.stopPropagation();deleteCustomGradient(${i})" style="position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;background:var(--t1);color:var(--bg);font-size:11px;line-height:16px;text-align:center;">&times;</span>`)).join('')}</div>
+  </div>`;
+  el.innerHTML=bank+Object.keys(HOME_CARD_DEFAULTS).map(id=>{
     const label=HOME_CARD_LABELS[id];
     const currentGrad=homeConfig[id]||HOME_CARD_DEFAULTS[id];
-    const swatches=GRADIENTS.map((g,i)=>`<div class="grad-swatch hcg-swatch ${g===currentGrad?'active':''}" style="background:${g};width:28px;height:28px;border-radius:6px;cursor:pointer;flex-shrink:0;border:2px solid ${g===currentGrad?'var(--t1)':'transparent'};transition:border-color 0.12s;" onclick="setHomeCardGrad('${id}',${i})" title="${g}"></div>`).join('');
+    const swatches=all.map((g,i)=>sw(g,`setHomeCardGrad('${id}',${i})`,g===currentGrad)).join('');
+    const d=hcgDraftFor(id);
+    const built=hcgBuild(d);
     return `<div style="background:var(--bg);border:0.5px solid var(--b3);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:10px;">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
-        <div style="width:44px;height:44px;border-radius:10px;background:${currentGrad};flex-shrink:0;"></div>
+        <div class="hcg-preview" style="width:44px;height:44px;border-radius:10px;background:${currentGrad};flex-shrink:0;"></div>
         <div>
           <div style="font-size:13px;font-weight:500;">${label}</div>
-          <div style="font-size:11px;color:var(--t3);font-family:monospace;margin-top:2px;" id="hcg-label-${id}">${currentGrad}</div>
+          <div style="font-size:11px;color:var(--t3);font-family:monospace;margin-top:2px;word-break:break-all;" id="hcg-label-${id}">${currentGrad}</div>
         </div>
         <button class="btn xs" style="margin-left:auto" onclick="resetHomeCardGrad('${id}')">Reset</button>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:5px;" id="hcg-swatches-${id}">${swatches}</div>
+      <button class="btn xs" style="margin-top:10px;" onclick="toggleHcgCreator('${id}')">${d.open?'Hide creator':'Create gradient'}</button>
+      <div id="hcg-creator-${id}" style="display:${d.open?'block':'none'};margin-top:10px;padding-top:10px;border-top:0.5px solid var(--b3);">
+        <div style="height:44px;border-radius:10px;background:${built};margin-bottom:10px;" id="hcg-cprev-${id}"></div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+          <input type="color" value="${d.c1}" oninput="hcgEdit('${id}','c1',this.value)" style="width:40px;height:32px;padding:0;border:none;background:none;">
+          <input type="color" value="${d.c2}" oninput="hcgEdit('${id}','c2',this.value)" style="width:40px;height:32px;padding:0;border:none;background:none;">
+          <input type="color" value="${d.c3||'#ffffff'}" ${d.c3?'':'disabled'} id="hcg-c3-${id}" oninput="hcgEdit('${id}','c3',this.value)" style="width:40px;height:32px;padding:0;border:none;background:none;${d.c3?'':'opacity:.35;'}">
+          <label style="font-size:12px;color:var(--t2);display:flex;align-items:center;gap:4px;"><input type="checkbox" ${d.c3?'checked':''} onchange="hcgToggle3('${id}',this.checked)">3rd color</label>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;color:var(--t2);">Angle
+          <input type="range" min="0" max="360" step="5" value="${d.angle}" style="flex:1;" oninput="hcgEdit('${id}','angle',+this.value)">
+          <span id="hcg-ang-${id}" style="width:36px;text-align:right;">${d.angle}&deg;</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn xs" onclick="hcgApply('${id}',false)">Use for this card</button>
+          <button class="btn xs" onclick="hcgApply('${id}',true)">Save to bank &amp; use</button>
+          <button class="btn xs" onclick="hcgApply('${id}','bank')">Save to bank only</button>
+        </div>
+      </div>
     </div>`;
   }).join('');
 }
-function setHomeCardGrad(cardId,gradIdx){
-  homeConfig[cardId]=GRADIENTS[gradIdx];
-  // Update swatch highlights
-  const container=document.getElementById('hcg-swatches-'+cardId);
-  if(container){
-    container.querySelectorAll('.hcg-swatch').forEach((s,i)=>{
-      s.style.border=`2px solid ${i===gradIdx?'var(--t1)':'transparent'}`;
-      s.classList.toggle('active',i===gradIdx);
-    });
+function toggleHcgCreator(id){const d=hcgDraftFor(id);d.open=!d.open;renderAdminHomeGradients();}
+function hcgEdit(id,k,v){
+  const d=hcgDraftFor(id);d[k]=v;
+  const pv=document.getElementById('hcg-cprev-'+id);if(pv) pv.style.background=hcgBuild(d);
+  const an=document.getElementById('hcg-ang-'+id);if(an&&k==='angle') an.textContent=v+'°';
+}
+function hcgToggle3(id,on){
+  const d=hcgDraftFor(id);d.c3=on?'#ffffff':'';
+  renderAdminHomeGradients();
+}
+function hcgApply(id,mode){
+  const d=hcgDraftFor(id);const g=hcgBuild(d);
+  if(!isValidCustomGrad(g)){alert('Invalid gradient');return;}
+  if(mode===true||mode==='bank'){
+    if(!GRADIENTS.includes(g)&&!customGradients.includes(g)) customGradients.push(g);
   }
-  const lbl=document.getElementById('hcg-label-'+cardId);
-  if(lbl) lbl.textContent=GRADIENTS[gradIdx];
-  // Update preview swatch
-  const preview=container&&container.closest('div[style*="border-radius:var(--radius-lg)"]')&&container.closest('div[style*="border-radius:var(--radius-lg)"]').querySelector('div[style*="border-radius:10px"]');
-  if(preview) preview.style.background=GRADIENTS[gradIdx];
+  if(mode==='bank'){saveHomeConfigToCloud();homeToast('Saved to gradient bank');return;}
+  homeConfig[id]=g;
   applyHomeCardGradients();
   saveHomeConfigToCloud();
+}
+function deleteCustomGradient(i){
+  const g=customGradients[i];
+  if(!g||!confirm('Delete this gradient from the bank? Cards currently using it keep it.')) return;
+  customGradients.splice(i,1);
+  saveHomeConfigToCloud();
+}
+function setHomeCardGrad(cardId,gradIdx){
+  const g=allHomeGradients()[gradIdx];
+  if(!g) return;
+  homeConfig[cardId]=g;
+  applyHomeCardGradients();
+  saveHomeConfigToCloud();
+  renderAdminHomeGradients();
 }
 function resetHomeCardGrad(cardId){
   delete homeConfig[cardId];
   applyHomeCardGradients();
   saveHomeConfigToCloud();
+  renderAdminHomeGradients();
 }
 
 // ---- Tab Visibility ----
@@ -2705,7 +3069,7 @@ function isTabVisible(entry){
   return false;
 }
 
-function applyTabVisibility(){
+function _applyTabVisibilityBase(){
   // Always hide admin-only UI elements for non-admins
   ['admin-tab','submissions-tab','editpeople-tab','debug-tab'].forEach(id=>{
     const el=document.getElementById(id);if(el) el.style.display=isAdmin?'inline-block':'none';
@@ -2892,12 +3256,13 @@ async function authSubmit() {
     const r = await sbFetch(`/rest/v1/dances?username=eq.${enc(finalUsername)}&select=data`);
     
     if (r.ok && r.data && r.data.length > 0) {
-      state = r.data[0].data || {know:[], learn:[], nights:{}, djFreestyles:{}, favorites:[]};
+      state = r.data[0].data || {know:[],learn:[],learning:[], nights:{}, djFreestyles:{}, favorites:[]};
     } else {
-      state = {know:[], learn:[], nights:{}, djFreestyles:{}, favorites:[], joinedAt: new Date().toISOString()};
+      state = {know:[],learn:[],learning:[], nights:{}, djFreestyles:{}, favorites:[], joinedAt: new Date().toISOString()};
     }
     
     if (!state.djFreestyles) state.djFreestyles = {};
+    if(!state.learning) state.learning=[];
     if (!state.favorites) state.favorites = [];
     if (!state.danceLog) state.danceLog = [];
     if (!state.favoriteFriends) state.favoriteFriends = [];
@@ -3173,7 +3538,7 @@ function enterApp(username){
   }
   updateSubmissionsBadge();
   renderDJDropdown();
-  renderBank();renderList('know');renderList('learn');initNightDate();renderDJRecords();renderPicks();
+  renderBank();renderList('know');renderList('learn');renderList('learning');initNightDate();renderDJRecords();renderPicks();
   renderCustomListPills();
   // Show admin-only create list button
   const createListBtn=document.getElementById('admin-create-list-btn');
@@ -3207,7 +3572,7 @@ function logout() {
   if(localStorage.getItem('ld_remember_me')!=='1'){
     localStorage.removeItem('ld_remembered_email');
   }
-  state = {know:[], learn:[], nights:{}, djFreestyles:{}, favorites:[], favoriteFriends:[], venue:'', venueConfigured:false, customDJs:[], customDjColors:{}};
+  state = {know:[],learn:[],learning:[], nights:{}, djFreestyles:{}, favorites:[], favoriteFriends:[], venue:'', venueConfigured:false, customDJs:[], customDjColors:{}};
   bank = []; drewPicks = []; submissions = []; friendCards = []; favoriteFriends = [];
   friendsFavFilterActive = false;
   
@@ -3238,14 +3603,51 @@ function hideSplash(){
   if(splash) splash.classList.add('hidden');
 }
 
-async function tryRefreshToken() {
-  const refreshToken = localStorage.getItem('sb_refresh_token');
-  if (!refreshToken) return false;
+let _refreshPromise = null;
+let _refreshRejected = false; // true only when the server explicitly refused the refresh token
+function tryRefreshToken() {
+  if (_refreshPromise) return _refreshPromise;
+  const p = (async () => {
+    _refreshRejected = false;
+    const refreshToken = localStorage.getItem('sb_refresh_token');
+    if (!refreshToken) { _refreshRejected = true; return false; }
+    const ctrl = new AbortController();
+    const to = setTimeout(()=>ctrl.abort(), 15000);
+    try {
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+        signal: ctrl.signal
+      });
+      if (!res.ok) { _refreshRejected = (res.status===400||res.status===401||res.status===403); return false; }
+      const data = await res.json();
+      if (data.access_token) {
+        localStorage.setItem('sb_access_token', data.access_token);
+        if (data.refresh_token) localStorage.setItem('sb_refresh_token', data.refresh_token);
+        return true;
+      }
+      _refreshRejected = true;
+    } catch(e) { /* network problem — not a rejection */ }
+    finally { clearTimeout(to); }
+    return false;
+  })();
+  _refreshPromise = p;
+  p.finally(() => { if (_refreshPromise === p) _refreshPromise = null; });
+  return p;
+}
+
+// If "Remember me" was ticked, quietly sign back in with the saved credentials
+async function tryPasswordRelogin() {
+  if (localStorage.getItem('ld_remember_me') !== '1') return false;
+  const email = localStorage.getItem('ld_remembered_email');
+  const pw = localStorage.getItem('ld_remembered_password');
+  if (!email || !pw) return false;
   try {
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
       method: 'POST',
       headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh_token: refreshToken })
+      body: JSON.stringify({ email, password: pw })
     });
     if (!res.ok) return false;
     const data = await res.json();
@@ -3256,6 +3658,20 @@ async function tryRefreshToken() {
     }
   } catch(e) {}
   return false;
+}
+
+// Make sure we hold a valid login token. Returns {ok, rejected}.
+async function ensureSession() {
+  if (!currentUser) return { ok: true };
+  const tok = localStorage.getItem('sb_access_token') || '';
+  const exp = jwtExpMs(tok);
+  if (exp && exp - Date.now() > 5*60*1000) return { ok: true };
+  if (await tryRefreshToken()) return { ok: true };
+  if (_refreshRejected) {
+    if (await tryPasswordRelogin()) return { ok: true };
+    return { ok: false, rejected: true };
+  }
+  return { ok: false, rejected: false };
 }
 
 async function tryAutoLogin() {
@@ -3277,8 +3693,9 @@ async function tryAutoLogin() {
   async function finishLogin(user) {
     const r = await sbFetch(`/rest/v1/dances?username=eq.${enc(user)}&select=data,updated_at`);
     if (r.ok && r.data && r.data.length > 0) {
-      state = r.data[0].data || {know:[], learn:[], nights:{}, djFreestyles:{}, favorites:[], favoriteFriends:[]};
+      state = r.data[0].data || {know:[],learn:[],learning:[], nights:{}, djFreestyles:{}, favorites:[], favoriteFriends:[]};
       if (!state.djFreestyles) state.djFreestyles = {};
+      if(!state.learning) state.learning=[];
       if (!state.favorites) state.favorites = [];
       if (!state.danceLog) state.danceLog = [];
       if (!state.favoriteFriends) state.favoriteFriends = [];
@@ -3429,12 +3846,12 @@ function switchTab(tab,_fromSwipe=false,_noSave=false){
   if(tab==='drewsnight') renderDrewsNight();
   if(tab==='log'){renderHistoryStats();renderTop5();renderLog();renderDJAnalytics();renderTFDJFavs();}
   if(tab==='admin'){
-    ['admin-gradients-form','admin-dj-form','admin-add-dance-form','admin-bank-section','admin-users-section','admin-mods-section','admin-tab-visibility-section'].forEach(id=>{
+    ['admin-gradients-form','admin-default-layout-form','admin-dj-form','admin-add-dance-form','admin-bank-section','admin-users-section','admin-mods-section','admin-tab-visibility-section'].forEach(id=>{
       const s=document.getElementById(id);if(s) s.classList.add('collapsed');
     });
     const bs=document.getElementById('admin-bank-search');if(bs) bs.value='';
     const us=document.getElementById('admin-users-search');if(us) us.value='';
-    renderAdminBank();renderAdminDJList();loadAdminUsers();renderAdminHomeGradients();
+    renderAdminBank();renderAdminDJList();loadAdminUsers();renderAdminHomeGradients();updateDefaultLayoutStatus();
   }
   if(tab==='bank') renderBank();
   if(tab==='home') recRefresh();
@@ -3464,6 +3881,7 @@ function toggleSort(key){
     renderBank();
   }
   else if(key==='know') renderList('know');
+  else if(key==='learning') renderList('learning');
   else if(key==='learn') renderList('learn');
   else if(key==='pick') renderPickList();
 }
@@ -3520,13 +3938,13 @@ function setListFilter(type,diff,el){
 function setBankView(view,el){
   bankView=view;
   // Reset fav filter when switching to learn/new view (favs are only for know list)
-  if((view==='learn'||view==='new')&&bankFavFilterActive){
+  if((view==='learn'||view==='learning'||view==='new')&&bankFavFilterActive){
     bankFavFilterActive=false;
     const favBtn=document.getElementById('bank-fav-btn');
     if(favBtn) favBtn.classList.remove('active');
   }
   // Update pill styles for view row
-  ['bank-view-all-pill','bank-view-know-pill','bank-view-learn-pill','bank-view-new-pill'].forEach(id=>{
+  ['bank-view-all-pill','bank-view-know-pill','bank-view-learning-pill','bank-view-learn-pill','bank-view-new-pill'].forEach(id=>{
     const p=document.getElementById(id);
     if(!p) return;
     p.style.background='';p.style.color='';p.style.borderColor='';
@@ -3536,14 +3954,38 @@ function setBankView(view,el){
   document.querySelectorAll('.custom-list-pill').forEach(p=>p.classList.remove('active'));
   if(view==='all'){el.style.background='var(--t1)';el.style.color='var(--bg)';el.style.borderColor='var(--t1)';}
   else if(view==='know'){el.style.background='var(--green-bg)';el.style.color='var(--green-text)';el.style.borderColor='var(--green-border)';}
+  else if(view==='learning'){el.style.background='var(--purple-bg)';el.style.color='var(--purple-text)';el.style.borderColor='var(--purple-border)';}
   else if(view==='learn'){el.style.background='var(--blue-bg)';el.style.color='var(--blue-text)';el.style.borderColor='var(--blue-border)';}
   else if(view==='new'){el.style.background='var(--amber-bg)';el.style.color='var(--amber-text)';el.style.borderColor='var(--amber-border)';}
-  // Show difficulty filters for all views (all, know, learn, new)
+  // Show difficulty filters for all views (all, know, learning, learn, new)
   const diffRow=document.getElementById('bank-diff-filters');
   if(diffRow) diffRow.style.display='';
   renderBank();
 }
-function isInList(name,type){return state[type].some(d=>d.name.toLowerCase()===name.toLowerCase());}
+function isInList(name,type){return (state[type]||[]).some(d=>d.name.toLowerCase()===name.toLowerCase());}
+// A dance lives in at most one of these lists at a time
+const DANCE_LISTS=['know','learning','learn'];
+function removeFromOtherLists(type,name){
+  DANCE_LISTS.forEach(t=>{
+    if(t===type) return;
+    state[t]=(state[t]||[]).filter(x=>x.name.toLowerCase()!==name.toLowerCase());
+  });
+}
+function bankStatusPill(inKnow,inLearning,inLearn){
+  if(inKnow) return `<span class="diff-badge" style="background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border)">&#10003; I Know It</span>`;
+  if(inLearning) return `<span class="diff-badge" style="background:var(--purple-bg);color:var(--purple-text);border:0.5px solid var(--purple-border)">&#9681; Learning</span>`;
+  if(inLearn) return `<span class="diff-badge" style="background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border)">&#9733; Want to Learn</span>`;
+  return '';
+}
+function bankAddBtns(d,inKnow,inLearning,inLearn){
+  if(inKnow) return '';
+  const knowBtn=`<button class="btn sm success" onclick="addFromBankById('know','${d.id}')">&#43; I Know It</button>`;
+  const learningBtn=`<button class="btn sm purple" onclick="addFromBankById('learning','${d.id}')">&#43; Learning</button>`;
+  const learnBtn=`<button class="btn sm info" onclick="addFromBankById('learn','${d.id}')">&#43; Want to Learn</button>`;
+  if(inLearning) return knowBtn;
+  if(inLearn) return knowBtn+learningBtn;
+  return knowBtn+learningBtn+learnBtn;
+}
 function renderBank(){
   const el=document.getElementById('bank-list');
   const q=(document.getElementById('bank-search')?.value||'');
@@ -3565,9 +4007,9 @@ function renderBank(){
       return;
     }
     el.innerHTML=items.map(d=>{
-      const inKnow=isInList(d.name,'know'),inLearn=isInList(d.name,'learn');
+      const inKnow=isInList(d.name,'know'),inLearning=isInList(d.name,'learning'),inLearn=isInList(d.name,'learn');
       const diffBadge=d.difficulty?`<span class="diff-badge diff-${d.difficulty}">${d.difficulty}</span>`:'';
-      const statusPill=inKnow?`<span class="diff-badge" style="background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border)">&#10003; I Know It</span>`:inLearn?`<span class="diff-badge" style="background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border)">&#9733; Learning</span>`:'';
+      const statusPill=bankStatusPill(inKnow,inLearning,inLearn);
       const demoBtn=d.demo?`<a class="link-btn demo" href="${escA(d.demo)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#9654; Demo</a>`:'';
       const tutBtn=d.tutorial?`<a class="link-btn tutorial" href="${escA(d.tutorial)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#127891; Tutorial</a>`:'';
       const spotifyBtn=renderSpotifyBtns(getSpotifyLinks(d),true);
@@ -3576,9 +4018,7 @@ function renderBank(){
         d.walls!=null?`<span class="bank-detail-stat"><strong>${d.walls}</strong> walls</span>`:'',
         d.tags!=null?`<span class="bank-detail-stat"><strong>${d.tags}</strong> tags</span>`:'',
       ].filter(Boolean).join('');
-      const addBtns=(!inKnow&&!inLearn)
-        ?`<button class="btn sm success" onclick="addFromBankById('know','${d.id}')">&#43; I Know It</button><button class="btn sm info" onclick="addFromBankById('learn','${d.id}')">&#43; Want to Learn</button>`
-        :inLearn?`<button class="btn sm success" onclick="addFromBankById('know','${d.id}')">&#43; I Know It</button>`:'';
+      const addBtns=bankAddBtns(d,inKnow,inLearning,inLearn);
       const hasBody=demoBtn||tutBtn||spotifyBtn||statPills||addBtns;
       return `<div class="bank-item" id="bcl-${d.id}">
         <div class="bank-item-head" onclick="this.parentElement.classList.toggle('open')">
@@ -3596,9 +4036,9 @@ function renderBank(){
     return;
   }
 
-  // --- New to Me view (not in know or learn) ---
+  // --- Other view (not in know, learning or learn) ---
   if(bankView==='new'){
-    let items=bank.filter(d=>!isInList(d.name,'know')&&!isInList(d.name,'learn'));
+    let items=bank.filter(d=>!isInList(d.name,'know')&&!isInList(d.name,'learning')&&!isInList(d.name,'learn'));
     if(q) items=items.filter(d=>danceMatchesQuery(d, q));
     if(bankFilter!=='all') items=items.filter(d=>d.difficulty===bankFilter);
     if(bankSortNewest){
@@ -3619,7 +4059,7 @@ function renderBank(){
         d.walls!=null?`<span class="bank-detail-stat"><strong>${d.walls}</strong> walls</span>`:'',
         d.tags!=null?`<span class="bank-detail-stat"><strong>${d.tags}</strong> tags</span>`:'',
       ].filter(Boolean).join('');
-      const addBtns=`<button class="btn sm success" onclick="addFromBankById('know','${d.id}')">&#43; I Know It</button><button class="btn sm info" onclick="addFromBankById('learn','${d.id}')">&#43; Want to Learn</button>`;
+      const addBtns=bankAddBtns(d,false,false,false);
       const hasBody=demoBtn||tutBtn||spotifyBtn||statPills;
       return `<div class="bank-item" id="bnew-${d.id}">
         <div class="bank-item-head" onclick="this.parentElement.classList.toggle('open')">
@@ -3637,8 +4077,8 @@ function renderBank(){
     return;
   }
 
-  // --- My Lists view (know / learn) ---
-  if(bankView==='know'||bankView==='learn'){
+  // --- My Lists view (know / learning / learn) ---
+  if(bankView==='know'||bankView==='learning'||bankView==='learn'){
     const listItems=[...state[bankView]];
     let filtered=listItems.filter(d=>{
       if(!q) return true;
@@ -3666,7 +4106,7 @@ function renderBank(){
       });
     } else if(sortState.bank) filtered.sort((a,b)=>a.name.localeCompare(b.name));
     if(!filtered.length){
-      const label=bankView==='know'?'Dances I Know':'Want to Learn';
+      const label={know:'Dances I Know',learning:'Learning',learn:'Want to Learn'}[bankView];
       el.innerHTML=`<div class="empty">${bankSortNewest?'No dances added in the past week.':`No dances in your "${label}" list yet${q?' matching your search':bankView==='know'&&bankFavFilterActive?' — heart some dances to see them here':'.'}`}</div>`;
       return;
     }
@@ -3687,7 +4127,7 @@ function renderBank(){
       ].filter(Boolean).join(''):'';
       // Remove button + promote button
       const removeBtn=`<button class="btn sm danger" onclick="removeFromList('${bankView}','${esc(d.name)}')">&#10005; Remove</button>`;
-      const promoteBtn=bankView==='learn'?`<button class="btn sm success" onclick="addFromBank('know','${esc(d.name)}')">&#43; I Know It</button>`:'';
+      const promoteBtn=bankView==='know'?'':`<button class="btn sm success" onclick="addFromBank('know','${esc(d.name)}')">&#43; I Know It</button>`+(bankView==='learn'?`<button class="btn sm purple" onclick="addFromBank('learning','${esc(d.name)}')">&#43; Learning</button>`:'');
       const favBtn=bankView==='know'?`<button class="fav-btn ${isFav(d.id)?'active':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" title="${isFav(d.id)?'Unfavorite':'Favorite'}" style="margin-right:2px;"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg></button>`:'';
       const hasBody=demoBtn||tutBtn||spotifyBtn||statPills||removeBtn;
       const itemId='bview-'+d.id;
@@ -3723,13 +4163,13 @@ function renderBank(){
   } else if(sortState.bank) items.sort((a,b)=>a.name.localeCompare(b.name));
   if(!items.length){el.innerHTML=`<div class="empty">${bankSortNewest?'No dances added in the past week.':bankFavFilterActive?'No favorite dances yet — heart any dance in the bank!':bank.length===0?'No dances in the bank yet.':'No dances match your search.'}</div>`;return;}
   el.innerHTML=items.map(d=>{
-    const inKnow=isInList(d.name,'know'),inLearn=isInList(d.name,'learn');
+    const inKnow=isInList(d.name,'know'),inLearning=isInList(d.name,'learning'),inLearn=isInList(d.name,'learn');
     const knowEntry=state.know.find(k=>k.name.toLowerCase()===d.name.toLowerCase());
     const knowId=knowEntry?knowEntry.id:null;
     const favId=knowId||d.id;
     const favBtn=`<button class="fav-btn ${isFav(favId)?'active':''}" onclick="event.stopPropagation();toggleFav('${favId}')" title="${isFav(favId)?'Unfavorite':'Favorite'}" style="margin-right:2px;"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg></button>`;
     const diffBadge=d.difficulty?`<span class="diff-badge diff-${d.difficulty}">${d.difficulty}</span>`:'';
-    const statusPill=inKnow?`<span class="diff-badge" style="background:var(--green-bg);color:var(--green-text);border:0.5px solid var(--green-border)">&#10003; I Know It</span>`:inLearn?`<span class="diff-badge" style="background:var(--blue-bg);color:var(--blue-text);border:0.5px solid var(--blue-border)">&#9733; Learning</span>`:'';
+    const statusPill=bankStatusPill(inKnow,inLearning,inLearn);
     const demoBtn=d.demo?`<a class="link-btn demo" href="${escA(d.demo)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#9654; Demo</a>`:'';
     const tutBtn=d.tutorial?`<a class="link-btn tutorial" href="${escA(d.tutorial)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">&#127891; Tutorial</a>`:'';
     const spotifyBtn=renderSpotifyBtns(getSpotifyLinks(d),true);
@@ -3738,9 +4178,7 @@ function renderBank(){
       d.walls!=null?`<span class="bank-detail-stat"><strong>${d.walls}</strong> walls</span>`:'',
       d.tags!=null?`<span class="bank-detail-stat"><strong>${d.tags}</strong> tags</span>`:'',
     ].filter(Boolean).join('');
-    const addBtns=(!inKnow&&!inLearn)
-      ?`<button class="btn sm success" onclick="addFromBankById('know','${d.id}')">&#43; I Know It</button><button class="btn sm info" onclick="addFromBankById('learn','${d.id}')">&#43; Want to Learn</button>`
-      :inLearn?`<button class="btn sm success" onclick="addFromBankById('know','${d.id}')">&#43; I Know It</button>`:'';
+    const addBtns=bankAddBtns(d,inKnow,inLearning,inLearn);
     const hasBody=demoBtn||tutBtn||spotifyBtn||statPills||addBtns;
     return `<div class="bank-item" id="bitem-${d.id}">
       <div class="bank-item-head" onclick="toggleBankItem('${d.id}')">
@@ -3812,26 +4250,24 @@ function addFromBankById(type,bankId){
   if(requireLogin('Sign in to add dances to your list')) return;
   const d=bank.find(x=>x.id===bankId);if(!d)return;
   const name=d.name;
-  const other=type==='know'?'learn':'know';
-  state[other]=state[other].filter(x=>x.name.toLowerCase()!==name.toLowerCase());
+  removeFromOtherLists(type,name);
   if(!isInList(name,type)) state[type].push({id:Date.now()+'',name,added:new Date().toISOString()});
   if(type==='know') launchConfetti();
-  renderBank();renderList('know');renderList('learn');scheduleSave();syncMyCard();
+  renderBank();renderList('know');renderList('learn');renderList('learning');scheduleSave();syncMyCard();
   // If fav filter is active and a dance was just added to know, keep filter consistent
   if(bankFavFilterActive) renderBank();
 }
 function addFromBank(type,name){
   if(requireLogin('Sign in to add dances to your list')) return;
-  const other=type==='know'?'learn':'know';
-  state[other]=state[other].filter(d=>d.name.toLowerCase()!==name.toLowerCase());
+  removeFromOtherLists(type,name);
   if(!isInList(name,type)) state[type].push({id:Date.now()+'',name,added:new Date().toISOString()});
   if(type==='know') launchConfetti();
-  renderBank();renderList('know');renderList('learn');scheduleSave();syncMyCard();
+  renderBank();renderList('know');renderList('learn');renderList('learning');scheduleSave();syncMyCard();
 }
 function removeFromList(type,name){
   if(requireLogin('Sign in to manage your dance list')) return;
   state[type]=state[type].filter(d=>d.name.toLowerCase()!==name.toLowerCase());
-  renderBank();renderList('know');renderList('learn');scheduleSave();syncMyCard();
+  renderBank();renderList('know');renderList('learn');renderList('learning');scheduleSave();syncMyCard();
 }
 
 // ---- My Night: personal venue & DJ list ----
@@ -4196,7 +4632,7 @@ function adminSaveEdit(id){
     propagateDanceRename(oldName,newName,state);
     scheduleSave();
   }
-  saveBankToCloud();renderAdminBank();renderBank();renderList('know');renderList('learn');
+  saveBankToCloud();renderAdminBank();renderBank();renderList('know');renderList('learn');renderList('learning');
   // Also update all other users asynchronously
   if(oldName!==newName) propagateRenameToAllUsers(oldName,newName);
 }
@@ -4278,6 +4714,7 @@ function renderAdminUsers(){
     const d=u.data||{};
     const knowCount=(d.know||[]).length;
     const learnCount=(d.learn||[]).length;
+    const learningCount=(d.learning||[]).length;
     const nightCount=Object.keys(d.nights||{}).length;
     const lastActive=u.updated_at?formatDate(u.updated_at.slice(0,10)):'—';
     const safeId='auser_'+u.username.replace(/[^a-zA-Z0-9]/g,'_');
@@ -4289,6 +4726,10 @@ function renderAdminUsers(){
     const learnSorted=(d.learn||[]).slice().sort((a,b)=>(a.name||'').localeCompare(b.name||''));
     const learnPills=learnSorted.slice(0,6).map(dl=>`<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:var(--blue-bg);border:0.5px solid var(--blue-border);color:var(--blue-text);font-weight:500">${esc(dl.name||dl)}</span>`).join('');
     const learnExtra=learnCount>6?`<span style="font-size:11px;color:var(--t3)">+${learnCount-6} more</span>`:'';
+    // Learning pills preview (up to 6)
+    const learningSorted=(d.learning||[]).slice().sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+    const learningPills=learningSorted.slice(0,6).map(dl=>`<span style="font-size:11px;padding:2px 8px;border-radius:20px;background:var(--purple-bg);border:0.5px solid var(--purple-border);color:var(--purple-text);font-weight:500">${esc(dl.name||dl)}</span>`).join('');
+    const learningExtra=learningCount>6?`<span style="font-size:11px;color:var(--t3)">+${learningCount-6} more</span>`:'';
     // Last 4 nights
     const nightDates=Object.keys(d.nights||{}).sort((a,b)=>b.localeCompare(a));
     const nightRows=nightDates.slice(0,4).map(nd=>{
@@ -4309,7 +4750,8 @@ function renderAdminUsers(){
         ${modList.includes(u.username)&&u.username!==ADMIN_USER?'<span class="mod-badge">Mod</span>':''}
         <span style="display:flex;gap:4px;flex-shrink:0;">
           <span style="font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--green-bg);border:0.5px solid var(--green-border);color:var(--green-text)">${knowCount} know</span>
-          <span style="font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--blue-bg);border:0.5px solid var(--blue-border);color:var(--blue-text)">${learnCount} learning</span>
+          <span style="font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--purple-bg);border:0.5px solid var(--purple-border);color:var(--purple-text)">${learningCount} learning</span>
+          <span style="font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--blue-bg);border:0.5px solid var(--blue-border);color:var(--blue-text)">${learnCount} want to learn</span>
           <span style="font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--bg2);border:0.5px solid var(--b3);color:var(--t2)">${nightCount} nights</span>
         </span>
         <span style="font-size:12px;color:var(--t2);flex-shrink:0;">Last active: ${lastActive}</span>
@@ -4320,6 +4762,7 @@ function renderAdminUsers(){
           <button class="btn sm amber" onclick="adminEditUser('${escA(u.username)}')">&#9998; Edit this user</button>
         </div>
         ${knowCount?`<div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">Dances they know (${knowCount})</div><div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">${knowPills}${knowExtra}</div>`:''}
+        ${learningCount?`<div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">Learning (${learningCount})</div><div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">${learningPills}${learningExtra}</div>`:''}
         ${learnCount?`<div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">Want to learn (${learnCount})</div><div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">${learnPills}${learnExtra}</div>`:''}
         ${nightCount?`<div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">Recent nights (${nightCount} total)</div>${nightRows}${nightExtra}`:'<div style="font-size:13px;color:var(--t3)">No nights logged yet.</div>'}
       </div>
@@ -4530,6 +4973,7 @@ function syncMyCard(){
   if(idx<0) return;
   friendCards[idx].know=state.know.map(d=>d.name);
   friendCards[idx].learn=state.learn.map(d=>d.name);
+  friendCards[idx].learning=(state.learning||[]).map(d=>d.name);
   // Keep favs that exist in know OR bank, and resolve names from both
   const knowIds=new Set(state.know.map(d=>d.id));
   const bankIds=new Set(bank.map(d=>d.id));
@@ -4574,10 +5018,22 @@ async function removeDance(type,id){
 }
 async function moveToKnow(id){
   if(requireLogin('Sign in to track your progress')) return;
-  const d=state.learn.find(x=>x.id===id);if(!d)return;
-  state.learn=state.learn.filter(x=>x.id!==id);state.know.push({...d});
+  const d=state.learn.find(x=>x.id===id)||(state.learning||[]).find(x=>x.id===id);if(!d)return;
+  state.learn=state.learn.filter(x=>x.id!==id);
+  state.learning=(state.learning||[]).filter(x=>x.id!==id);
+  state.know.push({...d});
   launchConfetti();
-  renderList('learn');renderList('know');renderBank();
+  renderList('learn');renderList('learning');renderList('know');renderBank();
+  const ok=await saveToCloud();
+  if(ok) syncMyCard();
+}
+async function moveToLearning(id){
+  if(requireLogin('Sign in to track your progress')) return;
+  const d=state.learn.find(x=>x.id===id);if(!d)return;
+  state.learn=state.learn.filter(x=>x.id!==id);
+  if(!state.learning) state.learning=[];
+  state.learning.push({...d});
+  renderList('learn');renderList('learning');renderBank();
   const ok=await saveToCloud();
   if(ok) syncMyCard();
 }
@@ -4586,7 +5042,7 @@ async function toggleFav(id){
   if(!state.favorites) state.favorites=[];
   if(isFav(id)) state.favorites=state.favorites.filter(f=>f!==id);
   else state.favorites.push(id);
-  renderList('know');renderList('learn');renderBank();
+  renderList('know');renderList('learn');renderList('learning');renderBank();
   saveToCloud();
 }
 function renderList(type){
@@ -4606,7 +5062,8 @@ function renderList(type){
     el.innerHTML=`<div class="empty">${
       favFilterActive&&type==='know'?'No favorites yet — click the heart on any dance!'
       :type==='know'?'No dances yet — browse the Dance Bank or add one above!'
-      :'No dances on your learning list yet.'
+      :type==='learning'?'No dances on your Learning list yet.'
+      :'No dances on your Want to Learn list yet.'
     }</div>`;return;
   }
   el.innerHTML=items.map(d=>{
@@ -4621,7 +5078,8 @@ function renderList(type){
       bankEntry.tags!=null?`<span class="bank-detail-stat"><strong>${bankEntry.tags}</strong> tags</span>`:'',
     ].filter(Boolean).join(''):'';
     const hasDropdown=demoBtn||tutBtn||spotifyBtn||statPills;
-    const actionBtns=`${type==='learn'?`<button class="btn sm success" onclick="moveToKnow('${d.id}')">I know it now!</button>`:''}
+    const actionBtns=`${type==='learn'?`<button class="btn sm purple" onclick="moveToLearning('${d.id}')">Start learning</button>`:''}
+      ${(type==='learn'||type==='learning')?`<button class="btn sm success" onclick="moveToKnow('${d.id}')">I know it now!</button>`:''}
       <button class="btn sm danger" onclick="removeDance('${type}','${d.id}')">Remove</button>`;
     return `<div class="bank-item" id="list-item-${d.id}">
       <div class="bank-item-head" onclick="this.parentElement.classList.toggle('open')">
@@ -5918,6 +6376,7 @@ function saveFriendCard(){
     favNames:favEntries.map(f=>f.name), // names for everyone to read
     know:state.know.map(d=>d.name),
     learn:state.learn.map(d=>d.name),
+    learning:(state.learning||[]).map(d=>d.name),
     grad:fcSelectedGrad,
     venue:state.venue||'',
     showVenue:showVenue,
@@ -6020,6 +6479,8 @@ function buildCardHTML(card,isMe){
   const learnPills=(card.learn||[]).slice().sort((a,b)=>a.localeCompare(b)).slice(0,6).map(n=>`<span class="fc-pill">${esc(n)}</span>`).join('');
   const knowCount=(card.know||[]).length;
   const learnCount=(card.learn||[]).length;
+  const learningPills=(card.learning||[]).slice().sort((a,b)=>a.localeCompare(b)).slice(0,6).map(n=>`<span class="fc-pill">${esc(n)}</span>`).join('');
+  const learningCount=(card.learning||[]).length;
   // Mutual dances count for card preview
   const myKnowNamesSet=new Set((state.know||[]).map(d=>d.name.toLowerCase()));
   const mutualCount=!isMe?(card.know||[]).filter(n=>myKnowNamesSet.has(n.toLowerCase())).length:0;
@@ -6043,6 +6504,7 @@ function buildCardHTML(card,isMe){
       <div class="fc-section-label">Top favorites</div>
       <div class="fc-fav-list">${favHTML}</div>
       ${knowPills?`<div class="fc-section-label">Dances they know (${knowCount})</div><div class="fc-pills" style="margin-bottom:10px">${knowPills}${knowCount>8?`<span class="fc-pill">+${knowCount-8} more</span>`:''}</div>`:''}
+      ${learningPills?`<div class="fc-section-label">Learning (${learningCount})</div><div class="fc-pills" style="margin-bottom:10px">${learningPills}${learningCount>6?`<span class="fc-pill">+${learningCount-6} more</span>`:''}</div>`:''}
       ${learnPills?`<div class="fc-section-label">Want to learn (${learnCount})</div><div class="fc-pills">${learnPills}${learnCount>6?`<span class="fc-pill">+${learnCount-6} more</span>`:''}</div>`:''}
     </div>
   </div>`;
@@ -6122,6 +6584,7 @@ function openFriendDetail(username){
   const myKnowNames=new Set((state.know||[]).map(d=>d.name.toLowerCase()));
   const friendKnow=(card.know||[]).slice().sort((a,b)=>a.localeCompare(b));
   const friendLearn=(card.learn||[]).slice().sort((a,b)=>a.localeCompare(b));
+  const friendLearning=(card.learning||[]).slice().sort((a,b)=>a.localeCompare(b));
   const mutualKnow=friendKnow.filter(n=>myKnowNames.has(n.toLowerCase()));
   const mutualSet=new Set(mutualKnow.map(n=>n.toLowerCase()));
 
@@ -6133,6 +6596,7 @@ function openFriendDetail(username){
       : `<span class="fc-pill">${esc(n)}</span>`;
   }).join('');
   const learnList=friendLearn.map(n=>`<span class="fc-pill">${esc(n)}</span>`).join('');
+  const learningList=friendLearning.map(n=>`<span class="fc-pill">${esc(n)}</span>`).join('');
 
   // Mutual section HTML
   const mutualHTML=mutualKnow.length
@@ -6152,6 +6616,7 @@ function openFriendDetail(username){
     </div>
     ${favNames.length?`<div class="section-title" style="margin-top:0">Top favorites</div><div style="display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem">${favNames.map((n,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:0.5px solid var(--b3);border-radius:var(--radius-md);background:var(--bg2)"><span style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--t3);min-width:20px">${i+1}</span><span style="font-size:14px;font-weight:500">${esc(n)}</span></div>`).join('')}</div>`:''}
     ${knowList?`<div class="section-title">Dances they know (${friendKnow.length}) <span style="font-size:11px;font-weight:400;color:var(--green-text)"></span></div><div class="fc-pills" style="margin-bottom:1.25rem">${knowList}</div>`:''}
+    ${learningList?`<div class="section-title">Learning (${friendLearning.length})</div><div class="fc-pills" style="margin-bottom:1.25rem">${learningList}</div>`:''}
     ${learnList?`<div class="section-title">Want to learn (${friendLearn.length})</div><div class="fc-pills" style="margin-bottom:1.25rem">${learnList}</div>`:''}
     <div class="section-title">Mutual dances</div>
     ${mutualHTML}
@@ -6166,6 +6631,7 @@ function openMyCardDetail(){
   const favNames=card.favs.map(id=>state.know.find(d=>d.id===id)?.name).filter(Boolean);
   const knowList=(card.know||[]).slice().sort((a,b)=>a.localeCompare(b)).map(n=>`<span class="fc-pill">${esc(n)}</span>`).join('');
   const learnList=(card.learn||[]).slice().sort((a,b)=>a.localeCompare(b)).map(n=>`<span class="fc-pill">${esc(n)}</span>`).join('');
+  const learningList=(card.learning||[]).slice().sort((a,b)=>a.localeCompare(b)).map(n=>`<span class="fc-pill">${esc(n)}</span>`).join('');
   document.getElementById('friend-detail-content').innerHTML=`
     <div style="background:${grad};border-radius:12px;padding:1.5rem;margin:-2rem -2rem 1.5rem;position:relative;">
       <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3)">${esc(card.displayName)}</div>
@@ -6176,6 +6642,7 @@ function openMyCardDetail(){
     </div>
     ${favNames.length?`<div class="section-title" style="margin-top:0">Top favorites</div><div style="display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem">${favNames.map((n,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:0.5px solid var(--b3);border-radius:var(--radius-md);background:var(--bg2)"><span style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--t3);min-width:20px">${i+1}</span><span style="font-size:14px;font-weight:500">${esc(n)}</span></div>`).join('')}</div>`:''}
     ${knowList?`<div class="section-title">Dances I know (${(card.know||[]).length})</div><div class="fc-pills" style="margin-bottom:1.25rem">${knowList}</div>`:''}
+    ${learningList?`<div class="section-title">Learning (${(card.learning||[]).length})</div><div class="fc-pills" style="margin-bottom:1.25rem">${learningList}</div>`:''}
     ${learnList?`<div class="section-title">Want to learn (${(card.learn||[]).length})</div><div class="fc-pills">${learnList}</div>`:''}
   `;
   document.getElementById('friend-detail-modal').style.display='flex';
@@ -6385,7 +6852,7 @@ function renderSubmissions(){
     if(isSug){listLabel='Dance Suggestion';badgeCls='learn';}
     else if(isApp){listLabel='💡 App Suggestion';badgeCls='know';}
     else if(isBug){listLabel='🐛 Bug Report';badgeCls='learn';}
-    else{listLabel=s.list==='know'?'Dances I Know':'Want to Learn';badgeCls=s.list==='know'?'know':'learn';}
+    else{listLabel={know:'Dances I Know',learning:'Learning'}[s.list]||'Want to Learn';badgeCls=s.list==='know'?'know':'learn';}
     const dateStr=s.addedAt?formatDate(s.addedAt.slice(0,10)):'';
     const notesRow=(isSug||isApp||isBug)&&s.notes?`<div style="font-size:12px;color:var(--t2);padding:4px 15px 10px;font-style:italic">"${esc(s.notes)}"</div>`:'';
     const addToBankBtn=(isSug||(!isApp&&!isBug))?`<button class="btn xs success" onclick="toggleSubForm('${s.id}')">Add to Bank</button>`:'';
@@ -6558,6 +7025,7 @@ function propagateDanceRename(oldName,newName,userState){
   // know list
   userState.know.forEach(d=>{if(d.name===oldName)d.name=newName;});
   // learn list
+  (userState.learning||[]).forEach(d=>{if(d.name===oldName)d.name=newName;});
   userState.learn.forEach(d=>{if(d.name===oldName)d.name=newName;});
   // nights: dance ids in nights refer to know-list ids, names are stored in know so already updated
   // friend cards for current user handled via syncMyCard
@@ -6567,6 +7035,7 @@ async function propagateRenameToAllUsers(oldName,newName){
   let changed=false;
   friendCards.forEach(card=>{
     if(card.know){card.know=card.know.map(n=>n===oldName?newName:n);changed=true;}
+    if(card.learning){card.learning=card.learning.map(n=>n===oldName?newName:n);changed=true;}
     if(card.learn){card.learn=card.learn.map(n=>n===oldName?newName:n);changed=true;}
     if(card.favNames){card.favNames=card.favNames.map(n=>n===oldName?newName:n);changed=true;}
   });
@@ -6577,9 +7046,10 @@ async function propagateRenameToAllUsers(oldName,newName){
   const users=r.data.filter(u=>!u.username.startsWith('__'));
   for(const u of users){
     if(u.username===currentUser) continue; // already updated in memory + scheduled
-    const ustate=u.data||{know:[],learn:[],nights:{},favorites:[]};
+    const ustate=u.data||{know:[],learn:[],learning:[],nights:{},favorites:[]};
     let dirty=false;
     ustate.know&&ustate.know.forEach(d=>{if(d.name===oldName){d.name=newName;dirty=true;}});
+    ustate.learning&&ustate.learning.forEach(d=>{if(d.name===oldName){d.name=newName;dirty=true;}});
     ustate.learn&&ustate.learn.forEach(d=>{if(d.name===oldName){d.name=newName;dirty=true;}});
     if(dirty){
       await sbFetch(`/rest/v1/dances?username=eq.${enc(u.username)}`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:ustate,updated_at:new Date().toISOString()})});
@@ -6609,13 +7079,14 @@ async function epLoadUser(){
   epTargetUsername=username;
   const r=await sbFetch(`/rest/v1/dances?username=eq.${enc(username)}&select=data`);
   if(!r.ok||!r.data||!r.data.length){alert('Could not load user data.');return;}
-  epTargetState=r.data[0].data||{know:[],learn:[],nights:{},djFreestyles:{},favorites:[]};
+  epTargetState=r.data[0].data||{know:[],learn:[],learning:[],nights:{},djFreestyles:{},favorites:[]};
   if(!epTargetState.know) epTargetState.know=[];
   if(!epTargetState.learn) epTargetState.learn=[];
+  if(!epTargetState.learning) epTargetState.learning=[];
   if(!epTargetState.nights) epTargetState.nights={};
   if(!epTargetState.favorites) epTargetState.favorites=[];
   document.getElementById('ep-content').style.display='block';
-  epRenderKnow();epRenderLearn();epRenderNights();epRenderCard();
+  epRenderKnow();epRenderLearning();epRenderLearn();epRenderNights();epRenderCard();
 }
 
 async function epSaveUserState(){
@@ -6626,6 +7097,7 @@ async function epSaveUserState(){
   if(idx>=0){
     friendCards[idx].know=epTargetState.know.map(d=>d.name);
     friendCards[idx].learn=epTargetState.learn.map(d=>d.name);
+    friendCards[idx].learning=(epTargetState.learning||[]).map(d=>d.name);
     // sync favNames
     const knowMap=Object.fromEntries(epTargetState.know.map(d=>[d.id,d.name]));
     friendCards[idx].favs=friendCards[idx].favs.filter(id=>knowMap[id]);
@@ -6646,6 +7118,24 @@ function epRenderKnow(){
       <button class="btn sm danger" onclick="epRemoveDance('know','${d.id}')">Remove</button>
     </div>`).join('');
 }
+function epRenderList(type){
+  if(type==='know') epRenderKnow();
+  else if(type==='learning') epRenderLearning();
+  else epRenderLearn();
+}
+function epRenderLearning(){
+  const el=document.getElementById('ep-learning-list');
+  if(!el)return;
+  const list=epTargetState.learning||[];
+  if(!list.length){el.innerHTML=`<div class="empty">No dances in learning list.</div>`;return;}
+  const sorted=[...list].sort((a,b)=>a.name.localeCompare(b.name));
+  el.innerHTML=sorted.map(d=>`
+    <div class="dance-item">
+      <span class="name">${esc(d.name)}</span>
+      <button class="btn sm success" onclick="epMoveToKnow('${d.id}')">I know it!</button>
+      <button class="btn sm danger" onclick="epRemoveDance('learning','${d.id}')">Remove</button>
+    </div>`).join('');
+}
 function epRenderLearn(){
   const el=document.getElementById('ep-learn-list');
   if(!el)return;
@@ -6654,6 +7144,7 @@ function epRenderLearn(){
   el.innerHTML=sorted.map(d=>`
     <div class="dance-item">
       <span class="name">${esc(d.name)}</span>
+      <button class="btn sm purple" onclick="epMoveToLearning('${d.id}')">Start learning</button>
       <button class="btn sm success" onclick="epMoveToKnow('${d.id}')">I know it!</button>
       <button class="btn sm danger" onclick="epRemoveDance('learn','${d.id}')">Remove</button>
     </div>`).join('');
@@ -6662,24 +7153,34 @@ function epAddDance(type){
   if(!epTargetState)return;
   const inp=document.getElementById('ep-'+type+'-input');
   const name=inp.value.trim();if(!name)return;
+  if(!epTargetState[type]) epTargetState[type]=[];
   epTargetState[type].push({id:Date.now()+'',name,added:new Date().toISOString()});
   inp.value='';
-  if(type==='know') epRenderKnow(); else epRenderLearn();
+  epRenderList(type);
   epSaveUserState();
 }
 function epRemoveDance(type,id){
   if(!epTargetState)return;
   epTargetState[type]=epTargetState[type].filter(d=>d.id!==id);
   if(type==='know') epTargetState.favorites=(epTargetState.favorites||[]).filter(f=>f!==id);
-  if(type==='know') epRenderKnow(); else epRenderLearn();
+  epRenderList(type);
   epSaveUserState();
 }
 function epMoveToKnow(id){
   if(!epTargetState)return;
+  const d=epTargetState.learn.find(x=>x.id===id)||(epTargetState.learning||[]).find(x=>x.id===id);if(!d)return;
+  epTargetState.learn=epTargetState.learn.filter(x=>x.id!==id);
+  epTargetState.learning=(epTargetState.learning||[]).filter(x=>x.id!==id);
+  epTargetState.know.push({...d});
+  epRenderKnow();epRenderLearning();epRenderLearn();epSaveUserState();
+}
+function epMoveToLearning(id){
+  if(!epTargetState)return;
   const d=epTargetState.learn.find(x=>x.id===id);if(!d)return;
   epTargetState.learn=epTargetState.learn.filter(x=>x.id!==id);
-  epTargetState.know.push({...d});
-  epRenderKnow();epRenderLearn();epSaveUserState();
+  if(!epTargetState.learning) epTargetState.learning=[];
+  epTargetState.learning.push({...d});
+  epRenderLearning();epRenderLearn();epSaveUserState();
 }
 function epRenderNights(){
   const el=document.getElementById('ep-nights-list');if(!el)return;
@@ -6723,6 +7224,7 @@ function epRenderCard(){
         <div class="fc-section-label">Top favorites</div>
         <div class="fc-fav-list">${favHTML}</div>
         ${(card.know||[]).length?`<div class="fc-section-label">Knows (${card.know.length})</div>`:''}
+        ${(card.learning||[]).length?`<div class="fc-section-label">Learning (${card.learning.length})</div>`:''}
         ${(card.learn||[]).length?`<div class="fc-section-label">Wants to learn (${card.learn.length})</div>`:''}
       </div>
     </div>
@@ -8065,6 +8567,7 @@ function renderTFPersonalStats(){
   const totalDances=nights.reduce((s,n)=>s+(n.dances||[]).length,0);
   const totalKnow=state.know.length;
   const totalLearn=state.learn.length;
+  const totalLearning=(state.learning||[]).length;
 
   // Current streak (consecutive weeks with at least 1 night)
   const nightDates=new Set(nights.map(n=>n.date));
@@ -8097,7 +8600,7 @@ function renderTFPersonalStats(){
 
   el.innerHTML=`
     <div class="stat-card"><div class="stat-label">Total Dances Logged</div><div class="stat-value">${totalDances}</div><div class="stat-sub">across ${nights.length} night${nights.length!==1?'s':''}</div></div>
-    <div class="stat-card"><div class="stat-label">Repertoire Size</div><div class="stat-value">${totalKnow}</div><div class="stat-sub">${totalLearn} more on learning list</div></div>
+    <div class="stat-card"><div class="stat-label">Repertoire Size</div><div class="stat-value">${totalKnow}</div><div class="stat-sub">${totalLearning} learning · ${totalLearn} want to learn</div></div>
     <div class="stat-card"><div class="stat-label">Avg Dances / Night</div><div class="stat-value">${avg}</div><div class="stat-sub">per night out</div></div>
     <div class="stat-card"><div class="stat-label">Weekly Streak</div><div class="stat-value">${streak}</div><div class="stat-sub">week${streak!==1?'s':''} in a row</div></div>
     <div class="stat-card"><div class="stat-label">Best Night</div><div class="stat-value" style="font-size:18px">${bestNight.date?formatDate(bestNight.date):'—'}</div><div class="stat-sub">${(bestNight.dances||[]).length} dances</div></div>
@@ -8376,12 +8879,14 @@ function renderSpModal(){
 
   const knowNames=new Set(state.know.map(d=>d.name.toLowerCase()));
   const learnNames=new Set(state.learn.map(d=>d.name.toLowerCase()));
+  const learningNames=new Set((state.learning||[]).map(d=>d.name.toLowerCase()));
 
   el.innerHTML=sorted.map(d=>{
     const sel=spSelectedIds.has(d.id);
     const isKnow=knowNames.has(d.name.toLowerCase());
     const isLearn=learnNames.has(d.name.toLowerCase());
-    const tag=isKnow?`<span class="sp-dance-tag sp-tag-know">I Know It</span>`:isLearn?`<span class="sp-dance-tag sp-tag-learn">Learning</span>`:'';
+    const isLearning=learningNames.has(d.name.toLowerCase());
+    const tag=isKnow?`<span class="sp-dance-tag sp-tag-know">I Know It</span>`:isLearning?`<span class="sp-dance-tag sp-tag-learning">Learning</span>`:isLearn?`<span class="sp-dance-tag sp-tag-learn">Want to Learn</span>`:'';
     return `<div class="sp-dance-item ${sel?'selected':''}" onclick="spToggle('${d.id}')">
       <div class="sp-dance-check">${sel?'&#10003;':''}</div>
       <span class="sp-dance-name">${esc(d.name)}</span>
@@ -8400,11 +8905,13 @@ function spSelectGroup(group){
   const withSpotify=bank.filter(d=>getSpotifyLinks(d).some(l=>spUriFromLink(l.url)));
   const knowNames=new Set(state.know.map(d=>d.name.toLowerCase()));
   const learnNames=new Set(state.learn.map(d=>d.name.toLowerCase()));
+  const learningNames=new Set((state.learning||[]).map(d=>d.name.toLowerCase()));
   spSelectedIds.clear();
   if(group==='none'){ renderSpModal(); return; }
   withSpotify.forEach(d=>{
     if(group==='all') spSelectedIds.add(d.id);
     else if(group==='know'&&knowNames.has(d.name.toLowerCase())) spSelectedIds.add(d.id);
+    else if(group==='learning'&&learningNames.has(d.name.toLowerCase())) spSelectedIds.add(d.id);
     else if(group==='learn'&&learnNames.has(d.name.toLowerCase())) spSelectedIds.add(d.id);
   });
   renderSpModal();
@@ -8948,7 +9455,7 @@ async function debugDeleteNight(date){
 (function(){
   // Tab display names for the toast
   const TAB_LABELS={
-    home:'Home',bank:'Dance Bank',know:'Dances I Know',learn:'Want to Learn',
+    home:'Home',bank:'Dance Bank',know:'Dances I Know',learning:'Learning',learn:'Want to Learn',
     night:'My Night',log:'Analytics',friends:'Friends',feedback:'Suggestions & Bugs',
     submissions:'Submissions',admin:'Admin',editpeople:'Edit People',
     dj:'Test Features',drewsnight:"Drew's Night",debug:'Debug',picks:'Picks'
@@ -8967,7 +9474,7 @@ async function debugDeleteNight(date){
   function anyModalOpen(){
     const ids=['highlights-modal','friend-setup-modal','suggest-modal',
                'app-suggestion-modal','bug-modal','friend-detail-modal',
-               'sp-playlist-modal'];
+               'sp-playlist-modal','settings-modal','home-editor-modal','color-picker-modal','bg-picker-modal'];
     if(ids.some(id=>{const m=document.getElementById(id);return m&&m.style.display!=='none';})) return true;
     const mmo=document.getElementById('mobile-menu-overlay');
     if(mmo&&mmo.classList.contains('open')) return true;
@@ -9207,7 +9714,7 @@ async function recRefresh() {
 
   // Known names set (lowercase)
   const knownNames = new Set((state.know || []).map(d => d.name.toLowerCase().trim()));
-  const learnNames = new Set((state.learn || []).map(d => d.name.toLowerCase().trim()));
+  const learnNames = new Set([...(state.learn || []), ...(state.learning || [])].map(d => d.name.toLowerCase().trim()));
 
   // HOT_LEARN_THRESHOLD: if a dance is on the learn list but has a high recency score
   // (i.e. it's being played a lot), still allow it as a recommendation candidate.
@@ -9358,7 +9865,10 @@ function recShowResult(pick, profile, targetDiffs) {
   if (b.walls) pillsHTML += `<span class="rec-pill cool">${b.walls} walls</span>`;
   // Flag if the dance is already on the user's learn list (recommended because it's hot)
   const learnNamesCheck = new Set((state.learn || []).map(d => d.name.toLowerCase().trim()));
-  if (learnNamesCheck.has(b.name.toLowerCase().trim())) {
+  const learningNamesCheck = new Set((state.learning || []).map(d => d.name.toLowerCase().trim()));
+  if (learningNamesCheck.has(b.name.toLowerCase().trim())) {
+    pillsHTML += `<span class="rec-pill" style="background:var(--purple-bg);color:var(--purple-text);border-color:var(--purple-border);">📌 You're learning this</span>`;
+  } else if (learnNamesCheck.has(b.name.toLowerCase().trim())) {
     pillsHTML += `<span class="rec-pill" style="background:var(--purple-bg);color:var(--purple-text);border-color:var(--purple-border);">📌 On your learn list</span>`;
   }
   pillsEl.innerHTML = pillsHTML;
@@ -9389,11 +9899,11 @@ function recAddToLearn() {
   if(requireLogin('Sign in to add dances to your learn list')) return;
   if (!recCurrentResult) return;
   const name = recCurrentResult.b.name;
-  const already = (state.learn || []).some(d => d.name.toLowerCase() === name.toLowerCase());
+  const already = [...(state.learn || []), ...(state.learning || [])].some(d => d.name.toLowerCase() === name.toLowerCase());
   if (!already) {
     if (!state.learn) state.learn = [];
     state.learn.push({ id: Date.now() + '', name, added: new Date().toISOString() });
-    renderList('learn');
+    renderList('learn');renderList('learning');
     scheduleSave();
     syncMyCard();
   }
@@ -9405,6 +9915,430 @@ function recAddToLearn() {
 // Expose for the skip button
 window.recAddToLearn = recAddToLearn;
 window.recRefresh = recRefresh;
+
+// ===== SETTINGS & HOME CUSTOMIZER =====
+const HOME_DEFAULT_ORDER=[...document.querySelectorAll('.home-grid .home-card')].map(e=>e.id);
+const HOME_CARD_NAMES={
+  'home-card-bank':'Dance Bank','home-card-know':'Dances I Know','home-card-learning':'Learning','home-card-learn':'Want to Learn',
+  'home-card-night':'My Night','home-card-log':'Analytics','home-card-friends':'Friends','home-card-feedback':'Suggestions & Bugs',
+  'home-card-changelog':'Changelog','home-card-drewsnight':'Night','home-card-dj':'Test Features','home-card-admin':'Admin',
+  'home-card-submissions':'Submissions','home-card-modpanel':'Mod Panel','home-card-debug':'Debug','home-card-adminanalytics':'Admin Analytics'
+};
+const HOME_CARDS_WITH_NO_TAB=['home-card-know','home-card-learning','home-card-learn'];
+const HOME_UNMANAGED_CARDS=['home-card-know','home-card-learning','home-card-learn','home-card-changelog'];
+const HOME_PLAIN_TABS=['bank','night','log','friends','feedback','changelog'];
+
+function cardTabKey(cardId){
+  if(HOME_CARDS_WITH_NO_TAB.includes(cardId)) return null;
+  return cardId.replace('home-card-','');
+}
+function getHomeLayout(){
+  let l=null;
+  if(!isGuest&&state&&state.homeLayout) l=state.homeLayout;
+  else{ try{ l=JSON.parse(localStorage.getItem('ld_home_layout')||'null'); }catch(e){} }
+  const hasPersonal=!!(l&&Array.isArray(l.order)&&l.order.length);
+  const def=(!hasPersonal&&defaultHomeLayout)?defaultHomeLayout:null;
+  return{
+    order:hasPersonal?l.order:(def?def.order:[]),
+    hidden:hasPersonal?((l&&Array.isArray(l.hidden))?l.hidden:[]):(def&&Array.isArray(def.hidden)?def.hidden:((l&&Array.isArray(l.hidden))?l.hidden:[])),
+    colors:(l&&l.colors&&typeof l.colors==='object')?l.colors:{},
+    bgColor:(l&&isValidBg(l.bgColor))?l.bgColor:''
+  };
+}
+function isValidBg(v){
+  return typeof v==='string'&&(/^#[0-9a-fA-F]{6}$/.test(v)||/^(linear|radial)-gradient\([#0-9a-zA-Z%,.\s-]+\)$/.test(v));
+}
+function applyBgColor(c){
+  const v=isValidBg(c)?c:'';
+  let bl=document.getElementById('bg-layer');
+  if(!bl){bl=document.createElement('div');bl.id='bg-layer';document.body.insertBefore(bl,document.body.firstChild);}
+  bl.style.background=v;
+  bl.style.backgroundSize=v&&v[0]!=='#'?'cover':'';
+  const firstCol=(v.match(/#[0-9a-fA-F]{6}/)||[''])[0];
+  document.documentElement.style.background=firstCol;
+  document.body.style.background='';
+  document.querySelectorAll('meta[name="theme-color"]').forEach(m=>{if(!m.dataset.orig)m.dataset.orig=m.content;m.content=firstCol||m.dataset.orig;});
+  const r=document.documentElement.style;
+  if(v){
+    const lin=x=>{x/=255;return x<=0.03928?x/12.92:Math.pow((x+0.055)/1.055,2.4);};
+    const cols=v.match(/#[0-9a-fA-F]{6}/g)||[];
+    let L=0;
+    cols.forEach(h=>{const n=parseInt(h.slice(1),16);L+=0.2126*lin(n>>16&255)+0.7152*lin(n>>8&255)+0.0722*lin(n&255);});
+    L/=Math.max(cols.length,1);
+    if(L>0.4){r.setProperty('--page-t1','#1a1a18');r.setProperty('--page-t2','#45443f');r.setProperty('--page-t3','#6b6a66');}
+    else{r.setProperty('--page-t1','#f5f4ef');r.setProperty('--page-t2','#d4d2ca');r.setProperty('--page-t3','#a8a7a3');}
+  } else {['--page-t1','--page-t2','--page-t3'].forEach(k=>r.removeProperty(k));}
+  const sw=document.getElementById('set-bg-swatch');
+  if(sw) sw.style.background=v||'var(--bg3)';
+}
+function applyHomeLayout(){
+  const grid=document.querySelector('.home-grid');
+  if(!grid) return;
+  const layout=getHomeLayout();
+  applyBgColor(layout.bgColor);
+  // Reset things the role-visibility logic doesn't manage
+  HOME_PLAIN_TABS.forEach(k=>{
+    document.querySelectorAll('.tab[data-tab="'+k+'"], .mobile-tab[data-tab="'+k+'"]').forEach(t=>{t.style.display='';});
+  });
+  HOME_UNMANAGED_CARDS.forEach(id=>{const el=document.getElementById(id);if(el) el.style.display='';});
+  // Order
+  if(layout.order.length){
+    const ordered=[];
+    layout.order.forEach(id=>{if(HOME_DEFAULT_ORDER.includes(id)&&!ordered.includes(id)) ordered.push(id);});
+    HOME_DEFAULT_ORDER.forEach(id=>{if(!ordered.includes(id)) ordered.push(id);});
+    ordered.forEach(id=>{const el=document.getElementById(id);if(el) grid.appendChild(el);});
+  }
+  // Hidden
+  layout.hidden.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display='none';
+    const key=cardTabKey(id);
+    if(key) document.querySelectorAll('.tab[data-tab="'+key+'"], .mobile-tab[data-tab="'+key+'"]').forEach(t=>{t.style.display='none';});
+  });
+}
+function applyTabVisibility(){
+  _applyTabVisibilityBase();
+  applyHomeLayout();
+  applyHomeCardGradients();
+}
+function getAvailableHomeCards(){
+  _applyTabVisibilityBase();
+  HOME_UNMANAGED_CARDS.forEach(id=>{const el=document.getElementById(id);if(el) el.style.display='';});
+  const grid=document.querySelector('.home-grid');
+  const domOrder=[...grid.querySelectorAll('.home-card')].map(e=>e.id);
+  const avail=domOrder.filter(id=>{const el=document.getElementById(id);return el&&el.style.display!=='none';});
+  applyTabVisibility();
+  const saved=getHomeLayout().order;
+  if(saved.length){
+    avail.sort((a,b)=>{
+      const ia=saved.indexOf(a),ib=saved.indexOf(b);
+      return (ia<0?999:ia)-(ib<0?999:ib);
+    });
+  }
+  return avail;
+}
+function persistHomeLayout(layout){
+  try{
+    if(layout) localStorage.setItem('ld_home_layout',JSON.stringify(layout));
+    else localStorage.removeItem('ld_home_layout');
+  }catch(e){}
+  if(!isGuest&&currentUser){
+    if(layout) state.homeLayout=layout; else delete state.homeLayout;
+    scheduleSave();
+  }
+}
+function homeToast(msg){
+  const t=document.getElementById('swipe-toast');
+  if(!t) return;
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1600);
+}
+
+// ---- Background color ----
+function setBgColor(hex){
+  const layout=getHomeLayout();
+  layout.bgColor=hex||'';
+  const empty=!layout.order.length&&!layout.hidden.length&&!Object.keys(layout.colors).length&&!layout.bgColor;
+  persistHomeLayout(empty?null:layout);
+  applyBgColor(layout.bgColor);
+}
+function resetBgColor(){
+  setBgColor('');
+  homeToast('Background reset');
+}
+const BG_PRESETS=[
+  '#ffffff','#f5f0e6','#e5e7eb','#fde68a','#bfdbfe','#d9f99d','#fbcfe8','#1f2937','#0f172a','#111111','#14532d','#7f1d1d',
+  'linear-gradient(135deg,#fdc830,#f37335)','linear-gradient(135deg,#ff9a9e,#fad0c4)','linear-gradient(135deg,#f093fb,#f5576c)','linear-gradient(135deg,#667eea,#764ba2)',
+  'linear-gradient(135deg,#43e97b,#38f9d7)','linear-gradient(135deg,#4facfe,#00f2fe)','linear-gradient(135deg,#a1c4fd,#c2e9fb)','linear-gradient(135deg,#fbc2eb,#a6c1ee)',
+  'linear-gradient(135deg,#0f2027,#203a43,#2c5364)','linear-gradient(135deg,#141e30,#243b55)','linear-gradient(135deg,#232526,#414345)','linear-gradient(135deg,#2c3e50,#8e44ad)',
+  'linear-gradient(135deg,#ff512f,#dd2476)','linear-gradient(135deg,#ffecd2,#fcb69f)','linear-gradient(180deg,#fa709a,#fee140)','radial-gradient(circle,#a18cd1,#fbc2eb)'
+];
+function openBgPicker(){
+  document.getElementById('bgp-presets').innerHTML=BG_PRESETS.map((g,i)=>`<button class="cp-cell" style="background:${g}" onclick="bgPickPreset(${i})" aria-label="Preset ${i+1}"></button>`).join('');
+  const cur=getHomeLayout().bgColor;
+  if(/^#[0-9a-fA-F]{6}$/.test(cur)) document.getElementById('bgp-solid').value=cur;
+  bgpTab('presets');
+  bgpGradChanged(true);
+  document.getElementById('bg-picker-modal').style.display='flex';
+}
+function closeBgPicker(){ document.getElementById('bg-picker-modal').style.display='none'; }
+function bgpTab(t){
+  ['presets','gradient','color'].forEach(k=>{
+    document.getElementById('bgp-pane-'+k).style.display=(k===t)?'block':'none';
+    document.getElementById('bgp-tab-'+k).classList.toggle('active',k===t);
+  });
+}
+function bgPickPreset(i){ setBgColor(BG_PRESETS[i]); }
+function bgpBuildGradient(){
+  const c1=document.getElementById('bgp-c1').value,c2=document.getElementById('bgp-c2').value,c3=document.getElementById('bgp-c3').value;
+  const use3=document.getElementById('bgp-use3').checked;
+  const type=document.getElementById('bgp-type').value;
+  const ang=parseInt(document.getElementById('bgp-angle').value,10)||0;
+  const stops=[c1,c2].concat(use3?[c3]:[]).join(',');
+  document.getElementById('bgp-angle-val').textContent=ang+'°';
+  document.getElementById('bgp-angle-row').style.display=type==='linear'?'flex':'none';
+  document.getElementById('bgp-c3').style.display=use3?'inline-block':'none';
+  return type==='linear'?`linear-gradient(${ang}deg,${stops})`:`radial-gradient(circle,${stops})`;
+}
+function bgpGradChanged(previewOnly){
+  const g=bgpBuildGradient();
+  document.getElementById('bgp-preview').style.background=g;
+  if(previewOnly!==true) setBgColor(g);
+}
+// ---- Settings modal ----
+function openSettings(){
+  const tog=document.getElementById('set-rearrange-toggle');
+  if(tog) tog.checked=false;
+  const acc=document.getElementById('settings-account-body');
+  if(acc){
+    if(isGuest||!currentUser){
+      acc.innerHTML=`<div class="set-row"><div class="set-row-text"><div class="set-title">Browsing as guest</div><div class="set-desc">Sign in to save your data across devices.</div></div><button class="btn sm primary" onclick="closeSettings();openAuthModal('signin')">Sign in</button></div>`;
+    } else {
+      acc.innerHTML=`<div class="set-row"><div class="set-row-text"><div class="set-title">Signed in as ${esc(currentUser)}</div><div class="set-desc"></div></div><button class="btn sm danger" onclick="closeSettings();if(confirm('Sign out?'))logout()">Sign out</button></div>`;
+    }
+  }
+  document.getElementById('settings-modal').style.display='flex';
+}
+function closeSettings(){
+  document.getElementById('settings-modal').style.display='none';
+}
+function settingsRearrangeToggled(on){
+  if(on) openHomeEditor();
+}
+function resetHomeLayout(){
+  if(!confirm('Reset your home screen to the default layout?')) return;
+  const grid=document.querySelector('.home-grid');
+  HOME_DEFAULT_ORDER.forEach(id=>{const el=document.getElementById(id);if(el&&grid) grid.appendChild(el);});
+  persistHomeLayout(null);
+  applyTabVisibility();
+  homeToast('Home layout reset');
+}
+
+(function(){try{const c=JSON.parse(localStorage.getItem('ld_home_layout')||'null');if(c&&isValidBg(c.bgColor)) applyBgColor(c.bgColor);}catch(e){}})();
+// ---- Home editor ----
+let heDraft={order:[],hidden:new Set(),colors:{}};
+let heMode='user';
+function heCardBg(id){
+  const el=document.getElementById(id);
+  if(heDraft.colors&&heDraft.colors[id]) return heDraft.colors[id];
+  return (typeof homeConfig!=='undefined'&&homeConfig[id])||(typeof HOME_CARD_DEFAULTS!=='undefined'&&HOME_CARD_DEFAULTS[id])||(el&&el.style.background)||'var(--bg3)';
+}
+function openHomeEditor(mode){
+  heMode=(mode==='admin'&&isAdmin)?'admin':'user';
+  const t=document.getElementById('he-title'),d=document.getElementById('he-desc'),b=document.getElementById('he-save-btn');
+  if(heMode==='admin'){
+    const def=defaultHomeLayout||{order:[],hidden:[]};
+    const order=[];
+    (def.order||[]).forEach(id=>{if(HOME_DEFAULT_ORDER.includes(id)&&!order.includes(id)) order.push(id);});
+    HOME_DEFAULT_ORDER.forEach(id=>{if(!order.includes(id)) order.push(id);});
+    heDraft={order,hidden:new Set(def.hidden||[]),colors:{}};
+    if(t) t.textContent='Default Home Layout';
+    if(d) d.textContent='Drag the handle to move a button, or tap Hide to hide it by default. This is what users see until they customize their own home screen.';
+    if(b) b.textContent='Save default';
+  } else {
+    const layout=getHomeLayout();
+    heDraft={order:getAvailableHomeCards(),hidden:new Set(layout.hidden),colors:{...layout.colors}};
+    if(t) t.textContent='Rearrange Home';
+    if(d) d.textContent="Tap and hold the handle in the top left corner to move a button. Tap Hide to remove a button and its card, or tap the palette emoji to change its color. You can bring hidden cards back anytime.";
+    if(b) b.textContent='Save';
+  }
+  renderHomeEditor();
+  document.getElementById('home-editor-modal').style.display='flex';
+}
+function renderHomeEditor(){
+  const list=document.getElementById('he-list');
+  if(!list) return;
+  list.innerHTML=heDraft.order.map(id=>{
+    const hidden=heDraft.hidden.has(id);
+    return `<div class="he-tile${hidden?' is-hidden':''}" data-id="${id}" style="background:${heCardBg(id)}">
+      <span class="he-handle" title="Drag to move">&#10021;</span>
+      <button class="he-eye" onclick="heToggleHidden('${id}')">${hidden?'Show':'Hide'}</button>
+      <span class="he-tile-title">${esc(HOME_CARD_NAMES[id]||id)}</span>
+      ${heMode==='admin'?'':`<div class="he-actions"><button class="he-icon-btn" onclick="openColorPicker('${id}')" title="Change color">&#127912;</button></div>`}
+    </div>`;
+  }).join('');
+}
+function heSyncOrderFromDOM(){
+  const list=document.getElementById('he-list');
+  heDraft.order=[...list.querySelectorAll('.he-tile')].map(r=>r.dataset.id);
+}
+function heToggleHidden(id){
+  heSyncOrderFromDOM();
+  if(heDraft.hidden.has(id)) heDraft.hidden.delete(id); else heDraft.hidden.add(id);
+  renderHomeEditor();
+}
+function closeHomeEditor(){
+  document.getElementById('home-editor-modal').style.display='none';
+  heMode='user';
+  const tog=document.getElementById('set-rearrange-toggle');
+  if(tog) tog.checked=false;
+}
+async function saveHomeEditor(){
+  heSyncOrderFromDOM();
+  if(heMode==='admin'){
+    if(!isAdmin) return;
+    defaultHomeLayout={order:[...heDraft.order],hidden:[...heDraft.hidden]};
+    closeHomeEditor();
+    await saveHomeConfigToCloud();
+    applyTabVisibility();
+    updateDefaultLayoutStatus();
+    homeToast('Default home layout saved');
+    return;
+  }
+  // Keep unavailable (role-hidden) cards' relative placement at the end
+  const rest=HOME_DEFAULT_ORDER.filter(id=>!heDraft.order.includes(id));
+  const colors={};
+  Object.keys(heDraft.colors).forEach(k=>{if(heDraft.colors[k]) colors[k]=heDraft.colors[k];});
+  const layout={order:[...heDraft.order,...rest],hidden:[...heDraft.hidden],colors,bgColor:getHomeLayout().bgColor};
+  persistHomeLayout(layout);
+  applyTabVisibility();
+  closeHomeEditor();
+  homeToast('Home layout saved');
+}
+// ---- Color picker (per-user; admin colors in homeConfig stay the default) ----
+let cpTarget=null;
+function openColorPicker(id){
+  cpTarget=id;
+  document.getElementById('color-picker-for').textContent='For: '+(HOME_CARD_NAMES[id]||id);
+  const cur=heCardBg(id);
+  document.getElementById('cp-grid').innerHTML=allHomeGradients().map((g,i)=>`<button class="cp-cell${g===cur?' active':''}" style="background:${g}" onclick="hePickColor(${i})" aria-label="Color ${i+1}"></button>`).join('');
+  document.getElementById('color-picker-modal').style.display='flex';
+}
+function closeColorPicker(){
+  document.getElementById('color-picker-modal').style.display='none';
+  cpTarget=null;
+}
+function hePickColor(i){
+  if(!cpTarget) return;
+  heSyncOrderFromDOM();
+  if(i===null||i===undefined) delete heDraft.colors[cpTarget];
+  else if(typeof i==='string') heDraft.colors[cpTarget]=i;
+  else heDraft.colors[cpTarget]=allHomeGradients()[i];
+  closeColorPicker();
+  renderHomeEditor();
+}
+function hePickCustomColor(){
+  const a=document.getElementById('cp-c1').value,b=document.getElementById('cp-c2').value;
+  hePickColor('linear-gradient(135deg,'+a+','+b+')');
+}
+(function heInitDrag(){
+  const list=document.getElementById('he-list');
+  if(!list) return;
+  let drag=null;
+  function onMove(e){
+    if(!drag) return;
+    e.preventDefault();
+    const tiles=[...list.querySelectorAll('.he-tile')];
+    const target=tiles.find(t=>{
+      if(t===drag.row) return false;
+      const r=t.getBoundingClientRect();
+      return e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;
+    });
+    if(target){
+      const di=tiles.indexOf(drag.row),ti=tiles.indexOf(target);
+      if(di<ti) list.insertBefore(drag.row,target.nextSibling);
+      else list.insertBefore(drag.row,target);
+    }
+    const sc=list.closest('.modal-card');
+    if(sc){
+      const cb=sc.getBoundingClientRect();
+      if(e.clientY<cb.top+50) sc.scrollTop-=12;
+      else if(e.clientY>cb.bottom-50) sc.scrollTop+=12;
+    }
+  }
+  function onUp(){
+    if(!drag) return;
+    drag.row.classList.remove('dragging');
+    drag=null;
+    window.removeEventListener('pointermove',onMove);
+    window.removeEventListener('pointerup',onUp);
+    window.removeEventListener('pointercancel',onUp);
+    heSyncOrderFromDOM();
+  }
+  list.addEventListener('pointerdown',e=>{
+    const h=e.target.closest('.he-handle');
+    if(!h) return;
+    const row=h.closest('.he-tile');
+    if(!row) return;
+    e.preventDefault();
+    drag={row};
+    row.classList.add('dragging');
+    window.addEventListener('pointermove',onMove,{passive:false});
+    window.addEventListener('pointerup',onUp);
+    window.addEventListener('pointercancel',onUp);
+  });
+})();
+
+// ---- Connection popup ----
+let _connKind=null,_connTimer=null,_connDismissedAt=0,_connChecking=false;
+const CONN_TEXT={
+  offline:{icon:'&#128241;',title:"You're offline",msg:"Your phone has no internet connection right now. Anything you do will be saved as soon as you're back online.",btn:'Try again'},
+  server:{icon:'&#128225;',title:"Can't reach the server",msg:"We couldn't connect to your account. We'll keep trying automatically.",btn:'Try again'},
+  pending:{icon:'&#9888;&#65039;',title:'Connection lost',msg:"Your latest changes haven't been saved yet. We'll keep trying and save them automatically once you reconnect.",btn:'Try again'},
+  session:{icon:'&#128274;',title:'Session expired',msg:'Please sign in again so your changes can be saved.',btn:'Sign in'}
+};
+// Admin testing helper: corrupt the stored login on this device only
+function connTestExpire(mode){
+  const msg=document.getElementById('conntest-msg');
+  try{
+    localStorage.setItem('sb_access_token','expired.invalid.token');
+    if(mode==='both') localStorage.setItem('sb_refresh_token','invalid-refresh-token');
+    if(msg) msg.textContent = mode==='both'
+      ? 'Login fully expired. Edit and save something now. If "Remember me" is ticked the app may quietly sign back in instead of showing the popup (that is correct behavior). Untick it and sign in again to see the popup.'
+      : 'Access token expired. Edit and save something now; it should save without any popup.';
+  }catch(e){ if(msg) msg.textContent='Could not change stored login: '+e.message; }
+}
+function showConnPopup(kind){
+  const el=document.getElementById('conn-popup');
+  if(!el||isGuest) return;
+  const visible=el.style.display!=='none';
+  if(visible && kind==='pending') return;
+  if(!visible && kind!=='session' && Date.now()-_connDismissedAt<60000) return;
+  _connKind=kind;
+  const t=CONN_TEXT[kind]||CONN_TEXT.server;
+  document.getElementById('conn-popup-icon').innerHTML=t.icon;
+  document.getElementById('conn-popup-title').textContent=t.title;
+  document.getElementById('conn-popup-msg').textContent=t.msg;
+  document.getElementById('conn-popup-retry').textContent=t.btn;
+  el.style.display='flex';
+  if(kind==='session'){ if(_connTimer){clearInterval(_connTimer);_connTimer=null;} }
+  else if(!_connTimer){ _connTimer=setInterval(()=>connCheck(false),5000); }
+}
+function hideConnPopup(reset){
+  const el=document.getElementById('conn-popup');
+  if(el) el.style.display='none';
+  if(_connTimer){clearInterval(_connTimer);_connTimer=null;}
+  if(reset) _connDismissedAt=0;
+}
+function dismissConnPopup(){ _connDismissedAt=Date.now(); hideConnPopup(false); }
+function connPrimary(){
+  if(_connKind==='session'){ hideConnPopup(true); openAuthModal('signin'); return; }
+  connCheck(true);
+}
+async function connCheck(manual){
+  if(_connChecking||!currentUser) return;
+  _connChecking=true;
+  const btn=document.getElementById('conn-popup-retry');
+  if(manual&&btn){btn.disabled=true;btn.textContent='Checking…';}
+  try{
+    if(navigator.onLine===false){ showConnPopup('offline'); return; }
+    const s=await ensureSession();
+    if(!s.ok){ showConnPopup(s.rejected?'session':'server'); return; }
+    let ok=false;
+    try{ const pr=await sbFetch(`/rest/v1/dances?username=eq.${enc(currentUser)}&select=username&limit=1`); ok=pr.ok; }catch(e){}
+    if(!ok){ showConnPopup('server'); return; }
+    if(retryQueued) await flushRetryQueue();
+    if(!retryQueued) setSyncStatus('synced','Synced'); // also hides the popup
+  } finally {
+    _connChecking=false;
+    if(btn){btn.disabled=false;const t=CONN_TEXT[_connKind]||CONN_TEXT.server;btn.textContent=t.btn;}
+  }
+}
+window.addEventListener('offline',()=>{ if(!isGuest&&currentUser) showConnPopup('offline'); });
+window.addEventListener('online',()=>{
+  const el=document.getElementById('conn-popup');
+  if(el&&el.style.display!=='none'&&_connKind!=='session') connCheck(false);
+});
 
 if (!checkForPasswordRecovery()) {
   tryAutoLogin();
@@ -9435,8 +10369,35 @@ async function _onAppResume() {
   _lastActiveAt = now;
   localStorage.setItem('ld_last_active', String(now));
 
-  // Always reload public data (bank, friend cards, home config) so
-  // any admin changes made while away show up immediately.
+  // 1) Logged-in users: make sure we're online, the login is still valid and the server is reachable
+  if (currentUser) {
+    if (navigator.onLine === false) {
+      showConnPopup('offline');
+      setSyncStatus('error', 'Offline');
+      return;
+    }
+    setSyncStatus('syncing', 'Reconnecting…');
+    const sess = await ensureSession();
+    if (!sess.ok) {
+      showConnPopup(sess.rejected ? 'session' : 'server');
+      setSyncStatus('error', 'Not connected');
+      return;
+    }
+    let reachable = false;
+    try {
+      const pr = await sbFetch(`/rest/v1/dances?username=eq.${enc(currentUser)}&select=username&limit=1`);
+      reachable = pr.ok;
+    } catch(e) {}
+    if (!reachable) {
+      showConnPopup('server');
+      setSyncStatus('error', 'Not connected');
+      return;
+    }
+    // Push any changes that were waiting before we overwrite local state with cloud data
+    if (retryQueued) await flushRetryQueue();
+  }
+
+  // 2) Reload shared public data so admin changes show up
   try {
     await loadBank();
     await loadFriendCards();
@@ -9449,39 +10410,29 @@ async function _onAppResume() {
     console.warn('Resume: public data reload error', e);
   }
 
-  // If the user was away for more than 30 minutes and is logged in,
-  // refresh their token and re-fetch their personal data so everything
-  // shows up without needing a manual page refresh.
+  // 3) Short absence (or unsent changes still queued): just re-render
   const STALE_THRESHOLD_MS = 30 * 60 * 1000; // 30 minutes
-  if (awayMs < STALE_THRESHOLD_MS) {
-    // Short absence — just re-render with the data we already have
+  if (awayMs < STALE_THRESHOLD_MS || retryQueued) {
     if (!isGuest) {
       try { renderBank(); } catch(e) {}
       try { renderFriendsTab(); } catch(e) {}
       try { applyTabVisibility(); } catch(e) {}
       try { applyHomeCardGradients(); } catch(e) {}
+      if (!retryQueued) setSyncStatus('synced', 'Synced');
     }
     return;
   }
 
-  // Long absence — token is likely expired; do a full re-auth + data reload.
   if (!currentUser) return; // guest — nothing to restore
 
-  setSyncStatus('syncing', 'Reconnecting…');
+  // 4) Long absence: re-fetch personal data from the cloud
   try {
-    const refreshed = await tryRefreshToken();
-    if (!refreshed) {
-      // Token could not be refreshed — fall back to guest mode
-      setSyncStatus('error', 'Session expired');
-      logout();
-      return;
-    }
-
-    // Re-fetch personal state from the cloud
     const r = await sbFetch(`/rest/v1/dances?username=eq.${enc(currentUser)}&select=data,updated_at`);
-    if (r.ok && r.data && r.data.length > 0) {
-      state = r.data[0].data || {know:[], learn:[], nights:{}, djFreestyles:{}, favorites:[], favoriteFriends:[]};
+    if (!r.ok) throw new Error('personal data fetch failed');
+    if (r.data && r.data.length > 0) {
+      state = r.data[0].data || {know:[],learn:[],learning:[], nights:{}, djFreestyles:{}, favorites:[], favoriteFriends:[]};
       if (!state.djFreestyles)    state.djFreestyles = {};
+      if(!state.learning) state.learning=[];
       if (!state.favorites)       state.favorites = [];
       if (!state.danceLog)        state.danceLog = [];
       if (!state.favoriteFriends) state.favoriteFriends = [];
@@ -9492,15 +10443,12 @@ async function _onAppResume() {
       if (typeof state.venue==='undefined') state.venue = '';
       if (typeof state.venueConfigured==='undefined') state.venueConfigured = false;
     }
-
-    // Re-load submissions / mod list (small payloads, always refresh)
     try { await loadSubmissions(); } catch(e) {}
     try { await loadModList(); } catch(e) {}
 
-    // Re-render everything
     renderBank();
     renderList('know');
-    renderList('learn');
+    renderList('learn');renderList('learning');
     renderDJDropdown();
     renderPicks();
     renderCustomListPills();
@@ -9512,19 +10460,20 @@ async function _onAppResume() {
     }
     setSyncStatus('synced', 'Synced');
   } catch(e) {
-    console.warn('Resume re-auth error:', e);
-    setSyncStatus('error', 'Reconnect failed — try refreshing');
+    console.warn('Resume reload error:', e);
+    showConnPopup('server');
+    setSyncStatus('error', 'Not connected');
   }
 }
 
-// Refresh the Supabase token every 45 minutes while the app is open,
-// so a long session never expires silently.
+// Keep the login token fresh while the app is open (timers pause while the phone is locked,
+// so the resume handler above covers that case too).
 setInterval(async()=>{
   if(!currentUser) return;
-  await tryRefreshToken();
+  await ensureSession();
   _lastActiveAt = Date.now();
-  localStorage.setItem('ld_last_active', String(_lastActiveAt)); // reset the stale timer after a successful background refresh
-}, 45 * 60 * 1000);
+  localStorage.setItem('ld_last_active', String(_lastActiveAt));
+}, 10 * 60 * 1000);
 
 // ---- CHANGELOG ----
 let changelog = [];
@@ -9697,9 +10646,10 @@ async function renderAdminAnalytics() {
   const totalMods = modList.length;
 
   // Aggregate stats
-  let totalKnow = 0, totalLearn = 0, totalNights = 0;
+  let totalKnow = 0, totalLearn = 0, totalLearning = 0, totalNights = 0;
   const knowCounts = {}; // danceName -> count of users who know it
   const learnCounts = {}; // danceName -> count of users who want to learn it
+  const learningCounts = {}; // danceName -> count of users currently learning it
   const nightDateCounts = {}; // date -> count of users who logged that night
   const userRows = [];
 
@@ -9707,10 +10657,12 @@ async function renderAdminAnalytics() {
     const d = u.data || {};
     const know = d.know || [];
     const learn = d.learn || [];
+    const learning = d.learning || [];
     const nights = d.nights || {};
     const nightCount = Object.keys(nights).length;
     totalKnow += know.length;
     totalLearn += learn.length;
+    totalLearning += learning.length;
     totalNights += nightCount;
     know.forEach(dk => {
       const name = dk.name || dk;
@@ -9719,6 +10671,10 @@ async function renderAdminAnalytics() {
     learn.forEach(dl => {
       const name = dl.name || dl;
       learnCounts[name] = (learnCounts[name] || 0) + 1;
+    });
+    learning.forEach(dl => {
+      const name = dl.name || dl;
+      learningCounts[name] = (learningCounts[name] || 0) + 1;
     });
     Object.keys(nights).forEach(date => {
       nightDateCounts[date] = (nightDateCounts[date] || 0) + 1;
@@ -9735,6 +10691,12 @@ async function renderAdminAnalytics() {
       if (!t) return latest;
       return (!latest || t > latest) ? t : latest;
     }, null);
+    // Find the most recently added dance in learning list
+    const lastLearningAdded = learning.reduce((latest, dl) => {
+      const t = dl.added || null;
+      if (!t) return latest;
+      return (!latest || t > latest) ? t : latest;
+    }, null);
     // New user = joinedAt within last 3 days.
     // joinedAt is stamped permanently on a user's first ever save and never overwritten.
     const createdAt = d.joinedAt || null;
@@ -9743,16 +10705,19 @@ async function renderAdminAnalytics() {
       username: u.username,
       know: know.length,
       learn: learn.length,
+      learning: learning.length,
       nights: nightCount,
       lastActive: u.updated_at || null,
       lastKnowAdded: lastKnowAdded,
       lastLearnAdded: lastLearnAdded,
+      lastLearningAdded: lastLearningAdded,
       createdAt: createdAt,
       isNewUser: isNewUser,
       isMod: modList.includes(u.username),
       isAdmin: u.username === ADMIN_USER,
       rawKnow: know,
       rawLearn: learn,
+      rawLearning: learning,
       rawNights: nights,
       rawFavorites: d.favorites || [],
       rawDanceLog: d.danceLog || [],
@@ -9765,6 +10730,7 @@ async function renderAdminAnalytics() {
 
   const avgKnow = totalUsers ? (totalKnow / totalUsers).toFixed(1) : 0;
   const avgLearn = totalUsers ? (totalLearn / totalUsers).toFixed(1) : 0;
+  const avgLearning = totalUsers ? (totalLearning / totalUsers).toFixed(1) : 0;
   const newUserCount = userRows.filter(u => u.isNewUser).length;
 
   // ---- Overview stat cards ----
@@ -9774,6 +10740,7 @@ async function renderAdminAnalytics() {
     { label: 'New Users (3 days)', value: newUserCount, sub: 'joined recently', highlight: newUserCount > 0 },
     { label: 'Dances in Bank', value: bankSize, sub: 'total available' },
     { label: 'Avg Dances Known', value: avgKnow, sub: 'per user' },
+    { label: 'Avg Learning', value: avgLearning, sub: 'per user' },
     { label: 'Avg Want to Learn', value: avgLearn, sub: 'per user' },
     { label: 'Total Nights Logged', value: totalNights, sub: 'across all users' },
     { label: 'Unique Nights', value: Object.keys(nightDateCounts).length, sub: 'distinct dates' },
@@ -9809,7 +10776,8 @@ async function renderAdminAnalytics() {
         ${u.isMod && !u.isAdmin ? '<span class="mod-badge">Mod</span>' : ''}
         <span style="display:flex;gap:4px;flex-shrink:0;">
           <span style="font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--green-bg);border:0.5px solid var(--green-border);color:var(--green-text)">${u.know} know</span>
-          <span style="font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--purple-bg);border:0.5px solid var(--purple-border);color:var(--purple-text)">${u.learn} learning</span>
+          <span style="font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--purple-bg);border:0.5px solid var(--purple-border);color:var(--purple-text)">${u.learning} learning</span>
+          <span style="font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--blue-bg);border:0.5px solid var(--blue-border);color:var(--blue-text)">${u.learn} want to learn</span>
           <span style="font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;background:var(--bg2);border:0.5px solid var(--b3);color:var(--t2)">${u.nights} nights</span>
         </span>
         <span style="font-size:11px;color:var(--t3);flex-shrink:0">${u.lastActive ? formatDate(u.lastActive.slice(0,10)) : '—'}</span>
@@ -9833,7 +10801,11 @@ async function renderAdminAnalytics() {
               <div style="font-size:12px;color:var(--t1);font-weight:500;">${u.lastKnowAdded ? fmtDt(u.lastKnowAdded) : '—'}</div>
             </div>
             <div style="padding:8px 12px;border-radius:var(--radius-md);background:var(--purple-bg);border:0.5px solid var(--purple-border);">
-              <div style="font-size:10px;font-weight:600;color:var(--purple-text);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Last Added to Learn</div>
+              <div style="font-size:10px;font-weight:600;color:var(--purple-text);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Last Added to Learning</div>
+              <div style="font-size:12px;color:var(--t1);font-weight:500;">${u.lastLearningAdded ? fmtDt(u.lastLearningAdded) : '—'}</div>
+            </div>
+            <div style="padding:8px 12px;border-radius:var(--radius-md);background:var(--purple-bg);border:0.5px solid var(--purple-border);">
+              <div style="font-size:10px;font-weight:600;color:var(--purple-text);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Last Added to Want to Learn</div>
               <div style="font-size:12px;color:var(--t1);font-weight:500;">${u.lastLearnAdded ? fmtDt(u.lastLearnAdded) : '—'}</div>
             </div>
             <div style="padding:8px 12px;border-radius:var(--radius-md);background:var(--bg);border:0.5px solid var(--b3);">
@@ -9857,6 +10829,17 @@ async function renderAdminAnalytics() {
             const addedStr = dk.added ? fmtDt(dk.added) : null;
             return `<div style="display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:6px;background:var(--bg);border:0.5px solid var(--green-border);margin-bottom:4px;">
               ${isFav ? '<span style="font-size:13px;flex-shrink:0;">⭐</span>' : ''}
+              <span style="flex:1;font-size:13px;font-weight:500;color:var(--t1);">${esc(name)}</span>
+              ${addedStr ? `<span style="font-size:11px;color:var(--t3);flex-shrink:0;">${addedStr}</span>` : ''}
+            </div>`;
+          }).join('') : '<div style="font-size:12px;color:var(--t3);padding:6px 0;">No dances yet.</div>';
+
+          // ---- Learning ----
+          const learningSorted = u.rawLearning.slice().sort((a,b) => (a.name||a).localeCompare(b.name||b));
+          const learningHtml = learningSorted.length ? learningSorted.map(dl => {
+            const name = dl.name || dl;
+            const addedStr = dl.added ? fmtDt(dl.added) : null;
+            return `<div style="display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:6px;background:var(--bg);border:0.5px solid var(--purple-border);margin-bottom:4px;">
               <span style="flex:1;font-size:13px;font-weight:500;color:var(--t1);">${esc(name)}</span>
               ${addedStr ? `<span style="font-size:11px;color:var(--t3);flex-shrink:0;">${addedStr}</span>` : ''}
             </div>`;
@@ -9912,6 +10895,7 @@ async function renderAdminAnalytics() {
 
           return activityHtml
             + section('Dances I Know (' + knowSorted.length + ')', 'var(--green-text)', 'var(--green-bg)', 'var(--green-border)', knowHtml)
+            + section('Learning (' + learningSorted.length + ')', 'var(--purple-text)', 'var(--purple-bg)', 'var(--purple-border)', learningHtml)
             + section('Want to Learn (' + learnSorted.length + ')', 'var(--purple-text)', 'var(--purple-bg)', 'var(--purple-border)', learnHtml)
             + section('Nights Attended (' + nightDates.length + ')', 'var(--pink-text)', 'var(--pink-bg)', 'var(--pink-border)', nightsHtml);
         })()}
@@ -9932,6 +10916,22 @@ async function renderAdminAnalytics() {
         <div style="height:100%;width:${pct}%;background:var(--green-dark);border-radius:20px;"></div>
       </div>
       <span style="font-size:12px;color:var(--t2);flex-shrink:0;min-width:70px;text-align:right">${count} / ${totalUsers} users</span>
+    </div>`;
+  }).join('') : '<div class="empty">No data yet.</div>';
+
+  // ---- Top dances currently being learned ----
+  const topLearning = Object.entries(learningCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const topLearningEl = document.getElementById('aa-top-learning');
+  topLearningEl.innerHTML = topLearning.length ? topLearning.map(([name, count], i) => {
+    const pct = totalUsers ? Math.round((count / totalUsers) * 100) : 0;
+    return `
+    <div style="display:flex;align-items:center;gap:12px;padding:8px 14px;border:0.5px solid var(--purple-border);border-radius:var(--radius-md);background:var(--purple-bg);margin-bottom:6px;">
+      <span style="font-size:16px;font-weight:700;color:var(--purple-text);font-family:'Playfair Display',serif;min-width:24px">${i + 1}</span>
+      <span style="flex:1;font-size:13px;font-weight:500;color:var(--t1)">${esc(name)}</span>
+      <div style="width:100px;background:var(--bg3);border-radius:20px;height:6px;flex-shrink:0;">
+        <div style="height:100%;width:${pct}%;background:var(--purple-border);border-radius:20px;"></div>
+      </div>
+      <span style="font-size:12px;color:var(--purple-text);flex-shrink:0;min-width:70px;text-align:right">${count} user${count !== 1 ? 's' : ''}</span>
     </div>`;
   }).join('') : '<div class="empty">No data yet.</div>';
 
