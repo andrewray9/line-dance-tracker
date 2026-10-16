@@ -2064,6 +2064,16 @@
       <button id="set-bg-swatch" onclick="openBgPicker()" aria-label="Choose background" style="width:40px;height:34px;border-radius:8px;border:1.5px solid var(--b2);cursor:pointer;padding:0;flex-shrink:0;background:var(--bg3);"></button>
       <button class="btn sm" onclick="resetBgColor()">Default</button>
     </div>
+    <div class="set-row">
+      <div class="set-row-text">
+        <div class="set-title">Text Color</div>
+      </div>
+      <div style="display:flex;gap:4px;flex-shrink:0;">
+        <button class="btn sm" id="set-text-auto" onclick="setTextMode('')">Auto</button>
+        <button class="btn sm" id="set-text-light" onclick="setTextMode('light')">Light</button>
+        <button class="btn sm" id="set-text-dark" onclick="setTextMode('dark')">Dark</button>
+      </div>
+    </div>
     <div class="set-section">Dancing</div>
     <div class="set-row">
       <div class="set-row-text">
@@ -4126,8 +4136,11 @@ function renderBank(){
         bankEntry.tags!=null?`<span class="bank-detail-stat"><strong>${bankEntry.tags}</strong> tags</span>`:'',
       ].filter(Boolean).join(''):'';
       // Remove button + promote button
-      const removeBtn=`<button class="btn sm danger" onclick="removeFromList('${bankView}','${esc(d.name)}')">&#10005; Remove</button>`;
-      const promoteBtn=bankView==='know'?'':`<button class="btn sm success" onclick="addFromBank('know','${esc(d.name)}')">&#43; I Know It</button>`+(bankView==='learn'?`<button class="btn sm purple" onclick="addFromBank('learning','${esc(d.name)}')">&#43; Learning</button>`:'');
+      // Use the dance's id (not its name) in inline handlers: names containing an
+      // apostrophe (e.g. "Boot Scootin' Boogie") break the onclick JS string and
+      // make the buttons silently do nothing.
+      const removeBtn=`<button class="btn sm danger" onclick="removeDance('${bankView}','${d.id}')">&#10005; Remove</button>`;
+      const promoteBtn=bankView==='know'?'':`<button class="btn sm success" onclick="moveToKnow('${d.id}')">&#43; I Know It</button>`+(bankView==='learn'?`<button class="btn sm purple" onclick="moveToLearning('${d.id}')">&#43; Learning</button>`:'');
       const favBtn=bankView==='know'?`<button class="fav-btn ${isFav(d.id)?'active':''}" onclick="event.stopPropagation();toggleFav('${d.id}')" title="${isFav(d.id)?'Unfavorite':'Favorite'}" style="margin-right:2px;"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg></button>`:'';
       const hasBody=demoBtn||tutBtn||spotifyBtn||statPills||removeBtn;
       const itemId='bview-'+d.id;
@@ -9942,13 +9955,14 @@ function getHomeLayout(){
     order:hasPersonal?l.order:(def?def.order:[]),
     hidden:hasPersonal?((l&&Array.isArray(l.hidden))?l.hidden:[]):(def&&Array.isArray(def.hidden)?def.hidden:((l&&Array.isArray(l.hidden))?l.hidden:[])),
     colors:(l&&l.colors&&typeof l.colors==='object')?l.colors:{},
-    bgColor:(l&&isValidBg(l.bgColor))?l.bgColor:''
+    bgColor:(l&&isValidBg(l.bgColor))?l.bgColor:'',
+    textMode:(l&&(l.textMode==='light'||l.textMode==='dark'))?l.textMode:''
   };
 }
 function isValidBg(v){
   return typeof v==='string'&&(/^#[0-9a-fA-F]{6}$/.test(v)||/^(linear|radial)-gradient\([#0-9a-zA-Z%,.\s-]+\)$/.test(v));
 }
-function applyBgColor(c){
+function applyBgColor(c,textMode){
   const v=isValidBg(c)?c:'';
   let bl=document.getElementById('bg-layer');
   if(!bl){bl=document.createElement('div');bl.id='bg-layer';document.body.insertBefore(bl,document.body.firstChild);}
@@ -9959,7 +9973,11 @@ function applyBgColor(c){
   document.body.style.background='';
   document.querySelectorAll('meta[name="theme-color"]').forEach(m=>{if(!m.dataset.orig)m.dataset.orig=m.content;m.content=firstCol||m.dataset.orig;});
   const r=document.documentElement.style;
-  if(v){
+  if(textMode==='dark'){
+    r.setProperty('--page-t1','#1a1a18');r.setProperty('--page-t2','#45443f');r.setProperty('--page-t3','#6b6a66');
+  } else if(textMode==='light'){
+    r.setProperty('--page-t1','#f5f4ef');r.setProperty('--page-t2','#d4d2ca');r.setProperty('--page-t3','#a8a7a3');
+  } else if(v){
     const lin=x=>{x/=255;return x<=0.03928?x/12.92:Math.pow((x+0.055)/1.055,2.4);};
     const cols=v.match(/#[0-9a-fA-F]{6}/g)||[];
     let L=0;
@@ -9970,12 +9988,27 @@ function applyBgColor(c){
   } else {['--page-t1','--page-t2','--page-t3'].forEach(k=>r.removeProperty(k));}
   const sw=document.getElementById('set-bg-swatch');
   if(sw) sw.style.background=v||'var(--bg3)';
+  updateTextModeButtons(textMode||'');
+}
+function updateTextModeButtons(mode){
+  ['auto','light','dark'].forEach(m=>{
+    const b=document.getElementById('set-text-'+m);
+    if(b) b.classList.toggle('primary',(m==='auto'?'':m)===mode);
+  });
+}
+function setTextMode(mode){
+  const layout=getHomeLayout();
+  layout.textMode=(mode==='light'||mode==='dark')?mode:'';
+  const empty=!layout.order.length&&!layout.hidden.length&&!Object.keys(layout.colors).length&&!layout.bgColor&&!layout.textMode;
+  persistHomeLayout(empty?null:layout);
+  applyBgColor(layout.bgColor,layout.textMode);
+  homeToast(layout.textMode?('Text set to '+layout.textMode):'Text color set to auto');
 }
 function applyHomeLayout(){
   const grid=document.querySelector('.home-grid');
   if(!grid) return;
   const layout=getHomeLayout();
-  applyBgColor(layout.bgColor);
+  applyBgColor(layout.bgColor,layout.textMode);
   // Reset things the role-visibility logic doesn't manage
   HOME_PLAIN_TABS.forEach(k=>{
     document.querySelectorAll('.tab[data-tab="'+k+'"], .mobile-tab[data-tab="'+k+'"]').forEach(t=>{t.style.display='';});
@@ -10038,9 +10071,9 @@ function homeToast(msg){
 function setBgColor(hex){
   const layout=getHomeLayout();
   layout.bgColor=hex||'';
-  const empty=!layout.order.length&&!layout.hidden.length&&!Object.keys(layout.colors).length&&!layout.bgColor;
+  const empty=!layout.order.length&&!layout.hidden.length&&!Object.keys(layout.colors).length&&!layout.bgColor&&!layout.textMode;
   persistHomeLayout(empty?null:layout);
-  applyBgColor(layout.bgColor);
+  applyBgColor(layout.bgColor,layout.textMode);
 }
 function resetBgColor(){
   setBgColor('');
@@ -10114,7 +10147,7 @@ function resetHomeLayout(){
   homeToast('Home layout reset');
 }
 
-(function(){try{const c=JSON.parse(localStorage.getItem('ld_home_layout')||'null');if(c&&isValidBg(c.bgColor)) applyBgColor(c.bgColor);}catch(e){}})();
+(function(){try{const c=JSON.parse(localStorage.getItem('ld_home_layout')||'null');if(c&&(isValidBg(c.bgColor)||c.textMode)) applyBgColor(isValidBg(c.bgColor)?c.bgColor:'',c.textMode);}catch(e){}})();
 // ---- Home editor ----
 let heDraft={order:[],hidden:new Set(),colors:{}};
 let heMode='user';
@@ -10189,7 +10222,7 @@ async function saveHomeEditor(){
   const rest=HOME_DEFAULT_ORDER.filter(id=>!heDraft.order.includes(id));
   const colors={};
   Object.keys(heDraft.colors).forEach(k=>{if(heDraft.colors[k]) colors[k]=heDraft.colors[k];});
-  const layout={order:[...heDraft.order,...rest],hidden:[...heDraft.hidden],colors,bgColor:getHomeLayout().bgColor};
+  const layout={order:[...heDraft.order,...rest],hidden:[...heDraft.hidden],colors,bgColor:getHomeLayout().bgColor,textMode:getHomeLayout().textMode};
   persistHomeLayout(layout);
   applyTabVisibility();
   closeHomeEditor();
