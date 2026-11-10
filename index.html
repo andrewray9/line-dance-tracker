@@ -842,7 +842,18 @@
     .cp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:8px;max-height:42vh;overflow-y:auto;}
     .cp-cell{height:44px;border-radius:10px;border:2px solid transparent;cursor:pointer;padding:0;}
     .cp-cell.active{border-color:var(--t1);}
-  </style>
+  
+.ep-sec{background:#fff;color:#1a1a1a;border:0.5px solid var(--b3);border-radius:var(--radius-md);padding:6px 10px;margin-bottom:6px;}
+.ep-sec>summary{cursor:pointer;font-size:13px;font-weight:600;padding:3px 0;list-style:none;display:flex;align-items:center;gap:6px;}
+.ep-sec>summary::-webkit-details-marker{display:none;}
+.ep-sec>summary::before{content:'\25B8';font-size:11px;color:var(--t3);}
+.ep-sec[open]>summary::before{content:'\25BE';}
+.ep-count{font-weight:400;font-size:11px;color:#666;}
+.ep-sec>summary::before{color:#666;}
+#tab-editpeople .section-note{margin-bottom:.6rem;}
+#tab-editpeople .dance-item{padding:4px 8px;font-size:13px;}
+#tab-editpeople .ep-compact-list{max-height:260px;overflow-y:auto;margin-bottom:4px;}
+</style>
 </head>
 <body>
 <div id="swipe-toast"></div>
@@ -1702,33 +1713,39 @@
       <button class="btn amber" onclick="epRefreshUsers()">Refresh Users</button>
     </div>
     <div id="ep-content" style="display:none;">
-      <!-- Dances I Know -->
-      <div class="section-title" style="margin-top:0">Dances I Know</div>
-      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-        <input type="text" id="ep-know-input" placeholder="Add dance to know list..." style="flex:1;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;">
-        <button class="btn success" onclick="epAddDance('know')">Add</button>
-      </div>
-      <div id="ep-know-list" class="dance-list" style="margin-bottom:1.5rem;"></div>
-      <!-- Learning -->
-      <div class="section-title">Learning</div>
-      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-        <input type="text" id="ep-learning-input" placeholder="Add dance to learning list..." style="flex:1;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;">
-        <button class="btn purple" onclick="epAddDance('learning')">Add</button>
-      </div>
-      <div id="ep-learning-list" class="dance-list" style="margin-bottom:1.5rem;"></div>
-      <!-- Want to Learn -->
-      <div class="section-title">Want to Learn</div>
-      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-        <input type="text" id="ep-learn-input" placeholder="Add dance to learn list..." style="flex:1;padding:9px 13px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;">
-        <button class="btn info" onclick="epAddDance('learn')">Add</button>
-      </div>
-      <div id="ep-learn-list" class="dance-list" style="margin-bottom:1.5rem;"></div>
-      <!-- Nights -->
-      <div class="section-title">Nights</div>
-      <div id="ep-nights-list" style="margin-bottom:1.5rem;"></div>
-      <!-- Friend Card -->
-      <div class="section-title">Friend Card</div>
-      <div id="ep-card-section" style="margin-bottom:1.5rem;"></div>
+      <details class="ep-sec">
+        <summary>Dances I Know <span class="ep-count" id="ep-count-know"></span></summary>
+        <div style="display:flex;gap:6px;margin:6px 0;flex-wrap:wrap;">
+          <input type="text" id="ep-know-input" placeholder="Add dance to know list..." style="flex:1;min-width:140px;padding:7px 11px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;">
+          <button class="btn sm success" onclick="epAddDance('know')">Add</button>
+        </div>
+        <div id="ep-know-list" class="dance-list ep-compact-list"></div>
+      </details>
+      <details class="ep-sec">
+        <summary>Learning <span class="ep-count" id="ep-count-learning"></span></summary>
+        <div style="display:flex;gap:6px;margin:6px 0;flex-wrap:wrap;">
+          <input type="text" id="ep-learning-input" placeholder="Add dance to learning list..." style="flex:1;min-width:140px;padding:7px 11px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;">
+          <button class="btn sm purple" onclick="epAddDance('learning')">Add</button>
+        </div>
+        <div id="ep-learning-list" class="dance-list ep-compact-list"></div>
+      </details>
+      <details class="ep-sec">
+        <summary>Want to Learn <span class="ep-count" id="ep-count-learn"></span></summary>
+        <div style="display:flex;gap:6px;margin:6px 0;flex-wrap:wrap;">
+          <input type="text" id="ep-learn-input" placeholder="Add dance to learn list..." style="flex:1;min-width:140px;padding:7px 11px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;">
+          <button class="btn sm info" onclick="epAddDance('learn')">Add</button>
+        </div>
+        <div id="ep-learn-list" class="dance-list ep-compact-list"></div>
+      </details>
+      <details class="ep-sec">
+        <summary>Nights <span class="ep-count" id="ep-count-nights"></span></summary>
+        <div id="ep-night-editor" style="margin-top:6px;"></div>
+        <div id="ep-nights-list" style="margin-top:6px;"></div>
+      </details>
+      <details class="ep-sec">
+        <summary>Friend Card</summary>
+        <div id="ep-card-section" style="margin-top:6px;"></div>
+      </details>
     </div>
   </div>
 
@@ -1910,10 +1927,10 @@
       <button class="btn sm" onclick="debugLoadUsers()">&#8635; Load Users</button>
     </div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;flex-wrap:wrap;" id="debug-night-row" style="display:none">
-      <select id="debug-date-select" style="padding:8px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;min-width:180px;" onchange="renderDebugNight()">
+      <select id="debug-date-select" style="padding:8px 12px;border:0.5px solid var(--b2);border-radius:var(--radius-md);background:var(--bg);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;min-width:180px;" onchange="debugRefresh()">
         <option value="">— Select a night —</option>
       </select>
-      <button class="btn sm" onclick="renderDebugNight()">&#8635; Refresh</button>
+      <button class="btn sm" onclick="debugRefresh()">&#8635; Refresh</button>
     </div>
     <div id="debug-status" style="font-size:13px;color:var(--t2);margin-bottom:1rem;"></div>
     <div id="debug-night-output"></div>
@@ -4425,6 +4442,7 @@ function renderNightSettingsDJs(){
         <div style="width:22px;height:22px;border-radius:5px;flex-shrink:0;background:${color};border:0.5px solid var(--b3);" id="ns-dj-color-preview-${cssId(dj)}"></div>
         <span style="flex:1;font-size:13px;font-weight:500;">${esc(dj)}</span>
         <button class="btn xs" style="font-size:11px;padding:3px 8px;" onclick="toggleNightSettingsDJColorPicker('${escA(dj)}')">Edit</button>
+        <button class="btn xs" style="font-size:11px;padding:3px 8px;" onclick="nightSettingsRenameDJ('${escA(dj)}')">Rename</button>
         <button class="btn xs danger" onclick="nightSettingsRemoveDJ('${escA(dj)}')">Remove</button>
       </div>
       <div id="ns-dj-color-picker-${cssId(dj)}" style="display:none;flex-wrap:wrap;gap:5px;margin-top:8px;">${swatches}</div>
@@ -4446,6 +4464,34 @@ function nightSettingsAddDJ(){
   state.customDJs.push(name);
   inp.value='';
   renderNightSettingsDJs();
+}
+function nightSettingsRenameDJ(oldName){
+  const input=prompt('Rename DJ:',oldName);
+  if(input===null) return;
+  const name=input.trim();
+  if(!name||name===oldName) return;
+  if(djList.some(d=>d.toLowerCase()===name.toLowerCase())){alert('That DJ is already on the main list.');return;}
+  if((state.customDJs||[]).some(d=>d!==oldName&&d.toLowerCase()===name.toLowerCase())){alert('That DJ is already in your list.');return;}
+  state.customDJs=(state.customDJs||[]).map(d=>d===oldName?name:d);
+  if(state.customDjColors&&state.customDjColors[oldName]!==undefined){
+    state.customDjColors[name]=state.customDjColors[oldName];
+    delete state.customDjColors[oldName];
+  }
+  if(state.djFreestyles&&state.djFreestyles[oldName]){
+    state.djFreestyles[name]=(state.djFreestyles[name]||[]).concat(state.djFreestyles[oldName]);
+    delete state.djFreestyles[oldName];
+  }
+  if(state.nights){
+    Object.keys(state.nights).forEach(k=>{
+      const nd=state.nights[k];
+      if(nd&&!Array.isArray(nd)&&nd.dj===oldName) nd.dj=name;
+    });
+  }
+  renderNightSettingsDJs();
+  try{renderDJDropdown();}catch(e){}
+  try{renderNight();}catch(e){}
+  scheduleSave();
+  if(currentUser) syncMyCard();
 }
 function nightSettingsRemoveDJ(name){
   state.customDJs=(state.customDJs||[]).filter(d=>d!==name);
@@ -4518,7 +4564,8 @@ function renderDJDropdown(){
       var nd=state.nights&&state.nights[drewsSelectedDate];
       if(!nd) return '';
       return Array.isArray(nd)?'':(nd.dj||'');
-    }
+    },
+    mySorted
   );
 
   _populate(document.getElementById('dj-entry-name'), '— Select DJ —');
@@ -5329,7 +5376,7 @@ function loadDrewsNightDJ(){
   const arrEl=document.getElementById('drewsnight-arrive');
   const lvEl=document.getElementById('drewsnight-leave');
   // If dropdown has no DJ options yet (race on first load), populate it now
-  if(djEl && djEl.options.length<=1 && djList.length>0) renderDJDropdown();
+  if(djEl && djEl.options.length<=1 && getMyDJList().length>0) renderDJDropdown();
   if(djEl) djEl.value=nd.dj||'';
   if(arrEl) arrEl.value=nd.arriveTime||'';
   if(lvEl) lvEl.value=nd.leaveTime||'';
@@ -7099,11 +7146,12 @@ async function epLoadUser(){
   if(!epTargetState.nights) epTargetState.nights={};
   if(!epTargetState.favorites) epTargetState.favorites=[];
   document.getElementById('ep-content').style.display='block';
-  epRenderKnow();epRenderLearning();epRenderLearn();epRenderNights();epRenderCard();
+  epRenderKnow();epRenderLearning();epRenderLearn();epRenderNights();(function(){const ed=document.getElementById('ep-night-editor');if(ed)ed.innerHTML='';})();epRenderCard();epUpdateCounts();
 }
 
 async function epSaveUserState(){
   if(!epTargetUsername||!epTargetState)return;
+  epUpdateCounts();
   await sbFetch(`/rest/v1/dances?username=eq.${enc(epTargetUsername)}`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({data:epTargetState,updated_at:new Date().toISOString()})});
   // Update friend card for this user
   const idx=friendCards.findIndex(c=>c.username===epTargetUsername);
@@ -7120,6 +7168,14 @@ async function epSaveUserState(){
   }
 }
 
+function epUpdateCounts(){
+  if(!epTargetState)return;
+  const set=(k,n)=>{const e=document.getElementById('ep-count-'+k);if(e)e.textContent='('+n+')';};
+  set('know',(epTargetState.know||[]).length);
+  set('learning',(epTargetState.learning||[]).length);
+  set('learn',(epTargetState.learn||[]).length);
+  set('nights',Object.keys(epTargetState.nights||{}).length);
+}
 function epRenderKnow(){
   const el=document.getElementById('ep-know-list');
   if(!el)return;
@@ -7208,12 +7264,26 @@ function epRenderNights(){
         <span class="date">${formatDate(date)}</span>
         ${nd.dj?`<span class="dj-name">DJ: ${esc(nd.dj)}</span>`:''}
         <span class="count">${dances.length} dance${dances.length!==1?'s':''}</span>
+        <button class="btn xs amber" onclick="epEditNight('${date}',event)">Edit</button>
         <button class="btn xs danger" onclick="epDeleteNight('${date}',event)">Delete</button>
         <span class="caret">&#9660;</span>
       </div>
       <div class="day-log-body">${pills||'<span style="font-size:13px;color:var(--t3)">No dances recorded</span>'}</div>
     </div>`;
   }).join('');
+}
+
+function epEditNight(date,e){
+  if(e) e.stopPropagation();
+  if(!epTargetState||!epTargetState.nights[date]) return;
+  const dbgOut=document.getElementById('debug-night-output');
+  if(dbgOut) dbgOut.innerHTML='';
+  debugCtx={outId:'ep-night-editor',ep:true,date:date,onChange:function(){epRenderNights();epUpdateCounts();}};
+  debugUserState=epTargetState;
+  debugUsername=epTargetUsername;
+  renderDebugNight();
+  const ed=document.getElementById('ep-night-editor');
+  if(ed) ed.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function epDeleteNight(date,e){
   e.stopPropagation();
@@ -9121,6 +9191,17 @@ window.addEventListener('load',()=>{
 // ---- Debug Tab ----
 let debugUserState = null; // state of the currently-inspected user
 let debugUsername = '';    // username of the currently-inspected user
+let debugCtx = {outId:'debug-night-output',ep:false,date:null,onChange:null};
+function debugResetCtx(){
+  if(debugCtx.ep){
+    const ed=document.getElementById('ep-night-editor'); if(ed) ed.innerHTML='';
+  }
+  debugCtx={outId:'debug-night-output',ep:false,date:null,onChange:null};
+}
+async function debugRefresh(){
+  if(debugCtx.ep){ await debugLoadUser(); }
+  renderDebugNight();
+}
 
 async function renderDebugTab(){
   if(!isAdmin) return;
@@ -9143,12 +9224,13 @@ async function debugLoadUsers(){
 }
 
 async function debugLoadUser(){
-  if(!isAdmin) return;
+  if(!isAdmin&&!debugCtx.ep) return;
+  debugResetCtx();
   const sel=document.getElementById('debug-user-select');
   const username=sel?.value;
   const status=document.getElementById('debug-status');
   const nightRow=document.getElementById('debug-night-row');
-  const out=document.getElementById('debug-night-output');
+  const out=document.getElementById(debugCtx.outId);
   const dateSel=document.getElementById('debug-date-select');
   if(!username){
     if(nightRow) nightRow.style.display='none';
@@ -9175,9 +9257,9 @@ async function debugLoadUser(){
 }
 
 function renderDebugNight(){
-  if(!isAdmin) return;
-  const date=document.getElementById('debug-date-select')?.value;
-  const out=document.getElementById('debug-night-output');
+  if(!isAdmin&&!debugCtx.ep) return;
+  const date=debugCtx.date||document.getElementById('debug-date-select')?.value;
+  const out=document.getElementById(debugCtx.outId);
   if(!out) return;
   if(!date||!debugUserState){out.innerHTML='<div class="empty">Select a user and night above to inspect data.</div>';return;}
 
@@ -9211,7 +9293,7 @@ function renderDebugNight(){
     return e.localTime||'—';
   }
 
-  const djOpts='<option value=""></option>'+djList.slice().sort((a,b)=>a.localeCompare(b)).map(dj=>'<option value="'+escA(dj)+'">'+esc(dj)+'</option>').join('');
+  const djOpts='<option value=""></option>'+[...new Set([...djList,...(debugUserState.customDJs||[]),...(nightObj.dj?[nightObj.dj]:[])])].sort((a,b)=>a.localeCompare(b)).map(dj=>'<option value="'+escA(dj)+'">'+esc(dj)+'</option>').join('');
 
   function editableLogTable(entries,tableId,emptyMsg){
     if(!entries.length) return'<div style="font-size:13px;color:var(--t3);padding:6px 0;">'+emptyMsg+'</div>';
@@ -9322,7 +9404,7 @@ function debugApplyDJToAll(tableId){
   const selEl=document.getElementById('debug-apply-dj-sel-'+tableId);
   if(!selEl) return;
   const dj=selEl.value;
-  const out=document.getElementById('debug-night-output');
+  const out=document.getElementById(debugCtx.outId);
   if(!out) return;
   out.querySelectorAll('#'+tableId+' .debug-edit-select[data-field="dj"]').forEach(sel=>{
     sel.value=dj;
@@ -9330,7 +9412,7 @@ function debugApplyDJToAll(tableId){
 }
 
 async function debugSaveNight(date){
-  if(!isAdmin||!debugUserState||!debugUsername) return;
+  if((!isAdmin&&!debugCtx.ep)||!debugUserState||!debugUsername) return;
   const statusEl=document.getElementById('debug-save-status');
   const btn=document.getElementById('debug-save-btn');
 
@@ -9362,7 +9444,7 @@ async function debugSaveNight(date){
 
   // Read editable log rows by _eid (stable key, never shifts on delete/filter)
   const fullLog=debugUserState.danceLog||[];
-  const out=document.getElementById('debug-night-output');
+  const out=document.getElementById(debugCtx.outId);
   if(out){
     out.querySelectorAll('.debug-edit-input').forEach(inp=>{
       const eid=inp.dataset.eid;
@@ -9415,6 +9497,7 @@ async function debugSaveNight(date){
     // Re-stamp eids on cleanLog entries so subsequent saves still work
     debugUserState.danceLog.forEach((e,i)=>{e._eid='eid_'+i+'_'+(e.timestamp||Date.now()+'_'+i);});
     setTimeout(()=>{if(statusEl&&statusEl.textContent.startsWith('✓'))statusEl.style.display='none';},3000);
+    if(debugCtx.onChange) debugCtx.onChange();
   }catch(err){
     setStatus('⚠ '+err.message,'var(--red-text)','var(--red-bg)');
   }
@@ -9422,14 +9505,14 @@ async function debugSaveNight(date){
 }
 
 function debugDeleteLogEntry(date,eid){
-  if(!isAdmin||!debugUserState) return;
+  if((!isAdmin&&!debugCtx.ep)||!debugUserState) return;
   if(!confirm('Delete this log entry?')) return;
   debugUserState.danceLog=(debugUserState.danceLog||[]).filter(e=>e._eid!==eid);
   renderDebugNight();
 }
 
 async function debugDeleteNight(date){
-  if(!isAdmin||!debugUserState||!debugUsername) return;
+  if((!isAdmin&&!debugCtx.ep)||!debugUserState||!debugUsername) return;
   if(!confirm(`Delete the night of ${formatDate(date)} for user "${debugUsername}"?\n\nThis will remove the night entry and all its dance log entries. This cannot be undone.`)) return;
 
   // Remove from the fetched user state
@@ -9455,13 +9538,14 @@ async function debugDeleteNight(date){
   // Update the night dropdown and clear output
   const dateSel=document.getElementById('debug-date-select');
   const status=document.getElementById('debug-status');
-  const out=document.getElementById('debug-night-output');
+  const out=document.getElementById(debugCtx.outId);
   if(dateSel){
     const nights=Object.keys(debugUserState.nights||{}).sort((a,b)=>b.localeCompare(a));
     dateSel.innerHTML='<option value="">— Select a night —</option>'+nights.map(d=>`<option value="${d}">${formatDate(d)} (${d})</option>`).join('');
   }
   if(out) out.innerHTML=`<div class="empty">Night of ${formatDate(date)} deleted successfully.</div>`;
   if(status) status.textContent=`Viewing: ${esc(debugUsername)} · ${Object.keys(debugUserState.nights||{}).length} night(s) remaining.`;
+  if(debugCtx.onChange) debugCtx.onChange();
 }
 
 // ── Swipe-to-navigate ───────────────────────────────────────
